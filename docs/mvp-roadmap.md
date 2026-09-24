@@ -48,7 +48,7 @@ MVP سه مسیر دارد: **شخص ثالث خودرو، بدنهٔ خودرو
 
 ### جهت بصری منتخب برای طراحی
 
-پیشنهاد کاربر: **«Design a visual storytelling, friendly fintech onboarding experience for Torob Bimeh with image-based insurance selection (maybe using animation too) and a simple conversational flow instead of a traditional form.»** این مسیر جست‌وجومحورِ ترب را با روایت تصویری ترکیب می‌کند؛ UI نهایی هنوز بر اساس مشورت دربارهٔ چیدمان دقیق صفحهٔ آغاز ساخته خواهد شد. گزینه‌های چیدمان در [ui-concepts.md](ui-concepts.md) آمده‌اند.
+پیشنهاد کاربر: **«Design a visual storytelling, friendly fintech onboarding experience for Torob Bimeh with image-based insurance selection (maybe using animation too) and a simple conversational flow instead of a traditional form.»** این مسیر جست‌وجومحورِ ترب را با روایت تصویری ترکیب می‌کند. چیدمان اولیه با مشورت کاربر مشخص شد: **سه کارت تصویری، سپس پرسش‌های گفت‌وگویی در همان صفحه**. گزینه‌ها و جزئیات قابل بازبینی در [ui-concepts.md](ui-concepts.md) آمده‌اند.
 
 ## دو نقش AI
 
