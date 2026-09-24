@@ -5,7 +5,7 @@ from typing import Any, Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, ConfigDict
 
-from ..adapters.bimeh.client import BimehUpstreamError, get_prices
+from ..adapters.bimeh.client import BimehConfigurationError, BimehUpstreamError, get_prices
 from ..adapters.bimeh.contract import InvalidBimehRequest, validate_inquiry
 
 router = APIRouter(prefix="/api/bimeh", tags=["bimeh"])
@@ -24,5 +24,7 @@ async def prices(request: InquiryRequest):
         return await get_prices(request.product, body)
     except InvalidBimehRequest as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except BimehConfigurationError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except BimehUpstreamError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc

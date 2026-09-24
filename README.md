@@ -25,7 +25,7 @@ cp .env.example .env
 uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-در Windows PowerShell به‌جای `cp` می‌توان `Copy-Item .env.example .env` را اجرا کرد. اگر درخواست بدون احراز هویت جواب نداد، **مقدار کامل هدر `Authorization`** را در `backend/.env` زیر `AZKI_AUTHORIZATION` قرار دهید. این فایل در `.gitignore` است و به مرورگر فرستاده نمی‌شود. `Deviceid` با `AZKI_DEVICE_ID` قابل تغییر است. مقدار `Baggage` فقط در صورت نیاز با `AZKI_BAGGAGE` تنظیم می‌شود. توکن و Cookie نمونه داخل مخزن نیست. بیمه‌دات‌کام در HAR هدر `token` با مقدار UUID v4 داشته است؛ بک‌اند برای هر بار اجرا شناسه‌ای تازه می‌سازد و می‌توان آن را با `BIMEH_TOKEN` در `.env` جایگزین کرد.
+در Windows PowerShell به‌جای `cp` می‌توان `Copy-Item .env.example .env` را اجرا کرد. اگر درخواست بدون احراز هویت جواب نداد، **مقدار کامل هدر `Authorization`** را در `backend/.env` زیر `AZKI_AUTHORIZATION` قرار دهید. این فایل در `.gitignore` است و به مرورگر فرستاده نمی‌شود. `Deviceid` با `AZKI_DEVICE_ID` قابل تغییر است. مقدار `Baggage` فقط در صورت نیاز با `AZKI_BAGGAGE` تنظیم می‌شود. برای بیمه‌دات‌کام، **مقدار واقعی هدر `token` از نشست فعلی مرورگر** را در `BIMEH_TOKEN` قرار دهید؛ UUID تصادفی تولید نمی‌شود و نبود توکن خطای `503` می‌دهد. توکن و Cookie نمونه داخل مخزن نیست.
 
 سپس این نشانی‌ها را باز کنید:
 
@@ -93,7 +93,7 @@ URLهای `/compare/.../` فقط برای لینک کارت‌ها هستند و
 | بدنهٔ خودرو | `/v1/insurance/car-body/inquiry` |
 | ثالث موتور | `/v1/insurance/motor/inquiry` |
 
-نمونهٔ درخواست: `{"product":"third_motor","body":{"MotorTypeId":11,"ProductionYearId":2024,"PreviousInsuranceStatusId":1,"DurationId":2,"isRenewal":false,"InquiryUrl":"https://bimeh.com/thirdpartyMotor/planlist?MotorTypeId=11"}}`. `InquiryUrl` لینک صفحهٔ مقایسه است و Backend آن را تنها برای همان محصول روی `bimeh.com` می‌پذیرد؛ درخواست قیمت به `coreapi.bimeh.com` فرستاده می‌شود. پاسخ JSON باید آرایه‌های `Inquiries` و `Companies` داشته باشد؛ آزمایشگاه کارت‌ها را از پاسخ تازه می‌سازد و نمونه‌های ضبط‌شده را جداگانه نشان می‌دهد. مسیر `Car-Price-Inquiry` در HARهای بدنه ۴۰۴ داشته و در مسیر اصلی قیمت‌گیری استفاده نمی‌شود. شناسهٔ موتور سه‌چرخ ۱۱ و برقی ۱۲ است؛ ۱۳ در HAR درخواست موفق دارد، اما نام آن تأیید نشده است. فهرست مدل ۲۰۲ ترکیب بدنه از کاتالوگ مدل‌های مشترک ثالث استفاده می‌کند.
+نمونهٔ درخواست: `{"product":"third_motor","body":{"MotorTypeId":11,"ProductionYearId":2024,"PreviousInsuranceStatusId":1,"DurationId":2,"isRenewal":false,"InquiryUrl":"https://bimeh.com/thirdpartyMotor/planlist?MotorTypeId=11"}}`. `InquiryUrl` لینک صفحهٔ مقایسه است و Backend آن را تنها برای همان محصول روی `bimeh.com` می‌پذیرد؛ درخواست قیمت به `coreapi.bimeh.com` فرستاده می‌شود. هدرهای `referer-data` و `token` از تنظیمات سمت سرور اضافه می‌شوند؛ هیچ‌یک از ۵۷ درخواست موفق HAR هدر Cookie نداشته است. خطای بالادستی کد HTTP و پیام کوتاه JSON را نشان می‌دهد، بدون چاپ توکن یا کل payload. پاسخ JSON باید آرایه‌های `Inquiries` و `Companies` داشته باشد؛ آزمایشگاه کارت‌ها را از پاسخ تازه می‌سازد و نمونه‌های ضبط‌شده را جداگانه نشان می‌دهد. مسیر `Car-Price-Inquiry` در HARهای بدنه ۴۰۴ داشته و در مسیر اصلی قیمت‌گیری استفاده نمی‌شود. شناسهٔ موتور سه‌چرخ ۱۱ و برقی ۱۲ است؛ ۱۳ در HAR درخواست موفق دارد، اما نام آن تأیید نشده است. فهرست مدل ۲۰۲ ترکیب بدنه از کاتالوگ مدل‌های مشترک ثالث استفاده می‌کند.
 
 ## آزمون
 
