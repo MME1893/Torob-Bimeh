@@ -1,0 +1,17 @@
+[project]
+name = "torob-bimeh-backend"
+version = "0.1.0"
+description = "Provider adapters and experimental quote API for Torob Bimeh"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "httpx>=0.27,<1",
+  "python-dotenv>=1,<2",
+  "uvicorn>=0.30,<1",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
