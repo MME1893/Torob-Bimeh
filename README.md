@@ -7,6 +7,8 @@ frontend/labs/              آزمایشگاه‌های HTML موجود برای
 backend/app/routers/azki.py APIهای محلی POST /api/azki/prices/third و /api/azki/prices/body
 backend/app/adapters/azki_contract.py  اعتبارسنجی URL و ساخت هدرهای ازکی
 backend/app/adapters/azki.py           درخواست HTTP به ازکی
+backend/app/routers/sabim.py          API محلی POST /api/sabim/prices
+backend/app/adapters/sabim*.py         اعتبارسنجی Query و POST به سابیم
 backend/tests/           آزمون قرارداد و پاسخ آزمایشی سرور
 ```
 
@@ -27,7 +29,8 @@ uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 - [آزمایشگاه ازکی](http://127.0.0.1:8000/labs/azki.html) — فرم ثالث خودرو/موتور و بدنهٔ خودرو و فراخوانی API از طریق Backend.
 - [مستندات API](http://127.0.0.1:8000/docs)
-- [آزمایشگاه سابیم](http://127.0.0.1:8000/labs/sabim.html)، [بیمه‌بازار](http://127.0.0.1:8000/labs/bimebazar.html)، [بیمه‌دات‌کام](http://127.0.0.1:8000/labs/bimeh.html) — فایل‌های تحقیق موجود، هنوز بدون اتصال به روترهای پروژه.
+- [آزمایشگاه سابیم](http://127.0.0.1:8000/labs/sabim.html) — ثالث خودرو، ثالث موتور و بدنهٔ خودرو به Backend وصل‌اند؛ بدنهٔ موتور فقط پیش‌نمایش Query دارد.
+- [بیمه‌بازار](http://127.0.0.1:8000/labs/bimebazar.html) و [بیمه‌دات‌کام](http://127.0.0.1:8000/labs/bimeh.html) — آزمایشگاه‌های تحقیق موجود، هنوز بدون اتصال به روترهای پروژه.
 
 صفحهٔ ازکی را از نشانی `127.0.0.1:8000/labs/azki.html` باز کنید، نه با دوبار کلیک روی فایل HTML. صفحه و API محلی در این حالت هم‌مبدأ هستند.
 
@@ -59,6 +62,12 @@ uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 درخواست بدنه به شکل `{"body": { ... }}` است؛ شیء `body` همان ۲۷ کلید یا کلیدهای شاخهٔ فعال فرم آزکی را دارد. تاریخ‌های `clearanceDate` و `oldInsureExpireDate` در POST به فرمت میلادی `YYYY-MM-DD` هستند. مقدار `vehiclePrice` در بدنه، مبلغ خامی است که آزکی برای ارزش خودرو انتظار دارد. برای دیدن نمونهٔ واقعی همان فرم، بخش «خروجی» آزمایشگاه بدنه را باز کنید. پیشنهادهای بدنه در پاسخ ازکی قیمت را روی خود رکورد شرکت دارند؛ پیشنهادهای ثالث `company.prices[]` دارند.
 
+### سابیم
+
+`POST /api/sabim/prices` مقدارهای `product` و `query` را می‌پذیرد. محصول فقط `third_car`، `third_motor` یا `body_car` است. Backend کلیدهای Query را مطابق خروجی مرحلهٔ پنجم HTML بررسی می‌کند، سپس به یکی از دو URL ثابت `https://api.sabim.com/api/price_thirdparty` یا `https://api.sabim.com/api/price_bodycar` درخواست POST می‌زند. پارامترها در Query String هستند، پوشش‌های بدنه با کلید تکراری `bodycar_coverage_id[]` فرستاده می‌شوند، و بدنهٔ POST دقیقاً `{}` است. هدر Authorization تنظیم نمی‌شود. پاسخ JSON خام به آزمایشگاه برمی‌گردد؛ فعلاً کارت‌های قیمت سابیم به دلیل نداشتن نمونهٔ معتبر از ساختار پاسخ نرمال‌سازی نمی‌شوند.
+
+در دادهٔ ضبط‌شدهٔ داخل HTML، هر ۲۸ نمونهٔ POST بدنهٔ خودرو از سابیم HTTP `500` داشته‌اند. پس تکمیل فرم و ارسال درخواست ثابت می‌کند قرارداد و اتصال محلی درست ساخته شده‌اند، ولی موفقیت زندهٔ سرویس بدنه را تضمین نمی‌کند. خطای بالادستی به جای قیمت ساختگی با کد `502` و توضیح کد بالادستی نمایش داده می‌شود. بدنهٔ موتور به API وصل نیست زیرا کاتالوگ، شناسهٔ کاربری بدنهٔ موتور ندارد.
+
 ## آزمون
 
 ```bash
@@ -66,6 +75,7 @@ cd backend
 python -m unittest discover -s tests -p 'test_contract.py' -v
 uv run pytest -q
 node ../frontend/tests/azki_lab_smoke.cjs
+node ../frontend/tests/sabim_lab_smoke.cjs
 ```
 
 آزمون HTTP با پاسخ ساختگی فقط قرارداد Backend را می‌سنجد. آزمایش واقعی ازکی به دسترسی شبکه و هدر معتبر در محیط خودتان نیاز دارد. سپس برای هر سایت دیگر یک adapter و router مجزا می‌افزاییم؛ بعد فرم مشترک و ادغام نتایج را می‌سازیم.
