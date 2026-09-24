@@ -15,9 +15,33 @@ async def get_offers(product: str, params: Mapping[str, object],
                      transport: httpx.AsyncBaseTransport | None = None) -> dict:
     query = validate_offer_params(params, product)
     try:
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=False, transport=transport) as client:
-            response = await client.get("https://" + HOST + OFFER_PATHS[product],
-                                        params=query, headers={"Accept": "application/json"})
+        # async with httpx.AsyncClient(timeout=30.0, follow_redirects=False, transport=transport) as client:
+        #     response = await client.get("https://" + HOST + OFFER_PATHS[product],
+        #                                 params=query, headers={"Accept": "application/json"})
+        async with httpx.AsyncClient(
+        timeout=30.0,
+        follow_redirects=False,
+        transport=transport
+        ) as client:
+
+            headers = {
+                "Accept": "application/json",
+                "User-Agent": "Mozilla/5.0",
+                "Referer": "https://bimebazar.com/",
+            }
+
+            # گرفتن session cookie
+            await client.get(
+                "https://bimebazar.com/",
+                headers=headers
+            )
+
+            # درخواست اصلی
+            response = await client.get(
+                "https://" + HOST + OFFER_PATHS[product],
+                params=query,
+                headers=headers
+            )
     except httpx.RequestError as exc:
         raise BimebazarUpstreamError("ارتباط با API پیشنهادهای بیمه‌بازار برقرار نشد") from exc
     if response.is_redirect:
