@@ -1,23 +1,46 @@
-"""Azki third-party request URL and header contract.
+"""Azki car and motorcycle third-party GET and car-body POST contracts.
 
 Only the fixed Azki host/path may be called. Authorization stays server-side.
 """
 
 import os
+import re
+from datetime import date
 from typing import Mapping
 from urllib.parse import parse_qsl, urlsplit
 
 AZKI_HOST = "www.azki.com"
 THIRD_PATH = "/api/aggregator/v1/third/prices/compare"
+BODY_PATH = "/api/aggregator/v1/body/prices/compare"
 COMPARE_PATHS = {
     "third_car": "/car-insurance/third-party-insurance/compare",
     "third_motor": "/motorcycle-insurance/compare",
+    "body_car": "/car-insurance/car-body-insurance/compare",
 }
 REQUIRED = {
     "vehicleTypeID", "vehicleModelID", "vehicleBrandID",
     "vehicleConstructionYear", "vehicleUsageID", "withoutInsure",
     "zeroKilometer", "durationID", "coverID", "orig_cover_amount",
 }
+BODY_FLAGS = {
+    "acidicSpray", "war", "glassBreak", "naturalDisaster", "transportation",
+    "franchiseRemoval", "unconventionalVehicle", "nail", "valueSubsidence",
+    "depreciationRemoval", "zeroKilometer", "imported", "installment",
+}
+BODY_INTEGERS = {
+    "vehicleTypeID", "vehicleModelID", "vehicleBrandID", "vehicleConstructionYear",
+    "vehiclePrice", "accessoryPrice", "vehicleUsageID", "fuelTypeID",
+    "bodyDiscountID", "provinceId", "cityId", "regionId", "thirdCompanyID",
+    "thirdDiscountID", "oldCompanyID", "accessoryRobberyCoverID",
+    "marketFluctuateCoverID",
+}
+BODY_OPTIONAL = {
+    "clearanceDate", "oldInsureExpireDate", "fromEditModal", "accessories",
+}
+BODY_REQUIRED = (BODY_FLAGS | BODY_INTEGERS) - {
+    "regionId", "thirdCompanyID", "thirdDiscountID", "oldCompanyID",
+    "accessoryRobberyCoverID", "marketFluctuateCoverID",
+} | {"locationSource"}
 
 
 class InvalidPriceRequest(ValueError):
@@ -63,6 +86,55 @@ def validate_price_params(params: Mapping[str, object]) -> dict[str, str]:
     return clean
 
 
+def validate_body_payload(payload: Mapping[str, object]) -> dict[str, object]:
+    """Keep the numeric/boolean JSON types captured in the body-price HAR."""
+    if not isinstance(payload, Mapping) or len(payload) > 50:
+        raise InvalidPriceRequest("بدنهٔ درخواست قیمت بدنه نامعتبر است")
+    unknown = payload.keys() - (BODY_FLAGS | BODY_INTEGERS | BODY_OPTIONAL | {"locationSource"})
+    missing = BODY_REQUIRED - payload.keys()
+    if unknown or missing:
+        raise InvalidPriceRequest("کلیدهای درخواست بدنه نامعتبر یا ناقص است: " + ", ".join(sorted(unknown | missing)))
+    for key in BODY_FLAGS | {"fromEditModal"}:
+        if key in payload and type(payload[key]) is not bool:
+            raise InvalidPriceRequest("فلگ درخواست بدنه باید boolean باشد: " + key)
+    for key in BODY_INTEGERS:
+        if key in payload and (type(payload[key]) is not int or payload[key] < 0):
+            raise InvalidPriceRequest("شناسه یا مبلغ درخواست بدنه باید عدد صحیح نامنفی باشد: " + key)
+    if any(payload[key] <= 0 for key in ("vehiclePrice", "vehicleTypeID", "vehicleModelID", "vehicleBrandID", "bodyDiscountID")):
+        raise InvalidPriceRequest("ارزش خودرو و شناسه‌های اصلی باید مثبت باشند")
+    if not isinstance(payload["locationSource"], str) or not 0 < len(payload["locationSource"]) <= 100:
+        raise InvalidPriceRequest("منبع مکان نامعتبر است")
+    if ("thirdCompanyID" in payload) != ("thirdDiscountID" in payload):
+        raise InvalidPriceRequest("شرکت و تخفیف ثالث قبلی باید با هم ارسال شوند")
+    if ("oldCompanyID" in payload) != ("oldInsureExpireDate" in payload):
+        raise InvalidPriceRequest("شرکت بدنه و تاریخ انقضای قبلی باید با هم ارسال شوند")
+    if payload["zeroKilometer"] and "clearanceDate" not in payload:
+        raise InvalidPriceRequest("تاریخ ترخیص خودرو صفرکیلومتر لازم است")
+    for key in ("clearanceDate", "oldInsureExpireDate"):
+        if key in payload and (not isinstance(payload[key], str) or
+                               not re.fullmatch(r"\d{4}-\d{2}-\d{2}", payload[key])):
+            raise InvalidPriceRequest("تاریخ درخواست بدنه باید میلادی با قالب YYYY-MM-DD باشد")
+        if key in payload:
+            try:
+                date.fromisoformat(payload[key])
+            except ValueError as exc:
+                raise InvalidPriceRequest("تاریخ درخواست بدنه معتبر نیست") from exc
+    if "accessories" in payload:
+        items = payload["accessories"]
+        if (not isinstance(items, list) or len(items) > 30 or
+                any(not isinstance(item, dict) or set(item) != {"categoryId", "items", "price"} or
+                    type(item["categoryId"]) is not int or
+                    type(item["price"]) is not int or item["price"] <= 0 or
+                    not isinstance(item["items"], list) or not 0 < len(item["items"]) <= 100 or
+                    any(type(i) is not int for i in item["items"]) for item in items)):
+            raise InvalidPriceRequest("لوازم غیرفابریک ساختار معتبر ندارند")
+        if sum(item["price"] for item in items) != payload["accessoryPrice"]:
+            raise InvalidPriceRequest("جمع ارزش لوازم با accessoryPrice یکسان نیست")
+    elif payload["accessoryPrice"] != 0:
+        raise InvalidPriceRequest("برای ارزش لوازم، فهرست accessories لازم است")
+    return dict(payload)
+
+
 def make_headers(product: str) -> dict[str, str]:
     if product not in COMPARE_PATHS:
         raise InvalidPriceRequest("محصول ثالث ناشناخته است")
@@ -85,4 +157,3 @@ def make_headers(product: str) -> dict[str, str]:
     if baggage:
         headers["Baggage"] = baggage
     return headers
-

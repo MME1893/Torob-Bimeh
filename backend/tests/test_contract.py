@@ -6,7 +6,7 @@ from unittest.mock import patch
 from urllib.parse import urlencode
 
 from app.adapters.azki_contract import (
-    InvalidPriceRequest, make_headers, price_params_from_url,
+    InvalidPriceRequest, make_headers, price_params_from_url, validate_body_payload,
     validate_price_params,
 )
 
@@ -19,6 +19,18 @@ QUERY = {
     "isExtend": "false", "sanhab": "false",
 }
 BASE = "https://www.azki.com/api/aggregator/v1/third/prices/compare"
+BODY = {
+    "vehicleTypeID": 1, "vehicleModelID": 161821, "vehicleBrandID": 16,
+    "vehicleConstructionYear": 1404, "vehiclePrice": 2000000000,
+    "accessoryPrice": 0, "zeroKilometer": True, "vehicleUsageID": 1,
+    "fuelTypeID": 1, "acidicSpray": False, "war": False,
+    "glassBreak": False, "naturalDisaster": False, "transportation": False,
+    "franchiseRemoval": False, "unconventionalVehicle": False,
+    "nail": False, "valueSubsidence": False, "depreciationRemoval": False,
+    "imported": False, "installment": False, "clearanceDate": "2026-03-21",
+    "bodyDiscountID": 9, "provinceId": 1, "cityId": 1,
+    "locationSource": "INCOMPLETE_ADDRESS",
+}
 
 
 class AzkiContractTests(unittest.TestCase):
@@ -46,6 +58,23 @@ class AzkiContractTests(unittest.TestCase):
             headers = make_headers("third_motor")
         self.assertEqual(headers["Authorization"], "test-placeholder")
         self.assertEqual(headers["Referer"], "https://www.azki.com/motorcycle-insurance/compare")
+
+    def test_car_body_post_keeps_json_types_and_referer(self):
+        self.assertEqual(validate_body_payload(BODY), BODY)
+        self.assertEqual(make_headers("body_car")["Referer"],
+                         "https://www.azki.com/car-insurance/car-body-insurance/compare")
+
+    def test_car_body_requires_consistent_post_payload(self):
+        for bad in (
+            {**BODY, "zeroKilometer": "true"},
+            {**BODY, "vehiclePrice": -1},
+            {**BODY, "clearanceDate": "1405-01-01", "extra": 1},
+            {k: v for k, v in BODY.items() if k != "clearanceDate"},
+            {**BODY, "thirdCompanyID": 3},
+            {**BODY, "accessoryPrice": 1000},
+        ):
+            with self.subTest(bad=tuple(bad)), self.assertRaises(InvalidPriceRequest):
+                validate_body_payload(bad)
 
 
 if __name__ == "__main__":

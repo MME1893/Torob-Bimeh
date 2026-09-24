@@ -35305,7 +35305,7 @@ const opts=(items,value='id',label='title')=>(items||[]).map(o=>({value:String(o
 const blank=[{value:'',label:'انتخاب کنید…'}];
 const yesno=[...blank,{value:'true',label:'بله'},{value:'false',label:'خیر'}];
 const priorChoices=[...blank,{value:'company',label:'بیمه‌نامهٔ قبلی دارم'},{value:'zero',label:'صفرکیلومتر'},{value:'none',label:'فاقد بیمهٔ قبلی'}];
-const products=[['third','شخص ثالث خودرو'],['body','بیمه بدنه خودرو'],['motor','شخص ثالث موتور'],['motorBody','بیمه بدنه موتور']];
+const products=[['third','شخص ثالث خودرو'],['body','بیمه بدنه خودرو'],['motor','شخص ثالث موتور']];
 const states={third:{product:'third',priorKind:'',durationID:'12',coverID:'47',emitPageCover:true,emitIsFirstTime:true,includeVehicleTypeTitle:true,importedOverride:''},body:{product:'body',hasBodyInsurance:'',zeroKilometer:'',thirdPriorKind:'',isZeroKilometerFlow:'',fromEditModal:false,importedOverride:''},motor:{product:'motor',vehicleTypeID:'6',vehicleUsageID:'1',vehicleBrandID:'84',priorKind:'',durationID:'12',coverID:'47',emitPageCover:true,emitIsFirstTime:true,importedOverride:''},motorBody:{product:'motorBody',motorValueToman:'',motorYearOptionId:''}};
 let product='third',stage=0,last=null,wasGenerated=false,fullApproved=false,notice='';
 let quoteState={status:'idle',offers:[],error:'',excluded:0,providerStatus:null,receivedAt:null,origin:null};
@@ -35465,13 +35465,24 @@ function safeMotorAnswers(answers){const a=JSON.parse(JSON.stringify(answers));i
 const numberFa=n=>typeof n==='number'&&Number.isFinite(n)?new Intl.NumberFormat('fa-IR').format(n):'نامشخص';
 const quoteUrl=build=>'https://www.azki.com'+build.apiPath+'?'+A.makeQuery(build.price);
 const compareUrl=build=>'https://www.azki.com'+build.comparePath+'?'+A.makeQuery(build.page);
-function normalizeQuotes(response){
+function normalizeQuotes(response, selectedProduct=product){
  if(!response||typeof response!=='object'||!['top','bottom','others'].some(k=>Array.isArray(response[k])))throw Error('ساختار JSON قیمت ازکی شناخته نشد.');
- const excluded=new Set((Array.isArray(response.nonRevivablePrices)?response.nonRevivablePrices:[]).map(row=>String(row?.id)));
+ const excludedRows=selectedProduct==='body'?response.disablePrices:response.nonRevivablePrices;
+ const excluded=new Set((Array.isArray(excludedRows)?excludedRows:[]).map(row=>String(row?.id)));
  const offers=[],seen=new Set();
  for(const section of ['top','bottom','others']){
   for(const company of Array.isArray(response[section])?response[section]:[]){
    if(!company||company.id==null||excluded.has(String(company.id)))continue;
+   if(selectedProduct==='body'){
+    const amount=company.discountedPrice??company.price;
+    if(typeof amount==='number'&&Number.isFinite(amount)&&amount>=0&&!seen.has(String(company.id))){
+     seen.add(String(company.id));
+     offers.push({companyId:company.id,companyName:str(company.title||'شرکت بیمه'),amount,
+      originalAmount:company.price,coverAmount:null,duration:'',
+      installments:Array.isArray(company.installments)&&company.installments.some(item=>item?.enable===true)});
+    }
+    continue;
+   }
    for(const price of Array.isArray(company.prices)?company.prices:[]){
     if(!price||typeof price!=='object')continue;
     const amount=price.discountedPrice??price.price;
@@ -35488,34 +35499,35 @@ function normalizeQuotes(response){
  return {offers,excluded:excluded.size,providerStatus:response.noPriceStatus??null};
 }
 function liveOutput(){
- if(product!=='third'&&product!=='motor')return '';
- const apiUrl=quoteUrl(last),destination=compareUrl(last);
- let html=`<div class="output-title"><h3>۲. GET قیمت ازکی — URL کامل برای Backend</h3><span>از ورودی همین فرم ساخته می‌شود و Backend آن را اجرا می‌کند</span></div>
-  <div class="endpoint" dir="ltr">GET ${esc(apiUrl)}</div>
+ if(product!=='third'&&product!=='motor'&&product!=='body')return '';
+ const isBody=product==='body',apiUrl=isBody?'':quoteUrl(last),destination=compareUrl(last);
+ let html=`<div class="output-title"><h3>۲. ${isBody?'POST':'GET'} قیمت ازکی — درخواست Backend</h3><span>از ورودی همین فرم ساخته می‌شود و Backend آن را اجرا می‌کند</span></div>
+  <div class="endpoint" dir="ltr">${isBody?'POST https://www.azki.com'+last.apiPath:'GET '+esc(apiUrl)}</div>
   <div class="action-row"><button type="button" class="primary" id="fetch-quotes" ${quoteState.status==='loading'?'disabled':''}>${quoteState.status==='loading'?'در حال دریافت…':'دریافت قیمت و نمایش کارت‌ها'}</button>
-  <a class="open-api" href="${esc(apiUrl)}" target="_blank" rel="noopener noreferrer">باز کردن JSON خام در تب جدید ↗</a></div>
+  ${isBody?'':`<a class="open-api" href="${esc(apiUrl)}" target="_blank" rel="noopener noreferrer">باز کردن JSON خام در تب جدید ↗</a>`}</div>
   <details class="manual-response"><summary>اگر مرورگر پاسخ را نخواند، JSON همان درخواست را اینجا وارد کنید</summary><p>پاسخ JSON را از تب جدید کپی کنید یا فایل همان پاسخ را انتخاب کنید. سازگاری پاسخ دستی با ورودی فرم قابل تأیید خودکار نیست.</p><textarea id="quote-paste" rows="3" placeholder="پاسخ JSON درخواست قیمت"></textarea><div class="action-row"><button type="button" id="import-quotes">نمایش کارت‌ها از JSON واردشده</button><label class="file-label">انتخاب فایل JSON<input type="file" id="quote-file" accept=".json,application/json"/></label></div></details>`;
  if(quoteState.status==='loading')html+=banner('Backend در حال درخواست قیمت از API ازکی است…');
  if(quoteState.status==='error')html+=banner(quoteState.error,'error');
  if(quoteState.status==='success'){
   html+=`<div class="result-status">${numberFa(quoteState.offers.length)} پیشنهاد ${quoteState.origin==='manual'?'از JSON واردشده':'از پاسخ همین درخواست'} استخراج شد <span>${esc(quoteState.receivedAt||'')}</span></div>`;
   if(quoteState.providerStatus&&quoteState.providerStatus!=='REVIVABLE')html+=banner('وضعیت اعلام‌شده توسط ازکی: '+quoteState.providerStatus+'؛ قیمتِ نمایش‌داده‌شده به‌تنهایی تأیید امکان خرید نیست.','warn');
-  if(quoteState.excluded)html+=banner(numberFa(quoteState.excluded)+' شرکت در بخش nonRevivablePrices پاسخ بودند و به‌عنوان پیشنهاد قابل خرید نمایش داده نشدند.','warn');
-  html+=quoteState.offers.length?`<div class="offer-grid">${quoteState.offers.map(offer=>`<a class="offer-card" href="${esc(destination)}" target="_blank" rel="noopener noreferrer" aria-label="مشاهدهٔ ${esc(offer.companyName)} در صفحهٔ مقایسهٔ ازکی"><span class="offer-source">ازکی • شرکت ${esc(offer.companyName)}</span><strong>${numberFa(offer.amount)}</strong><small>قیمت خام پاسخ API؛ واحد ریال/تومان هنوز تطبیق داده نشده است</small><span>مدت: ${esc(offer.duration||'نامشخص')} · پوشش خام: ${numberFa(offer.coverAmount)}</span>${offer.installments?'<span>دارای گزینهٔ اقساط در پاسخ</span>':''}<em>مشاهده در صفحهٔ مقایسهٔ ازکی ↗</em></a>`).join('')}</div>`:banner('در پاسخ این درخواست، پیشنهادی با قیمت قابل استخراج پیدا نشد.','warn');
+  if(quoteState.excluded)html+=banner(numberFa(quoteState.excluded)+' شرکت در بخش '+(isBody?'disablePrices':'nonRevivablePrices')+' پاسخ بودند و به‌عنوان پیشنهاد قابل خرید نمایش داده نشدند.','warn');
+  html+=quoteState.offers.length?`<div class="offer-grid">${quoteState.offers.map(offer=>`<a class="offer-card" href="${esc(destination)}" target="_blank" rel="noopener noreferrer" aria-label="مشاهدهٔ ${esc(offer.companyName)} در صفحهٔ مقایسهٔ ازکی"><span class="offer-source">ازکی • شرکت ${esc(offer.companyName)}</span><strong>${numberFa(offer.amount)}</strong><small>قیمت خام پاسخ API؛ واحد ریال/تومان هنوز تطبیق داده نشده است</small>${isBody?'':`<span>مدت: ${esc(offer.duration||'نامشخص')} · پوشش خام: ${numberFa(offer.coverAmount)}</span>`}${offer.installments?'<span>دارای گزینهٔ اقساط در پاسخ</span>':''}<em>مشاهده در صفحهٔ مقایسهٔ ازکی ↗</em></a>`).join('')}</div>`:banner('در پاسخ این درخواست، پیشنهادی با قیمت قابل استخراج پیدا نشد.','warn');
  }
  return html;
 }
 async function fetchQuotes(){
- if(!last||(product!=='third'&&product!=='motor'))return;
+ if(!last||(product!=='third'&&product!=='motor'&&product!=='body'))return;
  resetQuotes();
  const requestedProduct=product,requestedBuild=last,controller=new AbortController();quoteController=controller;
  quoteState.status='loading';draw();
  try{
-  const response=await fetch('/api/azki/prices/third',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({product:requestedProduct==='motor'?'third_motor':'third_car',url:quoteUrl(requestedBuild)}),signal:controller.signal});
+  const isBody=requestedProduct==='body';
+  const response=await fetch(isBody?'/api/azki/prices/body':'/api/azki/prices/third',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(isBody?{body:requestedBuild.price}:{product:requestedProduct==='motor'?'third_motor':'third_car',url:quoteUrl(requestedBuild)}),signal:controller.signal});
   if(!response.ok){let detail='';try{detail=(await response.json()).detail||'';}catch{}throw Error('Backend کد HTTP '+response.status+' برگرداند. '+(typeof detail==='string'?detail:''));}
   const contentType=response.headers.get('content-type')||'';
   if(!contentType.toLowerCase().includes('json'))throw Error('پاسخ ازکی JSON نیست؛ ممکن است به نشست یا ورود در سایت نیاز باشد.');
-  const normalized=normalizeQuotes(await response.json());
+  const normalized=normalizeQuotes(await response.json(),requestedProduct);
   if(controller.signal.aborted||requestedProduct!==product||requestedBuild!==last)return;
   quoteState={status:'success',...normalized,error:'',receivedAt:new Date().toLocaleString('fa-IR'),origin:'fetch'};
  }catch(err){
@@ -35527,7 +35539,7 @@ async function fetchQuotes(){
 function importQuotes(text){
  resetQuotes();
  try{
-  const normalized=normalizeQuotes(JSON.parse(text));
+  const normalized=normalizeQuotes(JSON.parse(text),product);
   quoteState={status:'success',...normalized,error:'',receivedAt:new Date().toLocaleString('fa-IR'),origin:'manual'};
  }catch(err){
   quoteState={status:'error',offers:[],excluded:0,providerStatus:null,receivedAt:null,origin:null,error:'JSON قابل خواندن نیست: '+str(err.message||err)};
@@ -35535,7 +35547,7 @@ function importQuotes(text){
  draw();
 }
 function outputStep(){
- let out=title('خروجی',product==='third'||product==='motor'?'ابتدا درخواست را بساز؛ سپس با دکمهٔ دریافت قیمت، JSON همان درخواست ازکی به کارت تبدیل می‌شود.':'این مسیر فعلاً فقط پیش‌نمایش قرارداد درخواست را دارد.');
+ let out=title('خروجی',product==='third'||product==='motor'||product==='body'?'ابتدا درخواست را بساز؛ سپس با دکمهٔ دریافت قیمت، JSON همان درخواست ازکی به کارت تبدیل می‌شود.':'این مسیر فعلاً فقط پیش‌نمایش قرارداد درخواست را دارد.');
  if(product==='motorBody'){
   out+=banner('بیمه بدنه موتور محصول Nano با بیمه بدنه خودرو و شخص ثالث موتور متفاوت است: URL/قیمت بدون حضور attendanceId معتبر قابل بازتولید نیست.');
   out+=`<div class="action-row"><button type="button" class="primary" id="generate">ساخت قالب دو پاسخ آفلاین</button><button type="button" id="run-fixtures">آزمون‌های HAR</button></div>`;
@@ -35546,7 +35558,7 @@ function outputStep(){
   out+=`<div class="action-row"><button type="button" id="copy-safe">کپی خروجی دو مرحلهٔ ساختگی</button></div>`;
   return out+'<div id="fixture-slot"></div>';
  }
- out+=banner('URL صفحهٔ مقایسه و URL درخواست قیمت دو مقصد جدا هستند. دکمهٔ دریافت قیمت فقط در ثالث خودرو و ثالث موتور فعال است.');
+ out+=banner('URL صفحهٔ مقایسه و API قیمت دو مقصد جدا هستند. درخواست ثالث GET و درخواست بدنهٔ خودرو POST با بدنهٔ JSON است.');
  out+=`<div class="action-row"><button type="button" class="primary" id="generate">تولید و اعتبارسنجی خروجی</button><button type="button" id="run-fixtures">اجرای آزمون‌های HAR ناشناس</button></div>`;
  if(!wasGenerated)return out+`<div id="output-slot"></div><div id="fixture-slot"></div>`;
  if(!last)return out+`<div id="output-slot">${banner(notice,'error')}</div><div id="fixture-slot"></div>`;
