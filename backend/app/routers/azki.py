@@ -5,8 +5,8 @@ from typing import Any, Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ..adapters.azki import AzkiUpstreamError, get_body_prices, get_third_prices
-from ..adapters.azki_contract import InvalidPriceRequest, price_params_from_url, validate_body_payload, validate_price_params
+from ..adapters.azki.client import AzkiUpstreamError, get_body_prices, get_third_prices
+from ..adapters.azki.contract import InvalidPriceRequest, price_params_from_url, validate_body_payload, validate_price_params
 
 
 router = APIRouter(prefix="/api/azki", tags=["azki"])

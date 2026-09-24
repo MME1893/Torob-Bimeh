@@ -4,7 +4,7 @@ from typing import Mapping
 
 import httpx
 
-from .azki_contract import BODY_PATH, THIRD_PATH, make_headers, validate_body_payload, validate_price_params
+from .contract import BODY_PATH, THIRD_PATH, make_headers, validate_body_payload, validate_price_params
 
 
 class AzkiUpstreamError(RuntimeError):

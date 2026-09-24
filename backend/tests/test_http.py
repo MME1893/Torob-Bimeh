@@ -5,7 +5,7 @@ import json
 import httpx
 from fastapi.testclient import TestClient
 
-from app.adapters.azki import get_body_prices, get_third_prices
+from app.adapters.azki.client import get_body_prices, get_third_prices
 from app.main import app
 from tests.test_contract import BASE, BODY, QUERY
 

@@ -1,0 +1,1 @@
+"""Bimebazar upstream adapter package."""

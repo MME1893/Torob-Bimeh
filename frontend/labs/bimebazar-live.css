@@ -1,0 +1,12 @@
+.live-offers{margin:18px 0;padding:16px;background:#f7fbfa;border:1px solid #d4e8e2;border-radius:14px}
+.live-offers h3{margin:0 0 6px;font-size:16px}
+.live-offers .action{margin-top:10px}
+.live-status{margin:12px 0;color:#395568;font-size:13px}
+.live-status.error{color:#ae483b}
+.live-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:10px;margin-top:12px}
+.live-card{display:flex;flex-direction:column;gap:7px;padding:14px;background:#fff;border:1px solid #d8e6e2;border-radius:12px;color:#174b49;text-decoration:none}
+.live-card:hover{border-color:#1d736f;box-shadow:0 5px 18px #1d736f18}
+.live-card strong{font-size:18px}
+.live-card small{color:#526778}
+.live-offers details{margin-top:14px;font-size:12px}
+.live-offers pre{max-height:260px;overflow:auto;direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere}

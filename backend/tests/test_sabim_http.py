@@ -5,7 +5,7 @@ import asyncio
 import httpx
 from fastapi.testclient import TestClient
 
-from app.adapters.sabim import get_prices
+from app.adapters.sabim.client import get_prices
 from app.main import app
 from tests.test_sabim_contract import BODY, THIRD
 
@@ -34,7 +34,7 @@ def test_body_coverages_are_repeated_and_errors_are_not_fake_prices():
         assert request.content == b"{}"
         return httpx.Response(500, json={"message": "upstream unavailable"})
 
-    from app.adapters.sabim import SabimUpstreamError
+    from app.adapters.sabim.client import SabimUpstreamError
     import pytest
     with pytest.raises(SabimUpstreamError, match="HTTP 500"):
         asyncio.run(get_prices("body_car", body, httpx.MockTransport(handler)))

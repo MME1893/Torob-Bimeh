@@ -4,7 +4,7 @@ from typing import Mapping
 
 import httpx
 
-from .sabim_contract import BASE_URL, PATHS, validate_query
+from .contract import BASE_URL, PATHS, validate_query
 
 
 class SabimUpstreamError(RuntimeError):

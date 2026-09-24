@@ -5,8 +5,8 @@ from typing import Any, Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, ConfigDict
 
-from ..adapters.sabim import SabimUpstreamError, get_prices
-from ..adapters.sabim_contract import InvalidSabimRequest, validate_query
+from ..adapters.sabim.client import SabimUpstreamError, get_prices
+from ..adapters.sabim.contract import InvalidSabimRequest, validate_query
 
 router = APIRouter(prefix="/api/sabim", tags=["sabim"])
 
