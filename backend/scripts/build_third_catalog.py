@@ -152,13 +152,14 @@ def build():
             number = int(digits.group().translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")))
             coverages.add(number * (1_000_000_000 if "میلیارد" in row["Title"] else 1_000_000))
     years = {int(r["name"].split("-")[-1]) for r in sabim["years"]
-             if re.fullmatch(r"\d{4}-14\d{2}", r["name"])}
+             if re.fullmatch(r"\d{4}-1[34]\d{2}", r["name"])}
     years.update(int(row["value"]) for row in steps["car_production_year_picker"]["data"]
                  if isinstance(row["value"], int) and 1300 <= row["value"] <= 1500)
     for row in bimeh["options"]["thirdparty"]["ProductionYears"]:
-        match = re.search(r"14\d{2}", row["Title"])
+        match = re.search(r"1[34]\d{2}", row["Title"])
         if match:
             years.add(int(match.group()))
+    bimeh_options = {**bimeh["options"]["thirdparty"], "QuoteDurations": bimeh["fixtures"]["thirdparty"][0]["durations"]}
     result = {"models": models, "joined": joined,
               "insurers": sorted(insurers.values(), key=lambda item: item["label"]),
               "coverages_toman": sorted(coverages), "years_jalali": sorted(years, reverse=True), "options": {
@@ -166,9 +167,9 @@ def build():
         "sabim": {k: sabim[k] for k in ("insurers", "uses", "durations", "coverages", "years", "thirdDiscounts", "driverDiscounts", "financialDamages", "humanDamages", "driverDamages")},
         "bimebazar": {step: steps[step]["data"] for step in steps if step in (
             "policy_status_picker", "previous_company_sb_off_picker", "no_damage_factor_picker",
-            "car_production_year_picker", "policy_term_and_financial_coverage",
+            "car_production_year_picker", "policy_term_and_financial_coverage", "ownership_change_status_picker",
             "driver_no_damage_factor_picker") or "damage_count" in step},
-        "bimeh": bimeh["options"]["thirdparty"],
+        "bimeh": bimeh_options,
     }}
     return result
 

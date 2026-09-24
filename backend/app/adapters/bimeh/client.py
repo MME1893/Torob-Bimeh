@@ -5,6 +5,8 @@ import logging
 
 import httpx
 
+from ..errors import InvalidProviderResponse
+
 from .contract import BASE_URL, PATHS, validate_inquiry
 
 logger = logging.getLogger(__name__)
@@ -17,6 +19,10 @@ class BimehConfigurationError(RuntimeError):
 
 
 class BimehUpstreamError(RuntimeError):
+    pass
+
+
+class BimehInvalidResponse(InvalidProviderResponse, BimehUpstreamError):
     pass
 
 
@@ -52,7 +58,7 @@ async def get_prices(product: str, body: dict,
     try:
         data = response.json()
     except ValueError as exc:
-        raise BimehUpstreamError("پاسخ بیمه‌دات‌کام JSON معتبر نیست") from exc
+        raise BimehInvalidResponse("پاسخ بیمه‌دات‌کام JSON معتبر نیست") from exc
     if not isinstance(data, dict) or not isinstance(data.get("Inquiries"), list) or not isinstance(data.get("Companies"), list):
-        raise BimehUpstreamError("پاسخ بیمه‌دات‌کام فاقد Inquiries یا Companies است")
+        raise BimehInvalidResponse("پاسخ بیمه‌دات‌کام فاقد Inquiries یا Companies است", raw=data)
     return data

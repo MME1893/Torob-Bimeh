@@ -13,3 +13,27 @@
 .review span b {flex: 1 1 55%;}
 .review span button {padding: 6px 10px; font-size: 11px;}
 @media (max-width: 780px) {.answer {grid-template-columns: 1fr;}}
+.wizard-fields {border:0; margin:0; padding:0; min-width:0;}
+.combobox {position:relative; min-width:0;}
+.field-label {display:block; font-size:12px; color:#5b7260; margin-bottom:5px;}
+.combo-trigger {width:100%; min-height:45px; border:1px solid #d0ddcd; border-radius:11px; background:white; color:#294b38; display:flex; align-items:center; justify-content:space-between; padding:9px 12px; text-align:right;}
+.combo-trigger small,.combo-popover small {display:block; font-size:10px; color:#687d70;}
+.combo-popover {position:absolute; inset-inline:0; top:100%; background:white; z-index:30; border:1px solid #a4c5af; border-radius:12px; box-shadow:0 12px 30px #163c2429; padding:8px; min-width:260px;}
+.combo-popover ul {list-style:none; margin:6px 0 0; padding:0; max-height:260px; overflow:auto;}
+.combo-popover li {padding:9px 12px; border-radius:7px; cursor:pointer; font-size:13px;}
+.combo-popover li.active {background:#eef8f1;}
+.combo-popover li[aria-selected=true] {font-weight:800; color:#087145;}
+.combo-empty {font-size:12px; padding:10px;}
+.combo-more {border:0; background:#eef8f1; padding:10px; width:100%; color:#087145;}
+.answer .check-field,.check-field {display:flex; flex-direction:row; align-items:center; gap:8px; font-size:12px; padding:9px 0;}
+.answer input[type=checkbox],.check-field input {width:18px; height:18px; accent-color:#138854;}
+.provider-tabs {display:flex; gap:5px; margin-top:22px; overflow:auto;}
+.provider-tabs button {border:1px solid #d0ddcd; background:#f6f8f4; padding:11px; border-radius:10px 10px 0 0; flex:1; min-width:95px; color:#254735;}
+.provider-tabs button[aria-selected=true] {background:#e7f4e9; border-bottom-color:#138854; color:#087145;}
+.provider-tabs small {display:block; font-size:10px; margin-top:4px;}
+.provider-preview {border:1px solid #d0ddcd; padding:16px; border-radius:0 0 12px 12px;}
+.provider-preview pre {max-height:350px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; font-size:11px; background:#f4f7f3; padding:10px;}
+.provider-preview p {font-size:12px; line-height:1.8;}
+.mapping-ready {color:#087145;}
+
+.field-error{color:#b42323} .review-extra{margin:1rem 0;color:#365449}.review-extra p{line-height:1.9}

@@ -4,6 +4,8 @@ from typing import Mapping
 
 import httpx
 
+from ..errors import InvalidProviderResponse
+
 from .contract import BODY_PATH, THIRD_PATH, make_headers, validate_body_payload, validate_price_params
 
 
@@ -11,6 +13,10 @@ class AzkiUpstreamError(RuntimeError):
     def __init__(self, message: str, status: int = 502):
         super().__init__(message)
         self.status = status
+
+
+class AzkiInvalidResponse(InvalidProviderResponse, AzkiUpstreamError):
+    pass
 
 
 async def get_third_prices(params: Mapping[str, object], product: str,
@@ -47,7 +53,7 @@ def _read_price_response(response: httpx.Response) -> dict:
     try:
         data = response.json()
     except ValueError as exc:
-        raise AzkiUpstreamError("پاسخ ازکی JSON معتبر نیست") from exc
+        raise AzkiInvalidResponse("پاسخ ازکی JSON معتبر نیست") from exc
     if not isinstance(data, dict) or not any(isinstance(data.get(k), list) for k in ("top", "bottom", "others")):
-        raise AzkiUpstreamError("ساختار پاسخ قیمت ازکی شناخته‌شده نیست")
+        raise AzkiInvalidResponse("ساختار پاسخ قیمت ازکی شناخته‌شده نیست", raw=data)
     return data

@@ -106,7 +106,7 @@ def test_catalog_contains_the_complete_lab_union_and_scoped_identifiers():
     assert any(m["brand_key"].startswith("azki:") for m in data["models"])
     assert data["models"][0]["usages"]
     assert any(r["key"] == "آسیا" for r in data["insurers"])
-    assert data["third_car"]["supported_previous_policy_status"] == "no_previous_policy"
+    assert len(data["third_car"]["supported_previous_policy_statuses"]) == 3
     assert 1404 in data["production_years_jalali"]
 
 
@@ -236,11 +236,12 @@ def test_new_vehicle_requires_real_release_date_and_converts_per_provider():
     from app.domain.quotes import ThirdCarSearch
     from app.domain.crosswalk import CAR_MODELS
     form = {**FORM, "previous_policy": {"status": "new_vehicle",
-                                        "first_use_date_jalali": "1405/07/01"}}
+                                        "first_use_date_jalali": "1405/07/01",
+                                        "new_vehicle_expiry_jalali": "1405/07/01"}}
     request = ThirdCarSearch.model_validate(form)
     expected = {"azki": ("oldInsureExpireDate", "1405-07-01"),
                 "bimebazar": ("last_policy_exp_date", "1405/07/01"),
-                "bimeh": ("ReleaseDate", "2026/9/23")}
+                "bimeh": ("ReleaseDate", "2026-09-23")}
     for provider, (key, value) in expected.items():
         params, status, _ = search._prepare(request, provider, CAR_MODELS["peugeot_pars"])
         assert status is None and params[key] == value

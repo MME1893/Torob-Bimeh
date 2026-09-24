@@ -9,8 +9,8 @@ import re
 
 
 def jalali_to_gregorian(value: str) -> date:
-    if not isinstance(value, str) or not re.fullmatch(r"14\d\d[-/]\d\d[-/]\d\d", value):
-        raise ValueError("تاریخ شمسی باید ۱۴xx/ماه/روز باشد")
+    if not isinstance(value, str) or not re.fullmatch(r"1[34]\d\d[-/]\d\d[-/]\d\d", value):
+        raise ValueError("تاریخ شمسی باید YYYY/MM/DD باشد")
     jy, jm, jd = map(int, re.split("[-/]", value))
     if not 1 <= jm <= 12 or not 1 <= jd <= (31 if jm <= 6 else 30):
         raise ValueError("روز یا ماه شمسی معتبر نیست")

@@ -4,9 +4,7 @@ The entries are deliberately explicit. Similar names must not create IDs by
 fuzzy matching; expand only after checking each provider's actual catalog.
 """
 
-import json
 from functools import lru_cache
-from pathlib import Path
 
 CAR_MODELS = {
     "peugeot_pars": {
@@ -47,11 +45,7 @@ CAR_MODELS = {
 
 @lru_cache(maxsize=1)
 def catalog():
-    snapshot = Path(__file__).with_name("third_catalog.json")
-    if snapshot.exists():
-        return json.loads(snapshot.read_text(encoding="utf-8"))
-    # The checked-in HTML labs are the source of truth. Production can build
-    # the snapshot as a deploy artifact; a source checkout works directly.
+    # Build once from the authoritative labs; never trust a stale generated file.
     from scripts.build_third_catalog import build
     return build()
 

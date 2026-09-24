@@ -1,26 +1,77 @@
-# ممیزی نگاشت شخص ثالث خودرو
+# ممیزی و اجرای فرم یکپارچهٔ شخص ثالث خودرو
 
-منبع کاتالوگ‌ها چهار فایل `frontend/labs/{azki,sabim,bimebazar,bimeh}.html` است. Backend در اولین استفاده داده را مستقیم از آنها می‌سازد و نگه می‌دارد؛ برای ساخت snapshot اختیاری می‌توان `python backend/scripts/build_third_catalog.py` اجرا کرد. فایل تولیدی در Git نگهداری نمی‌شود. این اجتماع ۸۹۰۲ شناسهٔ مستقل دارد: ازکی ۱۸۷۹، سابیم ۴۰۶۱ مدل خودرو، بیمه‌بازار ۱۲۱۲ مدل/برند و بیمه‌دات‌کام ۱۷۵۰. تکرار یک مدل در کاربری‌های بیمه‌بازار زیر همان شناسه جمع می‌شود. `GET /api/search/catalog` فهرست قابل جست‌وجو و کاربری‌های همان منبع را می‌دهد. **هر شناسه فقط به سایت مبدأ تعلق دارد**. افزون بر سه نگاشت دستی `crosswalk.py`، ۶۲۲ ترکیب سواری شخصی با تطبیق *یکتای دقیقِ دسته، برند، عنوان کامل مدل و کاربری* در حداقل دو کاتالوگ به هم وصل شده‌اند (۶۱۵ دو منبع، ۷ سه منبع). تطبیق مبهم، نام مشابه، معادل بازاری یا نام تیپ متفاوت وصل نمی‌شود. شناسهٔ واقعی هر سایت همچنان از همان HTML خوانده می‌شود؛ برای سایت‌های فاقد ردیف `unmapped` برمی‌گردد.
+به‌روزرسانی: ۲۰۲۶/۰۹/۲۴. مبنا: `main` در `974e7739a103fbf097f4b2ad57d8f42c430dafec` و ادامهٔ شاخهٔ PR شمارهٔ ۱. دامنه فقط ثالث خودرو است؛ بدنه و موتور در رابط اصلی غیرفعال‌اند.
 
-| فیلد | ازکی | سابیم | بیمه‌بازار | بیمه‌دات‌کام | شواهد و وضعیت |
+## منابع بررسی‌شده
+
+چهار HTML تحویلی با نسخه‌های `frontend/labs` مقایسه شدند؛ اسکریپت‌ها و JSONهای تعبیه‌شده یکسان‌اند. منبع ساخت فرم و درخواست همان HTMLهاست، نه بازسازی سناریو از HAR. HAR فقط برای بررسی پاسخ واقعی و آزمون پارسر استفاده شد.
+
+| فایل | داده و منطق مورد استفاده |
+| --- | --- |
+| `azki.html` | `lab-data.third`، `lab-fixtures`، `resolveVehicle` و `buildThird`؛ تفاوت پارامترهای صفحه و API قیمت |
+| `sabim.html` | `sabim-data`، `validateVehicle` و `buildThirdRequest`؛ query کامل و POST با JSON خالی |
+| `bimebazar.html` | `wizard-data` و اولین `serialize`؛ روابط گام‌ها، شاخه‌های مالکیت و انتقال تخفیف، تفاوت compare و offers |
+| `bimeh.html` | `catalog`، `carPayload` و `makeRequest`؛ گزینه‌های سابقه و `fixtures.thirdparty[].durations` برای مدت درخواست جدید |
+
+تمام HARهای سه ZIP باز و درخواست‌های مرتبط طبقه‌بندی شدند: `Aski.zip` شش HAR، `BimehBazar.zip` چهار HAR و `Bimeh.com(1).zip` شش HAR. در `bimebazar.com-shakhs.har` یک entry دارای JSON خراب بود؛ ۱۳۲۰ entry سالم بازیابی شدند و entry خراب در استنتاج استفاده نشد. جزئیات شمارشِ بدون دادهٔ حساس در `docs/third-car-har-inventory.json` است. فایل قبلی `www.sabim.com-shakhse-sales-va-motor.har` نیز بازیابی و بررسی شد: **۳۰ پاسخ موفق قیمت** با `result/data/desc`؛ بنابراین درخواست قبلی برای ارسال مجدد پاسخ سابیم منتفی است.
+
+## اجتماع کاتالوگ و هویت خودرو
+
+`build_third_catalog.py` مستقیماً چهار HTML را می‌خواند. `crosswalk.catalog()` حاصل را در حافظه نگه می‌دارد و snapshot قدیمی را نمی‌خواند. اجتماع شامل ۸۹۰۲ شناسهٔ مستقل مدل/برند است: ازکی ۱۸۷۹، سابیم ۴۰۶۱ خودرو، بیمه‌بازار ۱۲۱۲ و بیمه‌دات‌کام ۱۷۵۰. کاربری‌ها به همان مدل/دستهٔ منبع متصل می‌مانند. ۶۲۲ گروه تطبیق دقیق و یکتای دسته، برند، عنوان کامل مدل و کاربری وجود دارد (۶۱۵ دو منبع، ۷ سه منبع)، به‌علاوهٔ سه تطبیق دستی پارس و ۲۰۶ تیپ ۲/۵. شناسهٔ یک سایت در سایت دیگر استفاده نمی‌شود.
+
+انتخاب اولیه از یک کمبوباکس با جست‌وجوی داخل فهرست انجام می‌شود. اگر تطبیق خودکار یک منبع موجود نباشد، کاربر در تب همان منبع مدل و کاربری معادل را از کاتالوگ اصلی آن انتخاب می‌کند. `provider_selections` فقط کلیدهای کاتالوگ را می‌پذیرد؛ backend عضویت مدل و کاربری در همان منبع را کنترل می‌کند. این انتخاب، نگاشت صریح کاربر است و تطبیق خودکارِ اثبات‌شده محسوب نمی‌شود. شناسهٔ کلی ۲۰۶ بیمه‌دات‌کام خودکار جایگزین تیپ ۲ یا ۵ نمی‌شود.
+
+## جدول نگاشت فیلدها
+
+«تأییدشده» در این جدول یعنی منطق در HTML/JSON منبع موجود است؛ به معنی اجرای زندهٔ همهٔ ترکیب‌های ممکن نیست.
+
+| فرم / DTO | ازکی | سابیم | بیمه‌بازار | بیمه‌دات‌کام | وضعیت و شاهد |
 | --- | --- | --- | --- | --- | --- |
-| دسته، برند، مدل، کاربری | `third.vehicleHierarchy` → `vehicleTypeID/vehicleBrandID/vehicleModelID/vehicleUsageID` | `modes/makers/cars/uses` → `carmode_id/car_company_id/car_id/thirdparty_usefor_id` | گام‌های `vehicle_type_picker/brand_picker_*/car_model_picker_*` → `vehicle_type/car_brand/car_model/car_usage` | `categories/thirdpartyModels` → `VehicleCategoryId/BrandId/ModelId/UsingTypeId` | کاتالوگ و سازندهٔ درخواست هر HTML: تأیید در هر منبع؛ ۶۲۲ تطبیق خودکار فقط با چهار ویژگی دقیق و یکتا |
-| سال | شمسی عددی `vehicleConstructionYear` | شناسه از `years` | شمسی عددی `car_production_year` | شناسه از `ProductionYears` | کاتالوگ‌ها: تأییدشده، سال خارج از فهرست `unmapped` |
-| فاقد بیمه | `withoutInsure=true` | تاریخ‌ها و شرکت قبلی در `buildThirdRequest` اجباری | `policy_status=without` | `PreviousInsuranceStatusId=1` | سازنده‌های HTML: سه منبع تأیید؛ سابیم `needs_input` |
-| خودروی نو | `zeroKilometer=true` و `oldInsureExpireDate` شمسی | قرارداد این شاخه روشن نیست | `policy_status=new` و `last_policy_exp_date` شمسی | `PreviousInsuranceStatusId=0` و `ReleaseDate` میلادی | سازنده‌های HTML: سه منبع تأیید؛ سابیم `needs_input` |
-| بیمهٔ قبلی دارد | تاریخ‌های شمسی، `oldCompanyID`، تخفیف/خسارت | تاریخ‌های میلادی، `thirdparty_lastcompany`، تخفیف/خسارت | `policy_status=other`، شرکت، تاریخ و تخفیف/خسارت | `PreviousInsuranceStatusId=2`، شرکت، انقضا، مدت، تخفیف/خسارت | سازنده‌های HTML: تأیید برای مالک بدون انتقال تخفیف؛ تغییر پلاک `needs_input` |
-| شرکت قبلی | `third.insurers` | `insurers` | `previous_company_sb_off_picker` | `Companies` | گزینه‌ها از چهار HTML؛ نام یکسان پس از حذف پیشوند «بیمه» به چهار شناسهٔ مستقل وصل می‌شود؛ نام غایب `needs_input` |
-| مدت | `durations`, `durationID` | `durations`, `thirdparty_time_id` | `policy_term` | `DurationId=2` در نمونهٔ موفق سالانه | سالانه تأیید؛ دورهٔ دیگر برای بیمه‌دات‌کام `unmapped` |
-| مدت بیمهٔ قبلی | فیلد مستقل در قیمت نیست | فیلد مستقل در قیمت نیست | فیلد مستقل در `serialize` نیست | `PreviousDurationId=1` سالانه | دورهٔ قبلی غیرسالانه در این شاخه نامشخص |
-| تخفیف‌ها | `thirdDiscounts/driverDiscounts` | `thirdDiscounts/driverDiscounts` | `no_damage_factor_picker/driver_no_damage_factor_picker` | `ThirdPartyDiscounts/DriverDiscounts` | درصد انتخابی در کاتالوگ هر سایت جدا بررسی می‌شود |
-| خسارت مالی، جانی، راننده | سه کاتالوگ `*Damages` | `financialDamages/humanDamages/driverDamages` | سه گام `*_damage_count_picker` | `PropertyLosses/LifeLosses/DriverLosses` | صفر، یک، دو و سه یا بیشتر تأیید؛ اعلام خسارت بدون تعداد معتبر `needs_input` |
-| تعهد مالی | `covers` با `coverID` و `orig_cover_amount` | `coverages` شامل مبلغ ریال و عنوان تومان | `financial_coverage` | `CoverageTypes`؛ درخواست استعلام فیلد تعهد ندارد | اجتماع مبالغِ موجود در HTML؛ تعهد هر ردیف قیمت فقط با شاهد خود ردیف قابل نمایش است |
-| تاریخ | `YYYY-MM-DD` شمسی | `YYYY-MM-DD` میلادی | `YYYY/MM/DD` شمسی | `ReleaseDate` میلادی و انقضا ISO | سازنده‌ها + `domain/dates.py` و آزمون ۱۴۰۵/۰۷/۰۱ ↔ ۲۰۲۶-۰۹-۲۳؛ روز نامعتبر رد می‌شود |
-| پاسخ قیمت | `top/bottom/others.prices` | JSON موفق قیمت در HTML وجود ندارد | `data.offers` | `Companies/Inquiries` | سه پارسر آزموده؛ سابیم در پاسخ ناشناخته `invalid_response` با JSON کامل، نه `empty` |
-| واحد مبلغ | نامشخص | نامشخص | نامشخص | نامشخص | هیچ تبدیل ضمنی یا رتبه‌بندی بین منابع انجام نمی‌شود |
+| دسته/برند/مدل/کاربری | `vehicleTypeID/vehicleBrandID/vehicleModelID/vehicleUsageID` | `carmode_id/car_company_id/car_id/thirdparty_usefor_id` | `vehicle_type/car_brand/car_model/car_usage` | `VehicleCategoryId/BrandId/ModelId/UsingTypeId` | کاتالوگ و روابط هر HTML؛ تأیید درون هر منبع، معادل غایب `unmapped` |
+| سال ساخت شمسی | `vehicleConstructionYear` | `thirdparty_yearofcons_id` از `years` | `car_production_year` | `ProductionYearId` از `ProductionYears` | شناسه از عنوان سال همان منبع؛ بدون محاسبهٔ حدسی ID |
+| سوخت/وارداتی/عنوان سال | فقط URL صفحه: `fuelTypeID`, `fuelTypeIDTitle`, `imported`, `vehicleConstructionYearTitle` | فیلد ندارد | فیلد ندارد | در ثالث فیلد ندارد | `buildThird` اینها را وارد API قیمت نمی‌کند؛ عنوان سال وارداتیِ خالی لینک صفحه را نامشخص می‌کند، قیمت را مسدود نمی‌کند |
+| بدون بیمه | `withoutInsure=true`, `zeroKilometer=false` | اطلاعات مبنا لازم است | `policy_status=without` | `PreviousInsuranceStatusId=1` | سه شاخه در HTML تأیید؛ برای سابیم تاریخ/شرکت ساخته نمی‌شود |
+| خودروی نو | `zeroKilometer=true`, `oldInsureExpireDate` = ترخیص شمسی | اطلاعات مبنا لازم است | `policy_status=new`, `last_policy_exp_date` = **پایان بیمهٔ خودروی نو** | `PreviousInsuranceStatusId=0`, `ReleaseDate` میلادی | ترخیص و انقضا دو فیلد مستقل فرم‌اند؛ `first_use_date_jalali/new_vehicle_expiry_jalali` |
+| بیمهٔ قبلی/مالک | `oldCompanyID` و سابقه | `thirdparty_lastcompany` و سابقه | `policy_status=other`, `previous_company` | وضعیت ۲ مالک فعلی، ۳ مالک قبلی، ۴ انتقال تخفیف | سازنده‌های HTML تأییدشده؛ `policy_owner` |
+| شروع/پایان قبلی | شمسی با خط تیره | میلادی ISO | شمسی با اسلش | فقط پایان میلادی ISO | `dates.py`؛ تبدیل ۱۴۰۵/۰۷/۰۱ به ۲۰۲۶-۰۹-۲۳ آزموده؛ ترتیب و اسفند نامعتبر رد می‌شود |
+| شرکت قبلی | `insurers` | `insurers` | `previous_company_sb_off_picker` | `Companies` | اجتماع نام‌های نرمال‌شده با ID مستقل؛ نبود شرکت آن منبع `needs_input` |
+| مدت جدید | `durationID` | `thirdparty_time_id` | `policy_term`؛ گزینه‌های ۲،۳،۴،۶،۹،۱۲ ماه | `DurationId` از **Durations پاسخ**؛ ۱،۲،۳،۴،۶،۹،۱۲ ماه | با کاتالوگ همان منبع کنترل می‌شود؛ ماه ناموجود `unmapped` |
+| مدت قبلی | مستقل ندارد | مستقل ندارد | مستقل ندارد | `PreviousDurationId=1` سالانه، `0` کوتاه‌مدت | `options.thirdparty.Durations`؛ با مدت جدید متفاوت است |
+| تخفیف ثالث/راننده | شناسه از `thirdDiscounts/driverDiscounts` | شناسه از درصد همان کاتالوگ | نسبت درصد به ۱۰۰ | شناسه از `ThirdPartyDiscounts/DriverDiscounts` | هر منبع جدا اعتبارسنجی می‌شود |
+| گزینهٔ تخفیف «صفر کیلومتر» سابیم | ندارد | شناسهٔ ۱۶، مقدار کاتالوگ `-5` | ندارد | ندارد | دو گزینهٔ مستقل در تب سابیم؛ `-5` درصد واقعی نیست و در فهرست درصد مشترک نشان داده نمی‌شود |
+| سابقه و سه نوع خسارت | `oldInsureUsed` و سه `*DamageID` | `prev_damage=darad/nadarad` و سه شناسه | `has_damage` و سه count | `Damage` و سه `*LossId` | کاتالوگ‌ها صفر/۱/۲/۳یا‌بیشتر؛ بدون خسارت IDهای بیمه‌دات‌کام `null` هستند |
+| تعویض پلاک | بدون تغییر: owner در قیمت حذف؛ بدون تخفیف ۱؛ همین پلاک ۲؛ پلاک دیگر ۳ | `transition` مستقل | `has_ownership_change` و سه `change_ownership_status` | `ownershipChange` | شاخه‌ها مستقیماً از `buildThird/serialize/carPayload` |
+| بدون تخفیف پس از تعویض | تخفیف‌ها شناسهٔ ۱ و خسارت صفر | تغییر ضمنی ندارد | پارامتر تخفیف/خسارت حذف می‌شود | مقادیر فرم | رفتار متفاوت منابع عیناً حفظ شده |
+| انتقال از پلاک دیگر | `unAttachedPlateNumber` | فیلد پلاک ندارد | `dis_plk1/2/3/Srl`, `dis_national_id`, `sb_id_pre`, نسبت اختیاری | در وضعیت ۴، `supplementDiscounts`؛ شرکت قبلی ارسال نمی‌شود | جزئیات مبدأ در فرم؛ نبود فیلد اجباری فقط همان منبع را `needs_input` می‌کند |
+| گزینه‌های سابیم | — | `transition`, `thirdparty_yadak` | — | — | boolean قابل ویرایش؛ پیش‌فرض false. معنای دقیق یدک در HTML روشن نیست و همین ابهام در UI ذکر شده |
+| تعهد مالی | ID پوشش و مبلغ تومان | ID از پوشش با ریال و عنوان صریح تومان | `financial_coverage` | پارامتر استعلام ندارد؛ ردیف پاسخ تعیین می‌کند | تبدیل ریال پوشش سابیم با شاهد کاتالوگ است؛ **واحد حق بیمه از آن استنتاج نمی‌شود** |
 
-شناسه‌های دستی پژو پارس سواری شخصی: ازکی برند/مدل `18/182341`، سابیم `22/13`، بیمه‌بازار `car_peugeot/car_peugeot_peugeot-pars` و بیمه‌دات‌کام `1001/1023`. پژو ۲۰۶ تیپ ۲ و ۵ در سه منبع شناسهٔ دقیق دارند، اما شناسهٔ کلی ۲۰۶ بیمه‌دات‌کام به جای تیپ استفاده نمی‌شود. نمونهٔ تطبیق خودکار دقیق: آئودی A4 سواری شخصی با شناسهٔ مدل `806880` ازکی و `car_audi_a4` بیمه‌بازار؛ مدل آئودی وارداتی در ازکی به «عنوان سال» اضافی نیاز دارد و فعلاً همان منبع `needs_input` می‌گیرد.
+مقادیر ثابتِ سازنده‌ها: ازکی `isEdit/isExtend/sanhab=false`؛ بیمه‌بازار ورود بدون پلاک با `plk2=1,sb_id=empty,inquiry_type=regular`؛ بیمه‌دات‌کام `isRenewal=false,EncryptedPlaque=null`؛ سابیم `command=get_price`. هیچ endpoint یا هدر یا token از فرم پذیرفته نمی‌شود.
 
-`POST /api/search` وضعیت چهار منبع را مستقل برمی‌گرداند. پاسخ معتبرِ بدون پیشنهاد `empty`، خطای شبکه/اعتبارنامه `unavailable` و JSON سالم با ساختار ناشناخته `invalid_response` است. JSON کامل پاسخ و ردیف خام پیشنهاد حفظ می‌شود؛ هدرها و توکن‌های درخواست در نتیجه یا Git قرار نمی‌گیرند. آزمون‌های فعلی با پاسخ شبیه‌سازی‌شده‌اند و اثبات استعلام زنده نیستند.
+## ارسال و پاسخ
 
-**نمونهٔ مشخصِ لازم برای تکمیل سابیم:** یک JSON پاسخ موفق `POST /api/price_thirdparty` برای خودروی دارای بیمهٔ قبلی، با ردیف قیمت کامل و بدون اطلاعات حساس. برای فاقد بیمه و خودروی نو، Query و پاسخ موفق همان شاخه لازم است تا مقدار معتبر تاریخ‌ها و شرکت قبلی اثبات شود. این داده در `sabim.html` موجود نیست؛ کد مقدار ساختگی نمی‌فرستد.
+`POST /api/search/preview` چهار درخواست را بدون تماس خارجی می‌سازد. چهار تب، مدل/کاربری معادل، URL، query، body و URL صفحهٔ مقایسه را نشان می‌دهند. `POST /api/search` **همان builder** را اجرا می‌کند و منابع مستقل فراخوانی می‌شوند. زمان انتظار ۳۵ ثانیه برای سه منبع و ۶۵ ثانیه برای بیمه‌دات‌کام است. UI پاسخ‌ها را هنگام درخواست مجدد پاک می‌کند؛ برگشت بین سؤال‌ها پاسخ‌های فرم را نگه می‌دارد.
+
+| منبع | درخواست | پاسخ آزموده | فیلدهای کارت |
+| --- | --- | --- | --- |
+| ازکی | GET `.../aggregator/v1/third/prices/compare` | `top/bottom/others[].prices` | شرکت، مبلغ، مدت/تعهد دقیق ردیف منطبق با درخواست |
+| سابیم | POST `.../api/price_thirdparty`، query و `{}` | `result=ok,data[],desc` | `company_name,company_id,price,jsonpricing_id`؛ مدت/تعهد نامشخص |
+| بیمه‌بازار | GET `.../thirdparty/api/offers/` | `status=ok,data.offers` | `company_name,cid,tariff`؛ مدت/تعهد ردیف نامشخص |
+| بیمه‌دات‌کام | POST `.../v1/insurance/third-party/inquiry`، JSON | `Companies/Inquiries/Coverages/Durations` | شرکت و `CashPrice.FinalAmount`؛ مدت از Durations؛ تعهد از Details.CoverageId و عنوان صریح تومان |
+
+کل JSON پاسخ در `raw_response` و ردیف کامل در `raw_offer` حفظ می‌شود. نمونه‌های فشردهٔ آزمون و منشأ آنها در `backend/tests/fixtures/README.md` ثبت شده‌اند. پارسرها واحد حق بیمه را **unknown** می‌گذارند؛ هیچ رتبه‌بندی بین‌منبعی یا تبدیل ضمنی ریال/تومان وجود ندارد. هدر، Cookie و token درخواست وارد JSON پاسخ و Git نمی‌شوند.
+
+`empty` فقط پاسخ شناخته‌شدهٔ بدون پیشنهاد است. JSON خراب یا ساختار ناشناخته `invalid_response` است؛ در صورت JSON بودن، پاسخ خام آن حفظ می‌شود. خطای HTTP/اتصال/اعتبارنامه `unavailable` است. خطای ساخت درخواست نیز تنها همان منبع را متوقف می‌کند.
+
+## سابیم و شاخه‌های فاقد سابقه
+
+تمام ۳۰ درخواست موفق HAR بازیابی‌شده شرکت مبنای ۵ و تاریخ‌های شروع/پایان داشتند. کاتالوگ insurer گزینهٔ مستقل «فاقد بیمه/نو» ندارد. فرم اکنون امکان ورود صریح تاریخ‌ها و شرکت مبنای سابیم را در تب این منبع دارد؛ در غیاب آن برای بدون بیمه/نو `needs_input` حفظ می‌شود. این ورودی کاربر، شاهد وجود یک مقدار پیش‌فرض مخصوص بدون بیمه نیست. برای خودکارکردن این حالت فقط **یک نمونهٔ موفق سابیم با انتخاب صریح فاقد بیمه یا صفرکیلومتر و query واقعی همان حالت** لازم است؛ برای مدل‌ها، روابط و سایر شاخه‌ها نیازی به ارسال دوبارهٔ HARها نیست.
+
+## صحت‌سنجی و اجرای زنده
+
+- `uv run pytest -q`: ۷۳ آزمون و ۳۶ زیرآزمون موفق؛ نمونهٔ واقعی چهار پاسخ، مالکیت، انتقال تخفیف، مدت‌های مستقل، تاریخ، گزینه‌های صفرکیلومتر سابیم، override معتبر/نامعتبر، برابری preview و اجرا، حفظ raw و خرابی مستقل پوشش داده شدند.
+- `npm ci` و `npm run build` موفق؛ smoke test هر چهار HTML موفق. موفقیت smoke test بدنه/موتور به معنی فعال‌شدن آنها در فرم مشترک نیست.
+- اجرای واقعی `POST /api/search` در **۲۰۲۶/۰۹/۲۴ ساعت ۲۲:۲۳:۵۷ UTC**: پژو پارس شخصی، سال ۱۴۰۴، بیمهٔ قبلی آسیا از ۱۴۰۴/۰۷/۰۱ تا ۱۴۰۵/۰۷/۰۱، بدون خسارت/تخفیف، مدت جدید ۱۲ ماه و تعهد انتخابی ۷۰ میلیون تومان. سابیم `ok` با ۱ پیشنهاد، بیمه‌بازار `ok` با ۱۶، بیمه‌دات‌کام `ok` با ۳۰۷؛ ازکی `unavailable`؛ بررسی جداگانه HTTP 401 را نشان داد و `AZKI_AUTHORIZATION` محلی تنظیم نبود. این نتیجه اجرای زنده است، مستقل از fixtureها. اعتبارنامهٔ محلی بیمه‌دات‌کام استفاده شد؛ توکن HAR بازپخش نشد.
+- اجرای تمام مدل‌ها و شاخه‌های مالکیت به‌صورت زنده ادعا نمی‌شود. ۳۰۷ پیشنهاد بیمه‌دات‌کام شامل مدت‌ها/تعهدهای متعدد پاسخ است؛ تعداد پیشنهادهای کاملاً قابل مقایسه نیست.
+- آزمون تعاملی DOM با React واقعی و backend محلی موفق بود: بازشدن کمبوباکس، جست‌وجوی فارسی ۲۰۶ در همان فهرست، انتخاب شرکت، ورود تاریخ فارسی، چهار تب، وضعیت مستقل مدل نگاشت‌نشده و حفظ پاسخ هنگام برگشت. این آزمون `/api/search/preview` واقعی را فراخواند و استعلام زنده اجرا نکرد. ابزار این بررسی Happy DOM موقت بود؛ نتیجهٔ تصویری/مرورگر محسوب نمی‌شود.
+- بررسی تصویری با Chromium اجرا نشد: مرورگر نصب نبود و دانلود binary ناموفق شد؛ موفقیت build جای بررسی تصویری تلقی نمی‌شود.

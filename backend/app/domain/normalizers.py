@@ -6,8 +6,10 @@ offer shape fails the provider rather than silently dropping its rows.
 
 from datetime import datetime
 from decimal import Decimal
+import re
 
 from .quotes import Offer, Premium, ProviderResult
+from .third_mapping import MONTH_TITLES
 
 
 def _amount(value):
@@ -36,6 +38,8 @@ def normalize(provider: str, data: dict, fetched_at: datetime, product: str,
                             fetched_at=fetched_at, raw_offer=source))
 
     if provider == "azki":
+        if not all(isinstance(data.get(group), list) for group in ("top", "bottom", "others")):
+            raise ValueError("فهرست پیشنهادهای ازکی معتبر نیست")
         for group in ("top", "bottom", "others"):
             for company in data[group]:
                 for price in company["prices"]:
@@ -45,6 +49,8 @@ def normalize(provider: str, data: dict, fetched_at: datetime, product: str,
                             months=duration, coverage_amount=coverage,
                             installments=bool(company.get("installments")))
     elif provider == "bimebazar":
+        if data.get("status") != "ok" or not isinstance(data.get("data", {}).get("offers"), list):
+            raise ValueError("فهرست پیشنهادهای بیمه‌بازار معتبر نیست")
         for row in data["data"]["offers"]:
             # Offers can contain multiple terms/coverages. The upstream row is
             # retained intact and used only when its dimensions are explicit.
@@ -52,13 +58,28 @@ def normalize(provider: str, data: dict, fetched_at: datetime, product: str,
                 installments=row.get("has_installment_payment"))
     elif provider == "bimeh":
         companies = {str(c["Id"]): c["Title"] for c in data["Companies"]}
+        durations = {str(d["Id"]): MONTH_TITLES.get(d["Title"]) for d in data.get("Durations", [])}
+        coverages = {}
+        for item in data.get("Coverages", []):
+            title = str(item.get("Title", "")).translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789"))
+            match = re.fullmatch(r"\s*(\d+)\s+(میلیون|میلیارد)\s+تومان\s*", title)
+            if match:
+                coverages[str(item["Id"])] = int(match[1]) * (1_000_000 if match[2] == "میلیون" else 1_000_000_000)
         for row in data["Inquiries"]:
             key = row["CompanyId"]
             name = companies.get(str(key))
             if not name:
                 raise ValueError("شناسهٔ شرکت بیمه‌دات‌کام در Companies پیدا نشد")
             add(name, row["CashPrice"]["FinalAmount"], row, key=key,
-                offer_id=row.get("Id"), installments=row.get("HasInstallments"))
+                offer_id=row.get("Id"), installments=row.get("HasInstallments"),
+                months=durations.get(str(row.get("DurationId"))),
+                coverage_amount=coverages.get(str((row.get("Details") or {}).get("CoverageId"))))
+    elif provider == "sabim":
+        if data.get("result") != "ok" or not isinstance(data.get("data"), list):
+            raise ValueError("پاسخ قیمت سابیم موفق یا قابل شناسایی نیست")
+        for row in data["data"]:
+            add(row["company_name"], row["price"], row, key=row.get("company_id"),
+                offer_id=row.get("jsonpricing_id"))
     else:
         raise ValueError("پارسر این منبع هنوز تأیید نشده است")
     return ProviderResult(provider=provider, status="ok" if offers else "empty",

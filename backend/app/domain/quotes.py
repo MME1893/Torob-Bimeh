@@ -30,6 +30,7 @@ class CarVehicle(Contract):
     production_month_jalali: int | None = Field(default=None, ge=1, le=12)
     imported: bool | None = None
     fuel_type_key: str | None = None
+    construction_year_title: str | None = Field(default=None, max_length=80)
 
 
 class MotorVehicle(Contract):
@@ -55,9 +56,23 @@ class PreviousThirdPartyPolicy(Contract):
     discount_transferred: bool = False
     first_use_date: date | None = None
     first_use_date_jalali: str | None = None
+    new_vehicle_expiry_jalali: str | None = None
+    ownership_mode: Literal["unchanged", "no_discount", "same_plate", "other_plate"] = "unchanged"
+    policy_owner: Literal["current", "previous", "transfer"] = "current"
+    supplement_discounts: bool = False
+    transfer_plate: str | None = Field(default=None, max_length=100)
+    transfer_plate_part1: str | None = Field(default=None, max_length=8)
+    transfer_plate_part2: str | None = Field(default=None, max_length=8)
+    transfer_plate_part3: str | None = Field(default=None, max_length=8)
+    transfer_plate_serial: str | None = Field(default=None, max_length=8)
+    transfer_national_id: str | None = Field(default=None, max_length=10)
+    transfer_relationship: str = Field(default="", max_length=40)
+    transfer_inquiry_id: str | None = Field(default=None, max_length=100)
 
     @model_validator(mode="after")
     def validate_persian_dates(self):
+        if self.new_vehicle_expiry_jalali:
+            jalali_to_gregorian(self.new_vehicle_expiry_jalali)
         for prefix, gregorian in (("previous_start", self.previous_start_date),
                                    ("previous_expiry", self.previous_expiry_date),
                                    ("first_use", self.first_use_date)):
@@ -66,6 +81,22 @@ class PreviousThirdPartyPolicy(Contract):
                 raise ValueError("تاریخ شمسی و میلادی بیمه با هم سازگار نیستند")
             if jalali:
                 jalali_to_gregorian(jalali)
+        return self
+
+
+class ProviderSelection(Contract):
+    model_key: str
+    usage_key: str
+
+
+class SabimHistory(Contract):
+    insurer_key: str
+    start_date_jalali: str
+    expiry_date_jalali: str
+    @model_validator(mode="after")
+    def valid_dates(self):
+        if jalali_to_gregorian(self.start_date_jalali) >= jalali_to_gregorian(self.expiry_date_jalali):
+            raise ValueError("تاریخ پایان سابیم باید پس از شروع باشد")
         return self
 
 
@@ -82,6 +113,12 @@ class ThirdCarSearch(Contract):
     previous_policy: PreviousThirdPartyPolicy
     duration_months: int = Field(ge=1, le=12)
     financial_coverage_toman: int = Field(gt=0)
+    provider_selections: dict[Provider, ProviderSelection] = Field(default_factory=dict)
+    sabim_history: SabimHistory | None = None
+    sabim_zero_km_third_discount: bool = False
+    sabim_zero_km_driver_discount: bool = False
+    sabim_yadak: bool = False
+    sabim_transition: bool = False
 
 
 class ThirdMotorSearch(Contract):
