@@ -89,3 +89,37 @@ def test_one_source_failure_preserves_other_results(monkeypatch):
     assert response.status_code == 200
     assert [p["status"] for p in response.json()["providers"]] == [
         "empty", "needs_input", "empty", "unavailable"]
+
+
+def test_catalog_lists_only_audited_model_and_supported_policy():
+    response = TestClient(app).get("/api/search/catalog")
+    assert response.status_code == 200
+    data = response.json()
+    assert [m["key"] for m in data["models"]] == ["peugeot_pars"]
+    assert data["models"][0]["brand_key"] == "peugeot"
+    assert data["third_car"]["supported_previous_policy_status"] == "no_previous_policy"
+    assert 1404 in data["production_years_jalali"]
+
+
+def test_malformed_provider_response_is_not_an_empty_result(monkeypatch):
+    async def empty_azki(*args):
+        return {"top": [], "bottom": [], "others": []}
+
+    async def empty_bazaar(*args):
+        return {"status": "ok", "data": {"offers": []}}
+
+    async def malformed_bimeh(*args):
+        return {"Companies": [], "Inquiries": [
+            {"CompanyId": 99, "CashPrice": {"FinalAmount": 12000000}}]}
+
+    monkeypatch.setattr(search, "get_third_prices", empty_azki)
+    monkeypatch.setattr(search, "get_offers", empty_bazaar)
+    monkeypatch.setattr(search, "get_prices", malformed_bimeh)
+    response = TestClient(app).post("/api/search", json=FORM)
+    assert response.status_code == 200
+    providers = {p["provider"]: p for p in response.json()["providers"]}
+    assert providers["azki"]["status"] == "empty"
+    assert providers["bimebazar"]["status"] == "empty"
+    assert providers["bimeh"]["status"] == "invalid_response"
+    assert providers["bimeh"]["raw_response"] is None
+    assert providers["bimeh"]["offers"] == []

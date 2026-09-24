@@ -2,12 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import './style.css';
 
-type Status = 'ok' | 'empty' | 'needs_input' | 'unmapped' | 'unavailable' | 'unsupported';
+type Status = 'ok' | 'empty' | 'needs_input' | 'unmapped' | 'unavailable' | 'invalid_response' | 'unsupported';
 type Offer = {insurer_name: string; provider: string; premium: {raw_amount: number; raw_unit: string; amount_toman: number | null}; financial_coverage_toman: number | null; duration_months: number | null; raw_offer: Record<string, unknown>};
 type ProviderResult = {provider: string; status: Status; message: string | null; offers: Offer[]; raw_response: unknown};
 type SearchResult = {request_id: string; fetched_at: string; providers: ProviderResult[]};
+type Catalog = {models: {key: string; label: string; category_key: string; brand_key: string; usage_key: string}[]; production_years_jalali: number[]; third_car: {duration_months: number; financial_coverage_toman: number; supported_previous_policy_status: 'no_previous_policy'}};
 const names: Record<string, string> = {azki: 'ازکی', sabim: 'سابیم', bimebazar: 'بیمه‌بازار', bimeh: 'بیمه‌دات‌کام'};
-const statusNames: Record<Status, string> = {ok: 'پیشنهاد دریافت شد', empty: 'پیشنهادی پیدا نشد', needs_input: 'به اطلاعات بیشتر نیاز دارد', unmapped: 'نگاشت تأیید نشده', unavailable: 'در دسترس نیست', unsupported: 'در این نسخه فعال نیست'};
+const statusNames: Record<Status, string> = {ok: 'پیشنهاد دریافت شد', empty: 'پیشنهادی پیدا نشد', needs_input: 'به اطلاعات بیشتر نیاز دارد', unmapped: 'نگاشت تأیید نشده', unavailable: 'در دسترس نیست', invalid_response: 'پاسخ قابل پردازش نیست', unsupported: 'در این نسخه فعال نیست'};
 const formatter = new Intl.NumberFormat('fa-IR');
 
 function VehicleArt({kind}: {kind: 'car' | 'shield' | 'motor'}) {
@@ -32,6 +33,19 @@ function App() {
   const [selected, setSelected] = useState(false);
   const [step, setStep] = useState(0);
   const [year, setYear] = useState(1404);
+  const [catalog, setCatalog] = useState<Catalog | null>(null);
+  const [modelKey, setModelKey] = useState('');
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/search/catalog', {signal: controller.signal})
+      .then(r => {if (!r.ok) throw new Error('کاتالوگ خودرو در دسترس نیست'); return r.json() as Promise<Catalog>})
+      .then(data => {
+        if (!data.models.length || !data.production_years_jalali.length) throw new Error('کاتالوگ خودرو خالی است');
+        setCatalog(data); setModelKey(data.models[0].key); setYear(data.production_years_jalali[0]);
+      })
+      .catch(e => {if (!controller.signal.aborted) setError(e instanceof Error ? e.message : 'خطا در دریافت کاتالوگ')});
+    return () => controller.abort();
+  }, []);
   const [result, setResult] = useState<SearchResult | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -39,11 +53,14 @@ function App() {
   useEffect(() => {if (result) document.querySelector('.results')?.scrollIntoView({behavior: 'smooth', block: 'start'});}, [result]);
 
   async function search() {
+    if (!catalog) {setError('ابتدا کاتالوگ خودرو باید دریافت شود'); return;}
+    const model = catalog.models.find(m => m.key === modelKey);
+    if (!model) {setError('مدل انتخاب‌شده در کاتالوگ پیدا نشد'); return;}
     setPending(true); setResult(null); setError(''); setAll(false);
     try {
       const response = await fetch('/api/search', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
-        product: 'third_car', vehicle: {category_key: 'passenger', brand_key: 'peugeot', model_key: 'peugeot_pars', usage_key: 'personal', production_year_jalali: year},
-        previous_policy: {status: 'no_previous_policy'}, duration_months: 12, financial_coverage_toman: 70000000,
+        product: 'third_car', vehicle: {category_key: model.category_key, brand_key: model.brand_key, model_key: model.key, usage_key: model.usage_key, production_year_jalali: year},
+        previous_policy: {status: catalog.third_car.supported_previous_policy_status}, duration_months: catalog.third_car.duration_months, financial_coverage_toman: catalog.third_car.financial_coverage_toman,
       })});
       if (!response.ok) throw new Error(`پاسخ سرور: HTTP ${response.status}`);
       setResult(await response.json() as SearchResult);
@@ -52,6 +69,7 @@ function App() {
   }
 
   const offers = result?.providers.flatMap(p => p.offers) || [];
+  const selectedModel = catalog?.models.find(m => m.key === modelKey);
   return <div className="site">
     <header className="header wrap"><a href="/" className="identity" aria-label="ترب بیمه، صفحهٔ آغاز"><img src="/logo.png" alt="ترب بیمه" /><span>مقایسهٔ بیمه، با خیال روشن‌تر</span></a><span className="edition">نسخهٔ آزمایشی • استعلام زنده</span></header>
     <main className="wrap">
@@ -62,10 +80,10 @@ function App() {
         <div className="product upcoming"><div className="art peach"><VehicleArt kind="motor"/></div><div className="product-copy"><strong>شخص ثالث موتور</strong><span>در حال تکمیل نگاشت‌ها</span></div><span className="soon">گام بعد</span></div>
       </div></section>
       {selected && <section className="wizard" aria-label="پرسش‌های استعلام"><div className="wizard-top"><span>گفت‌وگوی راهنما <small>• اطلاعات ساختاریافته</small></span><span>گام {formatter.format(step+1)} از ۳</span></div><div className="progress"><span style={{width: `${(step+1)/3*100}%`}}/></div>
-        {step === 0 && <div className="question"><span className="avatar">؟</span><h2>ماشینت چه مدلی است؟</h2><p>از این مدل، شناسه‌های تأییدشدهٔ هر سایت را جداگانه داریم.</p><div className="answer"><div className="chosen">پژو پارس <small>سواری · کاربری شخصی</small></div><label>سال ساخت شمسی<select value={year} onChange={e => setYear(Number(e.target.value))}>{Array.from({length:16}, (_,i) => 1405-i).map(y => <option key={y} value={y}>{formatter.format(y)}</option>)}</select></label></div><small className="explain">در این برش، نگاشت سایر مدل‌ها هنوز تأیید نشده است.</small></div>}
+        {step === 0 && <div className="question"><span className="avatar">؟</span><h2>ماشینت چه مدلی است؟</h2><p>از این مدل، شناسه‌های تأییدشدهٔ هر سایت را جداگانه داریم.</p><div className="answer"><label>مدل خودرو<select value={modelKey} disabled={!catalog} onChange={e => {setModelKey(e.target.value);setResult(null)}}>{catalog?.models.map(m => <option key={m.key} value={m.key}>{m.label}</option>) || <option value="">در حال دریافت کاتالوگ…</option>}</select></label><label>سال ساخت شمسی<select value={year} disabled={!catalog} onChange={e => setYear(Number(e.target.value))}>{catalog?.production_years_jalali.map(y => <option key={y} value={y}>{formatter.format(y)}</option>)}</select></label></div><small className="explain">در این برش، نگاشت سایر مدل‌ها هنوز تأیید نشده است.</small></div>}
         {step === 1 && <div className="question"><span className="avatar">؟</span><h2>قبلاً بیمهٔ شخص ثالث داشته؟</h2><p>این مسیر فعلاً برای خودرویی است که بیمهٔ قبلی نداشته است.</p><div className="chosen choice">خیر، بیمهٔ قبلی نداشته <span>✓</span></div><small className="explain">برای سابیم، تاریخ‌های اجباری این وضعیت هنوز مشخص نشده‌اند؛ در نتایج وضعیت آن را جدا می‌بینی.</small></div>}
-        {step === 2 && <div className="question"><span className="avatar">✓</span><h2>همه چیز درست است؟</h2><p>اطلاعاتی که برای استعلام می‌فرستیم:</p><div className="review"><span>بیمه <b>شخص ثالث خودرو</b></span><span>وسیله <b>پژو پارس، مدل {formatter.format(year)}</b></span><span>بیمهٔ قبلی <b>ندارد</b></span><span>مدت <b>۱۲ ماه</b></span><span>تعهد مالی <b>۷۰ میلیون تومان</b></span></div><p className="disclosure">داده‌ها برای استعلام به منابع بیمه ارسال می‌شوند. دریافت نتیجه ممکن است کمی طول بکشد.</p></div>}
-        <div className="controls">{step>0 && <button className="secondary" onClick={() => {setStep(step-1);setResult(null)}}>بازگشت</button>}{step<2 ? <button className="primary" onClick={() => setStep(step+1)}>ادامه ←</button> : <button className="primary" onClick={search} disabled={pending}>{pending?'در حال استعلام…':'دریافت پیشنهادهای تازه ←'}</button>}</div>
+        {step === 2 && <div className="question"><span className="avatar">✓</span><h2>همه چیز درست است؟</h2><p>اطلاعاتی که برای استعلام می‌فرستیم:</p><div className="review"><span>بیمه <b>شخص ثالث خودرو</b></span><span>وسیله <b>{selectedModel?.label || '—'}، مدل {formatter.format(year)}</b></span><span>بیمهٔ قبلی <b>ندارد</b></span><span>مدت <b>۱۲ ماه</b></span><span>تعهد مالی <b>۷۰ میلیون تومان</b></span></div><p className="disclosure">داده‌ها برای استعلام به منابع بیمه ارسال می‌شوند. دریافت نتیجه ممکن است کمی طول بکشد.</p></div>}
+        <div className="controls">{step>0 && <button className="secondary" onClick={() => {setStep(step-1);setResult(null)}}>بازگشت</button>}{step<2 ? <button className="primary" onClick={() => setStep(step+1)} disabled={!catalog}>ادامه ←</button> : <button className="primary" onClick={search} disabled={pending}>{pending?'در حال استعلام…':'دریافت پیشنهادهای تازه ←'}</button>}</div>
       </section>}
       {error && <div className="alert" role="alert">{error}</div>}
       {result && <section className="results" aria-live="polite"><div className="section-title"><div><span className="overline">نتیجهٔ استعلام</span><h2>پیشنهادها و وضعیت منابع</h2></div><span className="timestamp">دریافت: {new Date(result.fetched_at).toLocaleString('fa-IR')}</span></div><div className="providers">{result.providers.map(p => <div key={p.provider} className={'provider '+p.status}><b>{names[p.provider]}</b><span>{statusNames[p.status]}</span><small>{p.message || `${formatter.format(p.offers.length)} پیشنهاد`}</small></div>)}</div><div className="result-head"><h3>{formatter.format(offers.length)} پیشنهاد دریافت شد</h3><span>مبلغ خام API؛ واحد پول هنوز تأیید نشده و مرتب‌سازی قیمت غیرفعال است.</span></div>{offers.length ? <div className="offer-grid">{(all?offers:offers.slice(0,8)).map((o,i) => <article className="offer" key={`${o.provider}-${i}`}><span className="source">{names[o.provider]}</span><h4>{o.insurer_name}</h4><div className="price">{formatter.format(o.premium.raw_amount)} <small>واحد نامشخص</small></div><p>{o.duration_months ? `${formatter.format(o.duration_months)} ماه` : 'مدت در پیشنهاد تأیید نشده'} · {o.financial_coverage_toman ? `${formatter.format(o.financial_coverage_toman)} تومان تعهد مالی` : 'تعهد پیشنهاد تأیید نشده'}</p><details><summary>جزئیات خام این پیشنهاد</summary><pre dir="ltr">{JSON.stringify(o.raw_offer,null,2)}</pre></details></article>)}</div> : <p className="alert">هیچ پیشنهاد قابل‌نمایشی از منابع پاسخ‌دهنده دریافت نشد.</p>}{offers.length>8 && <button className="secondary more" onClick={() => setAll(!all)}>{all?'نمایش کمتر':`نمایش همهٔ ${formatter.format(offers.length)} پیشنهاد`}</button>}<div className="raw"><h3>پاسخ کامل منابع</h3><p>تمام فیلدهای پاسخ هر منبع در JSON آن حفظ شده‌اند.</p>{result.providers.map(p => <RawPanel key={p.provider} provider={p} result={result}/>)}</div></section>}

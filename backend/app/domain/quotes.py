@@ -133,7 +133,7 @@ class Offer(Contract):
 
 class ProviderResult(Contract):
     provider: Provider
-    status: Literal["ok", "empty", "needs_input", "unmapped", "unavailable", "unsupported"]
+    status: Literal["ok", "empty", "needs_input", "unmapped", "unavailable", "invalid_response", "unsupported"]
     offers: list[Offer] = Field(default_factory=list)
     message: str | None = None
     # Preserve the complete upstream JSON in a provider-specific namespace.

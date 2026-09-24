@@ -10,7 +10,7 @@ from fastapi import APIRouter, Body
 from ..adapters.azki.client import get_third_prices
 from ..adapters.bimebazar.client import get_offers
 from ..adapters.bimeh.client import get_prices
-from ..domain.crosswalk import match_car
+from ..domain.crosswalk import CAR_MODELS, match_car
 from ..domain.normalizers import normalize
 from ..domain.quotes import ProviderResult, SearchInput, SearchResult, ThirdCarSearch
 
@@ -63,13 +63,18 @@ async def _one(provider, request, car, fetched_at):
             raw = await asyncio.wait_for(get_offers(request.product, params), timeout=35)
         else:
             raw = await asyncio.wait_for(get_prices(request.product, params), timeout=65)
+    except Exception:
+        # Do not expose upstream text: it can contain request data or secrets.
+        return ProviderResult(provider=provider, status="unavailable",
+                              message="ارتباط با این منبع یا دریافت پاسخ ناموفق بود")
+    try:
         return normalize(provider, raw, fetched_at, request.product,
                          request.duration_months, request.financial_coverage_toman)
     except Exception:
-        # No request payload, secrets or untrusted upstream error text goes to
-        # the user. One source must never discard another source's result.
-        return ProviderResult(provider=provider, status="unavailable",
-                              message="دریافت یا پردازش پاسخ این منبع ناموفق بود")
+        # A valid empty list is handled inside normalize; malformed JSON or
+        # an unknown offer shape must never be presented as zero offers.
+        return ProviderResult(provider=provider, status="invalid_response",
+                              message="ساختار پیشنهادهای این منبع قابل پردازش نیست")
 
 
 @router.post("/api/search", response_model=SearchResult)
@@ -89,3 +94,21 @@ async def search(request: SearchInput = Body(discriminator="product")):
         providers = await asyncio.gather(*(_one(p, request, car, now) for p in PROVIDERS))
     return SearchResult(request_id=str(uuid4()), product=request.product,
                         fetched_at=now, providers=providers)
+
+
+@router.get("/api/search/catalog")
+def search_catalog():
+    """Only choices with an explicit crosswalk appear in the first car form."""
+    return {
+        "models": [
+            {"key": key, "label": row["label"], "category_key": row["category_key"],
+             "brand_key": row["brand_key"], "usage_key": row["usage_key"]}
+            for key, row in CAR_MODELS.items()
+        ],
+        "production_years_jalali": list(range(1405, 1389, -1)),
+        "third_car": {
+            "duration_months": 12,
+            "financial_coverage_toman": 70_000_000,
+            "supported_previous_policy_status": "no_previous_policy",
+        },
+    }
