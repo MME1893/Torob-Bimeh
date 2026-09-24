@@ -11,6 +11,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 from .pricing import to_toman
+from .dates import jalali_to_gregorian
 
 Product = Literal["third_car", "body_car", "third_motor"]
 Provider = Literal["azki", "sabim", "bimebazar", "bimeh"]
@@ -41,6 +42,8 @@ class PreviousThirdPartyPolicy(Contract):
     previous_insurer_key: str | None = None
     previous_start_date: date | None = None
     previous_expiry_date: date | None = None
+    previous_start_date_jalali: str | None = None
+    previous_expiry_date_jalali: str | None = None
     previous_duration_months: int | None = Field(default=None, ge=1, le=12)
     no_claim_discount_percent: int | None = Field(default=None, ge=0, le=100)
     driver_discount_percent: int | None = Field(default=None, ge=0, le=100)
@@ -51,6 +54,19 @@ class PreviousThirdPartyPolicy(Contract):
     ownership_changed: bool = False
     discount_transferred: bool = False
     first_use_date: date | None = None
+    first_use_date_jalali: str | None = None
+
+    @model_validator(mode="after")
+    def validate_persian_dates(self):
+        for prefix, gregorian in (("previous_start", self.previous_start_date),
+                                   ("previous_expiry", self.previous_expiry_date),
+                                   ("first_use", self.first_use_date)):
+            jalali = getattr(self, prefix + "_date_jalali")
+            if jalali and gregorian and jalali_to_gregorian(jalali) != gregorian:
+                raise ValueError("تاریخ شمسی و میلادی بیمه با هم سازگار نیستند")
+            if jalali:
+                jalali_to_gregorian(jalali)
+        return self
 
 
 class PreviousBodyPolicy(Contract):

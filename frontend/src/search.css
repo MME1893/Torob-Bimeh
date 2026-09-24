@@ -1,0 +1,15 @@
+.answer input {
+  height: 43px;
+  width: 100%;
+  border: 1px solid #d0ddcd;
+  border-radius: 11px;
+  background: white;
+  color: #294b38;
+  padding: 0 10px;
+  font: inherit;
+}
+.answer small {align-self: center; color: #60776a; line-height: 1.5;}
+.review span {flex-wrap: wrap; align-items: center;}
+.review span b {flex: 1 1 55%;}
+.review span button {padding: 6px 10px; font-size: 11px;}
+@media (max-width: 780px) {.answer {grid-template-columns: 1fr;}}

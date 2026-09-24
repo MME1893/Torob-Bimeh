@@ -46,22 +46,9 @@ async def get_prices(product: str, body: dict,
         logger.warning("Bimeh inquiry redirect: product=%s status=%s", product, response.status_code)
         raise BimehUpstreamError("API بیمه‌دات‌کام درخواست قیمت را تغییر مسیر داد")
     if response.status_code != 200:
-        # Response bodies and headers may contain session data; log only a short
-        # plain-text error message from a JSON response, never token/cookies.
-        detail = ""
-        if "application/json" in response.headers.get("content-type", ""):
-            try:
-                payload = response.json()
-                if isinstance(payload, dict):
-                    message = payload.get("Message") or payload.get("message")
-                    if isinstance(message, str):
-                        detail = message.replace(token, "[redacted]").replace("\n", " ").replace("\r", " ")[:180]
-            except ValueError:
-                pass
-        logger.warning("Bimeh inquiry failed: product=%s status=%s message=%s",
-                       product, response.status_code, detail or "(no JSON message)")
-        raise BimehUpstreamError(f"API بیمه‌دات‌کام HTTP {response.status_code}"
-                                 + (f": {detail}" if detail else ""))
+        # Even a provider's error text can echo personal data or credentials.
+        logger.warning("Bimeh inquiry failed: product=%s status=%s", product, response.status_code)
+        raise BimehUpstreamError(f"API بیمه‌دات‌کام HTTP {response.status_code}")
     try:
         data = response.json()
     except ValueError as exc:

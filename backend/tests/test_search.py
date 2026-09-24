@@ -6,6 +6,9 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.routers import search
+from app.domain.crosswalk import catalog
+from app.domain.dates import jalali_to_gregorian
+from app.adapters.sabim.contract import validate_query
 
 
 FORM = {
@@ -91,12 +94,18 @@ def test_one_source_failure_preserves_other_results(monkeypatch):
         "empty", "needs_input", "empty", "unavailable"]
 
 
-def test_catalog_lists_only_audited_model_and_supported_policy():
+def test_catalog_contains_the_complete_lab_union_and_scoped_identifiers():
     response = TestClient(app).get("/api/search/catalog")
     assert response.status_code == 200
     data = response.json()
-    assert [m["key"] for m in data["models"]] == ["peugeot_pars", "peugeot_206_type2", "peugeot_206_type5"]
-    assert data["models"][0]["brand_key"] == "peugeot"
+    assert len(data["models"]) > 8_000
+    assert {m["provider"] for m in data["models"]} == {
+        "azki", "sabim", "bimebazar", "bimeh", "چند منبع"}
+    assert {"peugeot_pars", "peugeot_206_type2", "peugeot_206_type5"} <= {
+        m["key"] for m in data["models"]}
+    assert any(m["brand_key"].startswith("azki:") for m in data["models"])
+    assert data["models"][0]["usages"]
+    assert any(r["key"] == "آسیا" for r in data["insurers"])
     assert data["third_car"]["supported_previous_policy_status"] == "no_previous_policy"
     assert 1404 in data["production_years_jalali"]
 
@@ -121,7 +130,7 @@ def test_malformed_provider_response_is_not_an_empty_result(monkeypatch):
     assert providers["azki"]["status"] == "empty"
     assert providers["bimebazar"]["status"] == "empty"
     assert providers["bimeh"]["status"] == "invalid_response"
-    assert providers["bimeh"]["raw_response"] is None
+    assert providers["bimeh"]["raw_response"]["Inquiries"][0]["CompanyId"] == 99
     assert providers["bimeh"]["offers"] == []
 
 
@@ -145,3 +154,94 @@ def test_two_audited_206_trims_never_use_generic_bimeh_id(monkeypatch):
         assert [p["status"] for p in response.json()["providers"]] == [
             "empty", "needs_input", "empty", "unmapped"]
     bimeh.assert_not_called()
+
+
+def test_jalali_conversion_and_invalid_esfand():
+    assert jalali_to_gregorian("1405/07/01").isoformat() == "2026-09-23"
+    assert jalali_to_gregorian("1403/01/01").isoformat() == "2024-03-20"
+    import pytest
+    with pytest.raises(ValueError):
+        jalali_to_gregorian("1405/12/30")
+
+
+def test_each_lab_contributes_provider_scoped_models_and_uses():
+    from collections import Counter
+    from app.domain.crosswalk import match_car
+    from app.domain.quotes import CarVehicle
+    rows = catalog()["models"]
+    assert Counter(m["provider"] for m in rows) == {
+        "sabim": 4061, "azki": 1879, "bimeh": 1750, "bimebazar": 1212}
+    assert len(catalog()["joined"]) == 622
+    for provider in ("azki", "sabim", "bimebazar", "bimeh"):
+        m = next(m for m in rows if m["provider"] == provider)
+        vehicle = CarVehicle(category_key=f'{provider}:{m["mapping"]["category"]}',
+                             brand_key=f'{provider}:{m["mapping"]["brand"]}',
+                             model_key=m["key"], usage_key=m["usages"][0]["key"],
+                             production_year_jalali=1404)
+        assert set(match_car(vehicle)) == {provider}
+        assert match_car(vehicle.model_copy(update={"brand_key": "another:brand"})) is None
+
+    joined = next(g for g in catalog()["joined"] if g["label"] == "آئودی A4")
+    selected = CarVehicle(category_key=joined["category_key"], brand_key=joined["brand_key"],
+                          model_key=joined["key"], usage_key="personal", production_year_jalali=1404)
+    assert match_car(selected)["azki"]["vehicleModelID"] == "806880"
+    assert match_car(selected)["bimebazar"]["car_model"] == "car_audi_a4"
+    assert match_car(selected.model_copy(update={"usage_key": "taxi"})) is None
+
+
+def test_previous_policy_builds_four_different_lab_requests_and_isolates_response(monkeypatch):
+    form = {**FORM, "previous_policy": {
+        "status": "had_previous_policy", "previous_insurer_key": "آسیا",
+        "previous_start_date_jalali": "1403/07/01", "previous_expiry_date_jalali": "1404/07/01",
+        "previous_duration_months": 12, "no_claim_discount_percent": 0,
+        "driver_discount_percent": 0, "had_claim": True,
+        "property_claim_count": 1, "bodily_claim_count": 0, "driver_claim_count": 0}}
+
+    async def azki(params, product):
+        assert params["oldCompanyID"] == "3"
+        assert params["thirdFinancialDamageID"] == "2"
+        assert params["oldInsureExpireDate"] == "1404-07-01"
+        return {"top": [], "bottom": [], "others": []}
+
+    async def sabim(product, params):
+        assert params["thirdparty_lastcompany"] == "3"
+        assert params["thirdparty_last_date_end"] == "2025-09-23"
+        assert params["thirdparty_coverage_id"] == "70"
+        validate_query(product, params)
+        return {"unknownPriceShape": [{"keep": 1}]}
+
+    async def bazaar(product, params):
+        assert params["previous_company"] == "asia"
+        assert params["has_damage"] == "true"
+        return {"status": "ok", "data": {"offers": []}}
+
+    async def bimeh(product, params):
+        assert params["PreviousCompanyId"] == 1024
+        assert params["PreviousExpirationDate"] == "2025-09-23"
+        return {"Companies": [], "Inquiries": []}
+
+    monkeypatch.setattr(search, "get_third_prices", azki)
+    monkeypatch.setattr(search, "get_sabim_prices", sabim)
+    monkeypatch.setattr(search, "get_offers", bazaar)
+    monkeypatch.setattr(search, "get_prices", bimeh)
+    response = TestClient(app).post("/api/search", json=form)
+    assert response.status_code == 200, response.text
+    providers = {r["provider"]: r for r in response.json()["providers"]}
+    assert [providers[p]["status"] for p in ("azki", "sabim", "bimebazar", "bimeh")] == [
+        "empty", "invalid_response", "empty", "empty"]
+    assert providers["sabim"]["raw_response"] == {"unknownPriceShape": [{"keep": 1}]}
+
+
+def test_new_vehicle_requires_real_release_date_and_converts_per_provider():
+    from app.domain.quotes import ThirdCarSearch
+    from app.domain.crosswalk import CAR_MODELS
+    form = {**FORM, "previous_policy": {"status": "new_vehicle",
+                                        "first_use_date_jalali": "1405/07/01"}}
+    request = ThirdCarSearch.model_validate(form)
+    expected = {"azki": ("oldInsureExpireDate", "1405-07-01"),
+                "bimebazar": ("last_policy_exp_date", "1405/07/01"),
+                "bimeh": ("ReleaseDate", "2026/9/23")}
+    for provider, (key, value) in expected.items():
+        params, status, _ = search._prepare(request, provider, CAR_MODELS["peugeot_pars"])
+        assert status is None and params[key] == value
+    assert search._prepare(request, "sabim", CAR_MODELS["peugeot_pars"])[1] == "needs_input"
