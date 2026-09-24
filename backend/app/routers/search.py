@@ -32,6 +32,8 @@ def _prepare(request: ThirdCarSearch, provider: str, car: dict):
     year = request.vehicle.production_year_jalali
     if not 1390 <= year <= 1405:
         return None, "unmapped", "سال ساخت در کاتالوگ این سناریو تأیید نشده است"
+    if provider not in car:
+        return None, "unmapped", "شناسهٔ این تیپ برای این منبع تأیید نشده است"
     if provider == "sabim":
         return None, "needs_input", "سابیم تاریخ شروع و پایان بیمهٔ قبلی می‌خواهد؛ برای خودروی بدون بیمه مقدار آن تأیید نشده است"
     if provider == "azki":

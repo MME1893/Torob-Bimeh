@@ -95,7 +95,7 @@ def test_catalog_lists_only_audited_model_and_supported_policy():
     response = TestClient(app).get("/api/search/catalog")
     assert response.status_code == 200
     data = response.json()
-    assert [m["key"] for m in data["models"]] == ["peugeot_pars"]
+    assert [m["key"] for m in data["models"]] == ["peugeot_pars", "peugeot_206_type2", "peugeot_206_type5"]
     assert data["models"][0]["brand_key"] == "peugeot"
     assert data["third_car"]["supported_previous_policy_status"] == "no_previous_policy"
     assert 1404 in data["production_years_jalali"]
@@ -123,3 +123,25 @@ def test_malformed_provider_response_is_not_an_empty_result(monkeypatch):
     assert providers["bimeh"]["status"] == "invalid_response"
     assert providers["bimeh"]["raw_response"] is None
     assert providers["bimeh"]["offers"] == []
+
+
+def test_two_audited_206_trims_never_use_generic_bimeh_id(monkeypatch):
+    async def azki(params, product):
+        assert params["vehicleModelID"] in {"182091", "182121"}
+        return {"top": [], "bottom": [], "others": []}
+
+    async def bazaar(product, params):
+        assert params["car_model"] in {"car_peugeot_206-type2", "car_peugeot_206-type5"}
+        return {"status": "ok", "data": {"offers": []}}
+
+    bimeh = AsyncMock()
+    monkeypatch.setattr(search, "get_third_prices", azki)
+    monkeypatch.setattr(search, "get_offers", bazaar)
+    monkeypatch.setattr(search, "get_prices", bimeh)
+    for key in ("peugeot_206_type2", "peugeot_206_type5"):
+        form = {**FORM, "vehicle": {**FORM["vehicle"], "model_key": key}}
+        response = TestClient(app).post("/api/search", json=form)
+        assert response.status_code == 200
+        assert [p["status"] for p in response.json()["providers"]] == [
+            "empty", "needs_input", "empty", "unmapped"]
+    bimeh.assert_not_called()
