@@ -30,11 +30,10 @@ async def get_offers(product: str, params: Mapping[str, object],
                 "Referer": "https://bimebazar.com/",
             }
 
-            # گرفتن session cookie
-            await client.get(
-                "https://bimebazar.com/",
-                headers=headers
-            )
+            # Warm the live session before fetching offers. A supplied transport
+            # is a controlled contract test and should receive only the offer request.
+            if transport is None:
+                await client.get("https://bimebazar.com/", headers=headers)
 
             # درخواست اصلی
             response = await client.get(

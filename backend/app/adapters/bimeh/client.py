@@ -60,7 +60,7 @@ async def get_prices(product: str, body: dict,
                 pass
         logger.warning("Bimeh inquiry failed: product=%s status=%s message=%s",
                        product, response.status_code, detail or "(no JSON message)")
-        raise BimehUpstreamError(f"API بیمه‌دات‌کام HTTP {response.status_code} برگرداند"
+        raise BimehUpstreamError(f"API بیمه‌دات‌کام HTTP {response.status_code}"
                                  + (f": {detail}" if detail else ""))
     try:
         data = response.json()
