@@ -8,6 +8,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from .routers.azki import router as azki_router
+from .routers.bimeh import router as bimeh_router
 from .routers.bimebazar import router as bimebazar_router
 from .routers.sabim import router as sabim_router
 
@@ -17,6 +18,7 @@ load_dotenv(ROOT / "backend" / ".env")
 
 app = FastAPI(title="Torob Bimeh API", version="0.1.0")
 app.include_router(azki_router)
+app.include_router(bimeh_router)
 app.include_router(bimebazar_router)
 app.include_router(sabim_router)
 app.mount("/labs", StaticFiles(directory=ROOT / "frontend" / "labs"), name="labs")

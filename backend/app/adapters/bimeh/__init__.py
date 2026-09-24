@@ -1,0 +1,1 @@
+"""Bimeh.com quote adapter."""
