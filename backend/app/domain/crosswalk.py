@@ -177,6 +177,70 @@ def public_models():
     return output
 
 
+@lru_cache(maxsize=1)
+def public_body_models():
+    """Body-car union, joined only by exact normalized source identity."""
+    groups = defaultdict(list)
+    for row in catalog()["body_models"]:
+        signature = (_normalized(row["category"]), _normalized(row["brand"]),
+                     _model_identity(row["brand"], row["model"]))
+        if all(signature):
+            groups[signature].append(row)
+    output = []
+    for signature, rows in sorted(groups.items()):
+        by_provider = defaultdict(list)
+        for row in rows:
+            by_provider[row["provider"]].append(row)
+        selected = {provider: values[0] for provider, values in by_provider.items()
+                    if len(values) == 1}
+        if not selected:
+            continue
+        preferred = next(selected[p] for p in ("bimebazar", "bimeh", "azki", "sabim")
+                         if p in selected)
+        category, brand = preferred["category"], preferred["brand"]
+        model = re.sub(r"\s+", " ", preferred["model"]).strip()
+        while model == brand or model.startswith(brand + " "):
+            model = model[len(brand):].strip()
+        category_key, brand_key = _public_keys(category, brand)
+        sources, usage_labels = {}, {}
+        for provider, source in selected.items():
+            usages = {}
+            for usage in source["usages"]:
+                usage_key = _usage_identity(usage["label"])
+                usages[usage_key] = str(usage["key"])
+                usage_labels.setdefault(usage_key, usage["label"])
+            sources[provider] = {"mapping": source["mapping"], "usages": usages,
+                                 "model_key": source["key"]}
+        digest = hashlib.sha256("\0".join(signature).encode()).hexdigest()[:16]
+        output.append({"key": "body:" + digest, "label": f"{brand} {model}".strip(),
+                       "category": category, "category_key": category_key,
+                       "brand": brand, "brand_key": brand_key, "model": model,
+                       "providers": [p for p in ("azki", "sabim", "bimebazar", "bimeh") if p in sources],
+                       "source_count": len(sources),
+                       "imported": selected.get("azki", {}).get("mapping", {}).get("imported"),
+                       "usages": [{"key": key, "label": label}
+                                  for key, label in usage_labels.items()], "sources": sources})
+    return output
+
+
+def match_body_car(vehicle, provider_selections=None):
+    public = next((item for item in public_body_models() if item["key"] == vehicle.model_key), None)
+    mapped = {}
+    if public and (vehicle.category_key, vehicle.brand_key) == (
+            public["category_key"], public["brand_key"]):
+        for provider, source in public["sources"].items():
+            usage = source["usages"].get(vehicle.usage_key)
+            if usage is not None:
+                mapped[provider] = _provider_mapping(provider, source["mapping"], usage)
+    for provider, selection in (provider_selections or {}).items():
+        mapped.pop(provider, None)
+        source = next((row for row in catalog()["body_models"]
+                       if row["provider"] == provider and row["key"] == selection.model_key), None)
+        if source and any(str(row["key"]) == str(selection.usage_key) for row in source["usages"]):
+            mapped[provider] = _provider_mapping(provider, source["mapping"], selection.usage_key)
+    return mapped or None
+
+
 def match_car(vehicle):
     row = CAR_MODELS.get(vehicle.model_key)
     if row and all(getattr(vehicle, key) == row[key] for key in
@@ -209,3 +273,10 @@ def match_car(vehicle):
                     or vehicle.usage_key not in {u["key"] for u in item["usages"]}):
         return None
     return {item["provider"]: _provider_mapping(item["provider"], item["mapping"], vehicle.usage_key)}
+
+
+def match_motor(vehicle):
+    """Return only the provider IDs explicitly recorded for a motor type."""
+    item = next((row for row in catalog()["motor_types"]
+                 if row["key"] == vehicle.motor_type_key), None)
+    return {provider: dict(mapping) for provider, mapping in item["mapping"].items()} if item else None

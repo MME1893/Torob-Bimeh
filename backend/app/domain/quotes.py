@@ -104,7 +104,24 @@ class PreviousBodyPolicy(Contract):
     had_policy: bool
     previous_insurer_key: str | None = None
     previous_expiry_date: date | None = None
+    previous_expiry_date_jalali: str | None = None
     claim_free_years: int | None = Field(default=None, ge=0)
+    had_claim: bool = False
+    previous_war_coverage: bool = False
+
+    @model_validator(mode="after")
+    def validate_expiry(self):
+        if self.previous_expiry_date_jalali:
+            converted = jalali_to_gregorian(self.previous_expiry_date_jalali)
+            if self.previous_expiry_date and converted != self.previous_expiry_date:
+                raise ValueError("تاریخ شمسی و میلادی انقضای بیمه بدنه سازگار نیستند")
+        return self
+
+
+class BodyAccessory(Contract):
+    category_key: str = Field(min_length=1)
+    item_keys: list[str] = Field(min_length=1, max_length=100)
+    value_toman: int = Field(gt=0)
 
 
 class ThirdCarSearch(Contract):
@@ -127,25 +144,54 @@ class ThirdMotorSearch(Contract):
     previous_policy: PreviousThirdPartyPolicy
     duration_months: int = Field(ge=1, le=12)
     financial_coverage_toman: int = Field(gt=0)
+    sabim_history: SabimHistory | None = None
+    sabim_zero_km_third_discount: bool = False
+    sabim_zero_km_driver_discount: bool = False
+    sabim_yadak: bool = False
+    sabim_transition: bool = False
+    discount_code: str | None = Field(default=None, max_length=100)
 
 
 class BodyCarSearch(Contract):
     product: Literal["body_car"] = "body_car"
     vehicle: CarVehicle
     previous_policy: PreviousBodyPolicy
+    provider_selections: dict[Provider, ProviderSelection] = Field(default_factory=dict)
+    zero_kilometer: bool = False
+    clearance_date_jalali: str | None = None
     third_party_insurer_key: str | None = None
     third_party_discount_percent: int | None = Field(default=None, ge=0, le=100)
     vehicle_value_toman: int = Field(gt=0)
     accessories_value_toman: int = Field(default=0, ge=0)
+    accessories: list[BodyAccessory] = Field(default_factory=list, max_length=30)
     province_key: str = Field(min_length=1)
     city_key: str = Field(min_length=1)
     region_key: str | None = None
     selected_coverages: list[str] = Field(default_factory=list, max_length=30)
+    theft_parts_percent: Literal[5, 10, 20] | None = None
+    price_fluctuation_percent: Literal[25, 50, 100] | None = None
+    duration_months: int = Field(default=12, ge=1, le=12)
+    cash_discount: bool = True
+    sabim_life_discount_key: str | None = None
+    sabim_other_discount_key: str | None = None
+    sabim_bank_discount_key: str | None = None
+    azki_body_discount_id: int | None = Field(default=None, gt=0)
+    discount_code: str | None = Field(default=None, max_length=100)
 
     @model_validator(mode="after")
     def body_needs_production_month(self):
         if self.vehicle.production_month_jalali is None:
             raise ValueError("ماه تولید برای استعلام بدنه لازم است")
+        if self.zero_kilometer and not self.clearance_date_jalali:
+            raise ValueError("تاریخ ترخیص برای خودروی صفرکیلومتر لازم است")
+        if self.clearance_date_jalali:
+            jalali_to_gregorian(self.clearance_date_jalali)
+        if self.previous_policy.had_policy and (not self.previous_policy.previous_insurer_key
+                or not self.previous_policy.previous_expiry_date_jalali
+                or self.previous_policy.claim_free_years is None):
+            raise ValueError("اطلاعات بیمه بدنه قبلی کامل نیست")
+        if sum(item.value_toman for item in self.accessories) != self.accessories_value_toman:
+            raise ValueError("جمع ارزش لوازم با مبلغ کل لوازم برابر نیست")
         return self
 
 

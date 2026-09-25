@@ -250,6 +250,36 @@ def normalize(provider: str, data: dict, fetched_at: datetime, product: str,
             raise ValueError("فهرست پیشنهادهای ازکی معتبر نیست")
         for companies in present_groups:
             for company in companies:
+                if product == "body_car":
+                    amount = company.get("discountedPrice")
+                    if amount is None:
+                        amount = company.get("price")
+                    plans = _azki_installments(company)
+                    methods = []
+                    if plans or any(option.get("enable") for option in company.get("installments", [])
+                                    if isinstance(option, dict)):
+                        methods.append("اقساط")
+                    if any(plan.is_credit for plan in plans):
+                        methods.append("اعتباری")
+                    add(
+                        company["title"], amount, company, key=company.get("id"),
+                        months=12, installments=bool(methods), installment_plans=plans,
+                        payment_methods=methods,
+                        discount_breakdown=_details(
+                            "toman", ("تخفیف ازکی", company.get("bimitoDiscount")),
+                            ("هدیه", company.get("giftAmount"))),
+                        insurer_metrics=_metrics(
+                            satisfaction=_number(company.get("satisfaction")),
+                            financial_strength=_number(company.get("wealthLevel")),
+                            branches_count=_integer(company.get("branchNumber")),
+                            complaint_response_time=_number(company.get("complaintResponseTime")),
+                            online_claims=_boolean(company.get("onlineDamage"))),
+                        benefits=_texts(company.get("features"), company.get("giftTitle")),
+                        badges=_texts(company.get("badges"), company.get("stick"),
+                                      company.get("discountTitle")),
+                        original_amount=company.get("price"),
+                    )
+                    continue
                 prices = company.get("prices")
                 if not isinstance(prices, list):
                     raise ValueError("قیمت‌های پیشنهاد ازکی معتبر نیست")
@@ -365,7 +395,7 @@ def normalize(provider: str, data: dict, fetched_at: datetime, product: str,
             row_duration = durations.get(str(row.get("DurationId")))
             details = row.get("Details") or {}
             row_coverage = coverages.get(str(details.get("CoverageId")))
-            if row_duration != duration or row_coverage != coverage:
+            if product != "body_car" and (row_duration != duration or row_coverage != coverage):
                 continue
             methods = []
             if row.get("HasInstallments") is True:
@@ -378,7 +408,7 @@ def normalize(provider: str, data: dict, fetched_at: datetime, product: str,
             add(
                 company["Title"], cash_price["FinalAmount"], row, key=key,
                 offer_id=row.get("Id"), installments=bool(methods), payment_methods=methods,
-                months=row_duration, coverage_amount=row_coverage,
+                months=(row_duration or 12), coverage_amount=row_coverage,
                 penalty=_penalty(days=details.get("PenaltyDayCount"),
                                  total=details.get("DelayPenalty"), unit="rial"),
                 price_breakdown=_details(
