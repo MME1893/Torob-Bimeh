@@ -5,6 +5,7 @@ from typing import Mapping
 import httpx
 
 from ..errors import InvalidProviderResponse
+from ..response_log import save_response
 
 from .contract import BODY_PATH, THIRD_PATH, make_headers, validate_body_payload, validate_price_params
 
@@ -29,7 +30,10 @@ async def get_third_prices(params: Mapping[str, object], product: str,
                                         params=query, headers=headers)
     except httpx.RequestError as exc:
         raise AzkiUpstreamError("ارتباط با API قیمت ازکی برقرار نشد") from exc
-    return _read_price_response(response)
+    data = _read_price_response(response)
+    if transport is None:
+        await save_response("azki", product, data)
+    return data
 
 
 async def get_body_prices(payload: Mapping[str, object],
@@ -42,7 +46,10 @@ async def get_body_prices(payload: Mapping[str, object],
                                          json=body, headers=headers)
     except httpx.RequestError as exc:
         raise AzkiUpstreamError("ارتباط با API قیمت ازکی برقرار نشد") from exc
-    return _read_price_response(response)
+    data = _read_price_response(response)
+    if transport is None:
+        await save_response("azki", "body_car", data)
+    return data
 
 
 def _read_price_response(response: httpx.Response) -> dict:
@@ -54,6 +61,7 @@ def _read_price_response(response: httpx.Response) -> dict:
         data = response.json()
     except ValueError as exc:
         raise AzkiInvalidResponse("پاسخ ازکی JSON معتبر نیست") from exc
-    if not isinstance(data, dict) or not any(isinstance(data.get(k), list) for k in ("top", "bottom", "others")):
+    groups = [data.get(k) for k in ("top", "bottom", "others") if k in data] if isinstance(data, dict) else []
+    if not groups or any(not isinstance(group, list) for group in groups):
         raise AzkiInvalidResponse("ساختار پاسخ قیمت ازکی شناخته‌شده نیست", raw=data)
     return data

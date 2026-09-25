@@ -116,6 +116,7 @@ def build():
             continue
         digest = hashlib.sha256((brand + "\0" + model).encode()).hexdigest()[:16]
         joined.append({"key": "shared:" + digest, "label": brand + " " + model,
+                       "category": "سواری", "brand": brand, "model": model,
                        "category_key": "shared:passenger", "brand_key": "shared:" + brand,
                        "usage_key": "personal", "evidence": "exact_unique_category_brand_model_usage",
                        "sources": [{"provider": r["provider"], "mapping": r["mapping"],
@@ -126,6 +127,13 @@ def build():
     # The handwritten crosswalk provides reviewed, exact identities where
     # independent names differ (for example Peugeot Pars). Do not infer more.
     insurers = {}
+    # These are spelling variants present in the committed lab catalogues,
+    # not guessed provider IDs.  Keeping the reviewed aliases here lets one
+    # product choice carry the four source-specific IDs server-side.
+    insurer_aliases = {
+        "خاور میانه": "خاورمیانه",
+        "حکمت": "حکمت صبا",
+    }
     for provider, rows, id_field, name_field in (
         ("azki", azki["insurers"], "id", "title"),
         ("sabim", sabim["insurers"], "id", "name"),
@@ -135,7 +143,8 @@ def build():
         for row in rows:
             name = re.sub(r"^بیمه\s*", "", str(row[name_field]).strip()).strip()
             key = name.replace("ي", "ی").replace("ك", "ک")
-            entry = insurers.setdefault(key, {"key": key, "label": name, "providers": {}})
+            key = insurer_aliases.get(key, key)
+            entry = insurers.setdefault(key, {"key": key, "label": key, "providers": {}})
             if provider in entry["providers"]:
                 # An ambiguous duplicate must never silently overwrite an ID.
                 del entry["providers"][provider]

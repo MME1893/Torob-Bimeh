@@ -1,4 +1,4 @@
-"""Avoid comparing prices when source units are unknown or fractional."""
+"""Verified provider amounts become comparable whole toman values."""
 
 import unittest
 
@@ -11,8 +11,10 @@ class PricingTest(unittest.TestCase):
         self.assertEqual(to_toman(12_500_000, "rial"), 1_250_000)
         self.assertIsNone(to_toman(12_500_000, "unknown"))
 
-    def test_no_rounding_or_invalid_values(self):
-        self.assertIsNone(to_toman(101, "rial"))
+    def test_rial_rounding_and_invalid_values(self):
+        self.assertEqual(to_toman(101, "rial"), 10)
+        self.assertEqual(to_toman(105, "rial"), 11)
+        self.assertEqual(to_toman(109, "rial"), 11)
         for amount, unit in ((-1, "toman"), (True, "rial"), (42, "USD")):
             with self.subTest(amount=amount, unit=unit), self.assertRaises(ValueError):
                 to_toman(amount, unit)

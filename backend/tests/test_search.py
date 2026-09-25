@@ -37,8 +37,12 @@ def test_single_request_keeps_four_provider_statuses_and_full_raw_json(monkeypat
     async def bimeh(product, body):
         assert body["ModelId"] == 1023
         assert body["ProductionYearId"] == 2025
-        return {"Companies": [{"Id": 9, "Title": "ایران"}], "Inquiries": [
-            {"CompanyId": 9, "CashPrice": {"FinalAmount": 33445566}}]}
+        return {"Companies": [{"Id": 9, "Title": "ایران"}],
+                "Durations": [{"Id": 2, "Title": "یک ساله"}],
+                "Coverages": [{"Id": 188, "Title": "۷۰ میلیون تومان"}],
+                "Inquiries": [{"CompanyId": 9, "DurationId": 2,
+                               "Details": {"CoverageId": 188},
+                               "CashPrice": {"FinalAmount": 33445566}}]}
 
     monkeypatch.setattr(search, "get_third_prices", azki)
     monkeypatch.setattr(search, "get_offers", bazaar)
@@ -51,7 +55,9 @@ def test_single_request_keeps_four_provider_statuses_and_full_raw_json(monkeypat
     assert sources["azki"]["raw_response"]["newField"] == [1, 2]
     assert sources["azki"]["offers"][0]["raw_offer"]["price"]["FutureField"] == {"kept": True}
     assert sources["bimebazar"]["offers"][0]["raw_offer"]["FutureField"] == "preserved"
-    assert all(o["premium"]["amount_toman"] is None for p in sources.values() for o in p["offers"])
+    assert all(o["premium"]["amount_toman"] is not None for p in sources.values() for o in p["offers"])
+    assert sources["azki"]["offers"][0]["premium"]["raw_unit"] == "toman"
+    assert sources["bimeh"]["offers"][0]["premium"]["raw_unit"] == "rial"
 
 
 def test_unknown_model_never_calls_upstream(monkeypatch):
@@ -98,16 +104,29 @@ def test_catalog_contains_the_complete_lab_union_and_scoped_identifiers():
     response = TestClient(app).get("/api/search/catalog")
     assert response.status_code == 200
     data = response.json()
-    assert len(data["models"]) > 8_000
-    assert {m["provider"] for m in data["models"]} == {
-        "azki", "sabim", "bimebazar", "bimeh", "چند منبع"}
+    assert 5_000 < len(data["models"]) < 8_000
+    assert len([m for m in data["models"] if m["category"] == "سواری" and
+                m["category_key"] == "category:سواری"]) > 100
+    assert "provider" not in data["models"][0]
     assert {"peugeot_pars", "peugeot_206_type2", "peugeot_206_type5"} <= {
         m["key"] for m in data["models"]}
-    assert any(m["brand_key"].startswith("azki:") for m in data["models"])
+    assert all(m["brand_key"].startswith("brand:") for m in data["models"])
     assert data["models"][0]["usages"]
     assert any(r["key"] == "آسیا" for r in data["insurers"])
     assert len(data["third_car"]["supported_previous_policy_statuses"]) == 3
     assert 1404 in data["production_years_jalali"]
+
+
+def test_product_insurer_choices_are_mappable_for_every_provider():
+    public = TestClient(app).get("/api/search/catalog").json()["insurers"]
+    internal = {row["key"]: row for row in catalog()["insurers"]}
+    providers = {"azki", "sabim", "bimebazar", "bimeh"}
+
+    assert public
+    assert all(providers <= set(internal[row["key"]]["providers"]) for row in public)
+    assert "امید" not in {row["key"] for row in public}
+    assert providers <= set(internal["خاورمیانه"]["providers"])
+    assert providers <= set(internal["حکمت صبا"]["providers"])
 
 
 def test_malformed_provider_response_is_not_an_empty_result(monkeypatch):
@@ -134,7 +153,7 @@ def test_malformed_provider_response_is_not_an_empty_result(monkeypatch):
     assert providers["bimeh"]["offers"] == []
 
 
-def test_two_audited_206_trims_never_use_generic_bimeh_id(monkeypatch):
+def test_two_audited_206_trims_map_exact_bimeh_ids_automatically(monkeypatch):
     async def azki(params, product):
         assert params["vehicleModelID"] in {"182091", "182121"}
         return {"top": [], "bottom": [], "others": []}
@@ -143,7 +162,10 @@ def test_two_audited_206_trims_never_use_generic_bimeh_id(monkeypatch):
         assert params["car_model"] in {"car_peugeot_206-type2", "car_peugeot_206-type5"}
         return {"status": "ok", "data": {"offers": []}}
 
-    bimeh = AsyncMock()
+    seen = []
+    async def bimeh(product, params):
+        seen.append(params["ModelId"])
+        return {"Companies": [], "Inquiries": []}
     monkeypatch.setattr(search, "get_third_prices", azki)
     monkeypatch.setattr(search, "get_offers", bazaar)
     monkeypatch.setattr(search, "get_prices", bimeh)
@@ -152,8 +174,8 @@ def test_two_audited_206_trims_never_use_generic_bimeh_id(monkeypatch):
         response = TestClient(app).post("/api/search", json=form)
         assert response.status_code == 200
         assert [p["status"] for p in response.json()["providers"]] == [
-            "empty", "needs_input", "empty", "unmapped"]
-    bimeh.assert_not_called()
+            "empty", "needs_input", "empty", "empty"]
+    assert seen == [1030, 1033]
 
 
 def test_jalali_conversion_and_invalid_esfand():

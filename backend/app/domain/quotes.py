@@ -167,6 +167,52 @@ class Premium(Contract):
         return self
 
 
+class MoneyDetail(Contract):
+    label: str = Field(min_length=1, max_length=120)
+    amount_toman: int = Field(ge=0)
+
+
+class InstallmentPayment(Contract):
+    sequence: int = Field(ge=0)
+    amount_toman: int = Field(ge=0)
+    months_after_purchase: int | None = Field(default=None, ge=0)
+    due_date: str | None = Field(default=None, max_length=80)
+    is_down_payment: bool = False
+
+
+class InstallmentPlan(Contract):
+    title: str = Field(min_length=1, max_length=160)
+    plan_type: str | None = Field(default=None, max_length=80)
+    is_credit: bool | None = None
+    installment_count: int = Field(ge=0)
+    down_payment_toman: int | None = Field(default=None, ge=0)
+    total_payable_toman: int | None = Field(default=None, ge=0)
+    operation_cost_toman: int | None = Field(default=None, ge=0)
+    operation_cost_in_installments: bool | None = None
+    payments: list[InstallmentPayment] = Field(default_factory=list)
+
+
+class PenaltyDetails(Contract):
+    days: int | None = Field(default=None, ge=0)
+    total_toman: int | None = Field(default=None, ge=0)
+    daily_toman: int | None = Field(default=None, ge=0)
+    forgiven: bool | None = None
+    description: str | None = Field(default=None, max_length=500)
+
+
+class InsurerMetrics(Contract):
+    satisfaction: float | None = Field(default=None, ge=0)
+    financial_strength: float | None = Field(default=None, ge=0)
+    solvency_level: float | None = Field(default=None, ge=0)
+    market_share_percent: float | None = Field(default=None, ge=0)
+    branches_count: int | None = Field(default=None, ge=0)
+    claim_centers_count: int | None = Field(default=None, ge=0)
+    complaint_response_time: float | None = Field(default=None, ge=0)
+    mobile_compensation: bool | None = None
+    online_claims: bool | None = None
+    online_issue: bool | None = None
+
+
 class Offer(Contract):
     provider: Provider
     product: Product
@@ -174,10 +220,23 @@ class Offer(Contract):
     insurer_key: str | None = None
     provider_offer_id: str | None = None
     premium: Premium
+    price_before_discount_toman: int | None = Field(default=None, ge=0)
+    discount_amount_toman: int | None = Field(default=None, ge=0)
+    discount_percent: float | None = Field(default=None, ge=0, le=100)
     duration_months: int | None = Field(default=None, ge=1, le=12)
     financial_coverage_toman: int | None = Field(default=None, ge=0)
     coverage_codes: list[str] = Field(default_factory=list)
     has_installments: bool | None = None
+    installment_plans: list[InstallmentPlan] = Field(default_factory=list)
+    payment_methods: list[str] = Field(default_factory=list)
+    penalty: PenaltyDetails | None = None
+    price_breakdown: list[MoneyDetail] = Field(default_factory=list)
+    discount_breakdown: list[MoneyDetail] = Field(default_factory=list)
+    insurer_metrics: InsurerMetrics | None = None
+    benefits: list[str] = Field(default_factory=list)
+    badges: list[str] = Field(default_factory=list)
+    is_recommended: bool | None = None
+    sale_rank: int | None = Field(default=None, ge=0)
     comparison_url: HttpUrl | None = None
     fetched_at: datetime
     # Exact source row, including fields the common cards do not yet display.

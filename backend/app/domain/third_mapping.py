@@ -200,7 +200,9 @@ def build(r, provider, car):
             p.update(PreviousExpirationDate=jalali_to_gregorian(expiry).isoformat(), PreviousDurationId=1 if previous_duration == 12 else 0,
                      ThirdPartyDiscountId=discount(options["ThirdPartyDiscounts"], h.no_claim_discount_percent, "تخفیف ثالث", id_key="Id", title_key="Title"),
                      DriverDiscountId=discount(options["DriverDiscounts"], h.driver_discount_percent, "تخفیف راننده", id_key="Id", title_key="Title"),
-                     Damage=need(h.had_claim, "سابقهٔ خسارت"), ownershipChange=mode != "unchanged", EncryptedPlaque=None)
+                     Damage=need(h.had_claim, "سابقهٔ خسارت"),
+                     ownershipChange=mode != "unchanged" or h.policy_owner == "transfer",
+                     EncryptedPlaque=None)
             if h.policy_owner != "transfer": p["PreviousCompanyId"] = int(insurer_id(h.previous_insurer_key, provider))
             else: p["supplementDiscounts"] = h.supplement_discounts
             financial, life, driver = claims(h)

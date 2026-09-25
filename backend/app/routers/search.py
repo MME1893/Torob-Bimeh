@@ -10,7 +10,7 @@ from ..adapters.errors import InvalidProviderResponse
 from ..adapters.azki.client import get_third_prices
 from ..adapters.bimebazar.client import get_offers
 from ..adapters.bimeh.client import get_prices
-from ..domain.crosswalk import CAR_MODELS, catalog
+from ..domain.crosswalk import catalog, public_models
 from ..domain.third_mapping import prepare as _prepare, preview, resolve_car
 from ..adapters.sabim.client import get_prices as get_sabim_prices
 from ..domain.normalizers import normalize
@@ -27,7 +27,9 @@ async def _one(provider, request, car, fetched_at):
         return ProviderResult(provider=provider, status="unmapped",
                               message="ساخت درخواست این منبع با کاتالوگ موجود ناموفق بود")
     if status:
-        return ProviderResult(provider=provider, status=status, message=message)
+        public_message = ("بخشی از اطلاعات لازم برای این پیشنهاد کامل نیست" if status == "needs_input"
+                          else "این منبع برای مشخصات انتخاب‌شده در دسترس نیست")
+        return ProviderResult(provider=provider, status=status, message=public_message)
     try:
         if provider == "azki":
             raw = await asyncio.wait_for(get_third_prices(params, request.product), timeout=35)
@@ -76,30 +78,27 @@ async def search(request: SearchInput = Body(discriminator="product")):
 
 @router.post("/api/search/preview")
 def search_preview(request: ThirdCarSearch):
-    return preview(request)
+    # This endpoint is called by the product UI. Provider IDs, URLs and payloads
+    # belong to the server-side integration and must not leak into the form.
+    return {"providers": [{"provider": row["provider"], "status": row["status"]}
+                          for row in preview(request)["providers"]]}
 
 
 @router.get("/api/search/catalog")
 def search_catalog():
-    """Full union from labs, with each model's provider and local usages."""
+    """Product-facing catalog; provider IDs and crosswalks stay server-side."""
     data = catalog()
+    # A single insurer choice is reused for every provider.  Do not offer a
+    # choice unless the committed lab catalogues provide an ID for all four;
+    # otherwise the exact same form becomes `needs_input` for one source.
+    common_insurers = [x for x in data["insurers"]
+                       if all(provider in x["providers"] for provider in PROVIDERS)]
     return {
-        "models": [{"key": g["key"], "label": g["label"], "category_key": g["category_key"],
-                    "brand_key": g["brand_key"], "category": "سواری", "provider": "چند منبع",
-                    "usages": [{"key": "personal", "label": "شخصی"}],
-                    "source_count": len(g["sources"])} for g in data["joined"]] + [
-            {"key": m["key"], "label": m["label"],
-                    "category_key": f'{m["provider"]}:{m["mapping"]["category"]}',
-                    "brand_key": f'{m["provider"]}:{m["mapping"]["brand"]}',
-                    "category": m["category"], "provider": m["provider"],
-                    "usages": m["usages"]} for m in data["models"]] + [
-            {"key": key, "label": row["label"], "category_key": row["category_key"],
-             "brand_key": row["brand_key"], "usages": [{"key": row["usage_key"], "label": "شخصی"}],
-             "category": "سواری", "provider": "چند منبع"}
-            for key, row in CAR_MODELS.items()
-        ],
+        "models": [{key: value for key, value in model.items()
+                    if key not in {"sources", "providers", "source_count"}}
+                   for model in public_models()],
         "production_years_jalali": data["years_jalali"],
-        "insurers": [{"key": x["key"], "label": x["label"]} for x in data["insurers"]],
+        "insurers": [{"key": x["key"], "label": x["label"]} for x in common_insurers],
         "durations": [12, 9, 8, 6, 4, 3, 2, 1],
         "discounts": sorted({int(r["percent"]) for r in data["options"]["sabim"]["thirdDiscounts"] if int(r["percent"]) >= 0}),
         "fuels": [{"key": str(r["id"]), "label": r["title"]} for r in data["options"]["azki"]["fuelTypes"]],

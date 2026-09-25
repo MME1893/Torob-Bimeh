@@ -6,6 +6,7 @@ import logging
 import httpx
 
 from ..errors import InvalidProviderResponse
+from ..response_log import save_response
 
 from .contract import BASE_URL, PATHS, validate_inquiry
 
@@ -59,6 +60,8 @@ async def get_prices(product: str, body: dict,
         data = response.json()
     except ValueError as exc:
         raise BimehInvalidResponse("پاسخ بیمه‌دات‌کام JSON معتبر نیست") from exc
+    if transport is None:
+        await save_response("bimeh", product, data)
     if not isinstance(data, dict) or not isinstance(data.get("Inquiries"), list) or not isinstance(data.get("Companies"), list):
         raise BimehInvalidResponse("پاسخ بیمه‌دات‌کام فاقد Inquiries یا Companies است", raw=data)
     return data

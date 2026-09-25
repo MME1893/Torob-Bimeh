@@ -13,6 +13,7 @@ from app.domain.crosswalk import catalog
 from app.domain.quotes import ThirdCarSearch
 from app.domain.third_mapping import prepare, preview, resolve_car
 from app.domain.normalizers import normalize
+from app.domain.pricing import to_toman
 from app.routers import search
 from app.adapters.azki.contract import validate_price_params
 from app.adapters.sabim.contract import validate_query
@@ -35,6 +36,15 @@ def params(r, provider):
     assert status is None, (provider, status, message)
     return result
 
+
+def test_every_product_insurer_choice_previews_all_four_sources():
+    choices = TestClient(app).get('/api/search/catalog').json()['insurers']
+    for choice in choices:
+        form = deepcopy(OLD)
+        form['previous_policy']['previous_insurer_key'] = choice['key']
+        statuses = [row['status'] for row in preview(request(form))['providers']]
+        assert statuses == ['ready', 'ready', 'ready', 'ready'], (choice, statuses)
+
 @pytest.mark.parametrize('provider', ['azki','sabim','bimebazar','bimeh'])
 def test_complete_captured_response_preserves_all_fields(provider):
     raw = json.loads(gzip.decompress((Path(__file__).parent / 'fixtures' / (provider+'-third-response.json.gz')).read_bytes()))
@@ -45,7 +55,9 @@ def test_complete_captured_response_preserves_all_fields(provider):
     result = normalize(provider, raw, datetime.now(timezone.utc), 'third_car', duration, coverage)
     assert result.status == 'ok' and result.raw_response == raw
     for offer in result.offers:
-        assert offer.premium.raw_unit == 'unknown' and offer.premium.amount_toman is None
+        expected_unit = 'rial' if provider in ('sabim', 'bimeh') else 'toman'
+        assert offer.premium.raw_unit == expected_unit
+        assert offer.premium.amount_toman == to_toman(offer.premium.raw_amount, expected_unit)
         if provider == 'azki':
             assert offer.raw_offer['company'] in sum([raw[g] for g in ('top','bottom','others')], [])
             assert offer.raw_offer['price'] in offer.raw_offer['company']['prices']
@@ -56,6 +68,67 @@ def test_complete_captured_response_preserves_all_fields(provider):
         assert result.offers[0].duration_months == 12 and result.offers[0].financial_coverage_toman == 70_000_000
     if provider in ('sabim','bimebazar'):
         assert all(o.duration_months is None and o.financial_coverage_toman is None for o in result.offers)
+    if provider in ('azki', 'bimebazar', 'bimeh'):
+        assert any(o.discount_amount_toman for o in result.offers)
+        assert any(o.has_installments for o in result.offers)
+
+
+def test_installment_plans_and_extra_details_come_from_captured_responses():
+    when = datetime.now(timezone.utc)
+    results = {}
+    for provider in ('azki', 'sabim', 'bimebazar', 'bimeh'):
+        raw = json.loads(gzip.decompress(
+            (Path(__file__).parent / 'fixtures' / f'{provider}-third-response.json.gz').read_bytes()))
+        results[provider] = normalize(provider, raw, when, 'third_car', 12, 70_000_000)
+
+    azki = next(offer for offer in results['azki'].offers if offer.installment_plans)
+    azki_plan = azki.installment_plans[0]
+    assert azki_plan.installment_count == 11
+    assert azki_plan.down_payment_toman == azki_plan.payments[0].amount_toman
+    assert azki_plan.total_payable_toman == sum(payment.amount_toman for payment in azki_plan.payments)
+    assert azki_plan.operation_cost_toman and azki_plan.payments[-1].due_date
+    assert azki.penalty.days is not None and azki.insurer_metrics.satisfaction is not None
+    assert azki.benefits and azki.badges
+
+    bazaar = next(offer for offer in results['bimebazar'].offers if offer.installment_plans)
+    bazaar_plan = bazaar.installment_plans[0]
+    assert bazaar_plan.plan_type == 'bb_bnpl' and bazaar_plan.is_credit is True
+    assert bazaar_plan.installment_count == len(bazaar_plan.payments) - 1
+    assert bazaar_plan.total_payable_toman and bazaar_plan.operation_cost_toman
+    assert 'بدون چک' in bazaar.payment_methods
+    assert {item.label for item in bazaar.price_breakdown} >= {'نرخ پایه', 'مالیات'}
+    assert bazaar.discount_breakdown and bazaar.insurer_metrics.mobile_compensation is True
+
+    bimeh = next(offer for offer in results['bimeh'].offers if offer.has_installments)
+    assert bimeh.installment_plans == []  # The response has flags, not payment amounts.
+    assert {'اقساط', 'اقساط اعتباری'} <= set(bimeh.payment_methods)
+    assert bimeh.penalty.total_toman is not None and bimeh.sale_rank is not None
+    assert bimeh.badges and bimeh.insurer_metrics.financial_strength is not None
+
+    sabim = results['sabim'].offers[0]
+    assert sabim.has_installments is None and sabim.installment_plans == []
+    assert sabim.payment_methods == []
+    assert sabim.penalty is not None and sabim.price_breakdown
+    assert sabim.insurer_metrics.claim_centers_count is not None
+
+
+def test_bimeh_returns_only_the_selected_duration_and_coverage():
+    raw = json.loads(gzip.decompress((Path(__file__).parent / 'fixtures' / 'bimeh-third-response.json.gz').read_bytes()))
+    result = normalize('bimeh', raw, datetime.now(timezone.utc), 'third_car', 12, 70_000_000)
+    assert len(result.offers) == sum(
+        row.get('DurationId') == 2 and (row.get('Details') or {}).get('CoverageId') == 188
+        for row in raw['Inquiries'])
+    assert all(offer.duration_months == 12 and offer.financial_coverage_toman == 70_000_000
+               for offer in result.offers)
+
+
+def test_azki_accepts_omitted_empty_groups_and_price_fallback():
+    raw = {'others': [{'id': 1, 'title': 'آسیا', 'prices': [
+        {'durationID': 12, 'coverAmount': 70_000_000,
+         'discountedPrice': None, 'price': 12_345_678}]}]}
+    parsed = _read_price_response(httpx.Response(200, json=raw))
+    result = normalize('azki', parsed, datetime.now(timezone.utc), 'third_car', 12, 70_000_000)
+    assert result.status == 'ok' and result.offers[0].premium.raw_amount == 12_345_678
 
 @pytest.mark.parametrize('mode,azki,bazar', [
     ('unchanged',None,None), ('no_discount','1','no_another_thirdparty_discount'),
@@ -107,6 +180,26 @@ def test_explicit_sabim_base_data_and_zero_km_catalog_option():
     validate_query('third_car',p)
     assert min(TestClient(app).get('/api/search/catalog').json()['discounts'])==0
 
+
+def test_complete_single_form_previews_four_provider_requests():
+    common_insurer = next(row for row in catalog()['insurers'] if len(row['providers']) == 4)
+    form = {**FORM, 'sabim_history': {
+        'insurer_key': common_insurer['key'],
+        'start_date_jalali': '1403/07/01',
+        'expiry_date_jalali': '1404/07/01',
+    }}
+    providers = TestClient(app).post('/api/search/preview', json=form).json()['providers']
+    assert [row['status'] for row in providers] == ['ready'] * 4
+    assert all(set(row) == {'provider', 'status'} for row in providers)
+
+
+def test_catalog_exposes_cascading_vehicle_dimensions_and_source_coverage():
+    models = TestClient(app).get('/api/search/catalog').json()['models']
+    pars = next(model for model in models if model['key'] == 'peugeot_pars')
+    assert (pars['category'], pars['brand'], pars['model']) == ('سواری', 'پژو', 'پارس')
+    assert not {'provider', 'providers', 'source_count', 'sources'} & pars.keys()
+    assert pars['imported'] is False
+
 def test_source_model_override_is_scoped_and_can_complete_an_unmapped_model():
     r=request({**FORM,'vehicle':{**FORM['vehicle'],'model_key':'peugeot_206_type2'}})
     row=next(m for m in catalog()['models'] if m['provider']=='bimeh')
@@ -116,6 +209,13 @@ def test_source_model_override_is_scoped_and_can_complete_an_unmapped_model():
     form['provider_selections']['bimeh']['model_key']='azki:1:18:182341'
     assert prepare(request(form),'bimeh',resolve_car(request(form)))[1]=='unmapped'
 
+
+def test_bimeh_transfer_status_always_sets_ownership_change():
+    r=request();r.previous_policy.policy_owner='transfer';r.previous_policy.ownership_mode='unchanged'
+    p=params(r,'bimeh')
+    assert p['PreviousInsuranceStatusId']==4 and p['ownershipChange'] is True
+    assert 'PreviousCompanyId' not in p and p['supplementDiscounts'] is False
+
 def test_preview_and_search_use_identical_builders_without_preview_network(monkeypatch):
     seen={}
     async def azki(p,product):seen['azki']=p;return {'top':[],'bottom':[],'others':[]}
@@ -123,10 +223,11 @@ def test_preview_and_search_use_identical_builders_without_preview_network(monke
     async def bazar(product,p):seen['bimebazar']=p;return {'status':'ok','data':{'offers':[]}}
     async def bimeh(product,p):seen['bimeh']=p;return {'Companies':[],'Inquiries':[]}
     for name,fn in [('get_third_prices',azki),('get_sabim_prices',sabim),('get_offers',bazar),('get_prices',bimeh)]:monkeypatch.setattr(search,name,fn)
-    client=TestClient(app);p=client.post('/api/search/preview',json=OLD)
-    assert p.status_code==200 and seen=={}
+    client=TestClient(app);public_preview=client.post('/api/search/preview',json=OLD)
+    assert public_preview.status_code==200 and seen=={}
+    full_preview=preview(request(OLD))
     assert all(p['status']=='empty' for p in client.post('/api/search',json=OLD).json()['providers'])
-    for source in p.json()['providers']:assert seen[source['provider']]==(source['body'] if source['provider']=='bimeh' else source['query'])
+    for source in full_preview['providers']:assert seen[source['provider']]==(source['body'] if source['provider']=='bimeh' else source['query'])
 
 @pytest.mark.parametrize('content', [b'<html>not json</html>', b'{"unexpected": [1]}'])
 def test_client_parse_failure_is_invalid_response_not_network_or_empty(monkeypatch,content):

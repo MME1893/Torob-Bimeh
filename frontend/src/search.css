@@ -37,3 +37,49 @@
 .mapping-ready {color:#087145;}
 
 .field-error{color:#b42323} .review-extra{margin:1rem 0;color:#365449}.review-extra p{line-height:1.9}
+.full {grid-column:1/-1;}
+.field-note {margin:0; padding:10px 12px; border-radius:10px; background:#f2f7f2; color:#526d5c; font-size:12px; line-height:1.8;}
+.subform {border:1px solid #d7e4d8; border-radius:14px; background:#fbfdfb; padding:14px;}
+.subform h3 {margin:0 0 8px; color:#294b38; font-size:14px;}
+.subform p {margin:0 0 10px; color:#60776a; font-size:12px; line-height:1.8;}
+.optional-section {border:1px solid #d7e4d8; border-radius:12px; background:#fbfdfb; padding:12px 14px;}
+.optional-section summary {cursor:pointer; color:#365e47; font-size:13px; font-weight:700;}
+.optional-section .answer {margin-top:14px;}
+.preview-summary {margin:18px 0 0; padding:10px 12px; background:#eef8f1; color:#176c4c; border-radius:10px; font-size:12px;}
+.provider-tabs button small {max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.mapping-meta {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:10px 0 14px;}
+.mapping-meta span {display:flex; flex-direction:column; gap:4px; padding:10px; background:#f4f7f3; border-radius:9px; font-size:12px; overflow-wrap:anywhere;}
+.mapping-meta b {font-size:10px; color:#698072;}
+.mapping-fix {margin:12px 0; border:1px dashed #b9ccb9; border-radius:10px; padding:10px;}
+.mapping-fix summary {cursor:pointer; color:#176c4c; font-size:12px; font-weight:700;}
+.provider-preview a {color:#087145; font-weight:700;}
+.old-price {display:block; color:#7a8c80; font-size:12px; margin-bottom:3px;}
+.offer-badges {display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;}
+.offer-badges span {background:#e8f6ed; color:#087145; border-radius:999px; padding:4px 8px; font-size:10px; font-weight:700;}
+.offer-details {margin-top:12px; border-top:1px solid #e5ece4; padding-top:0!important;}
+.offer-details>summary {padding:12px 0 2px; color:#176c4c; font-weight:800; list-style-position:inside;}
+.details-body {display:grid; gap:14px; margin-top:12px;}
+.details-body section {background:#f8faf7; border:1px solid #e7eee6; border-radius:11px; padding:12px; min-width:0;}
+.details-body h5,.installment-section h5 {font-size:12px; color:#284e39; margin:0 0 9px;}
+.detail-list {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px;}
+.detail-list span {display:flex; flex-direction:column; gap:3px; background:white; border-radius:8px; padding:8px; min-width:0;}
+.detail-list b {font-size:9px; color:#789080;}
+.detail-list em {font-style:normal; color:#244b36; font-weight:700; overflow-wrap:anywhere;}
+.detail-note {margin:9px 0 0!important; background:#fff8e9; border-radius:8px; padding:8px; color:#785d32!important;}
+.text-chips {display:flex; flex-wrap:wrap; gap:6px;}
+.text-chips span {background:white; border:1px solid #dbe8dc; color:#315f45; border-radius:999px; padding:5px 8px; line-height:1.6;}
+.installment-section {display:grid; gap:9px;}
+.installment-plan {background:white; border:1px solid #dce9dd; border-radius:10px; padding:11px; min-width:0;}
+.plan-head {display:flex; justify-content:space-between; gap:8px; align-items:start; color:#244b36;}
+.plan-head>span {background:#e8f6ed; color:#087145; padding:3px 7px; border-radius:999px; font-size:9px; white-space:nowrap;}
+.plan-facts {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin:10px 0;}
+.plan-facts span {display:flex; flex-direction:column; gap:3px; background:#f5f8f4; border-radius:7px; padding:7px; color:#789080; font-size:9px;}
+.plan-facts b {color:#234c36; font-size:10px; overflow-wrap:anywhere;}
+.plan-note {display:block; margin:0 0 8px; color:#657b6c;}
+.payments {border:1px solid #edf1ec; border-radius:8px; overflow:auto; max-height:250px;}
+.payment-row {display:grid; grid-template-columns:.8fr 1fr 1.2fr; gap:7px; min-width:330px; padding:7px 8px; border-top:1px solid #edf1ec; align-items:center; color:#566e5e;}
+.payment-row:first-child {border-top:0;}
+.payment-row b {color:#214a34; text-align:left; direction:rtl;}
+.payment-head {background:#f2f6f1; color:#768a7c; font-weight:700; position:sticky; top:0;}
+@media (max-width:780px){.mapping-meta{grid-template-columns:1fr}.provider-tabs button{min-width:130px}}
+@media (max-width:480px){.detail-list,.plan-facts{grid-template-columns:1fr}}
