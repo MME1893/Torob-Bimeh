@@ -1,0 +1,30 @@
+{
+  "http": 200,
+  "fetched_at": "2026-09-24T22:23:57.059308Z",
+  "providers": [
+    {
+      "provider": "azki",
+      "status": "unavailable",
+      "offer_count": 0,
+      "message": "ارتباط با این منبع یا دریافت پاسخ ناموفق بود"
+    },
+    {
+      "provider": "sabim",
+      "status": "ok",
+      "offer_count": 1,
+      "message": null
+    },
+    {
+      "provider": "bimebazar",
+      "status": "ok",
+      "offer_count": 16,
+      "message": null
+    },
+    {
+      "provider": "bimeh",
+      "status": "ok",
+      "offer_count": 307,
+      "message": null
+    }
+  ]
+}

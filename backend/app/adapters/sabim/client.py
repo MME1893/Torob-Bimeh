@@ -4,10 +4,17 @@ from typing import Mapping
 
 import httpx
 
+from ..errors import InvalidProviderResponse
+from ..response_log import save_response
+
 from .contract import BASE_URL, PATHS, validate_query
 
 
 class SabimUpstreamError(RuntimeError):
+    pass
+
+
+class SabimInvalidResponse(InvalidProviderResponse, SabimUpstreamError):
     pass
 
 
@@ -27,7 +34,9 @@ async def get_prices(product: str, query: Mapping[str, object],
     try:
         data = response.json()
     except ValueError as exc:
-        raise SabimUpstreamError("پاسخ قیمت سابیم JSON معتبر نیست") from exc
+        raise SabimInvalidResponse("پاسخ قیمت سابیم JSON معتبر نیست") from exc
+    if transport is None:
+        await save_response("sabim", product, data)
     if not isinstance(data, (dict, list)):
-        raise SabimUpstreamError("ساختار JSON قیمت سابیم شناخته‌شده نیست")
+        raise SabimInvalidResponse("ساختار JSON قیمت سابیم شناخته‌شده نیست", raw=data)
     return data

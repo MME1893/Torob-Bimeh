@@ -11,3 +11,5 @@ __pycache__/
 .DS_Store
 *.har
 *.log
+backend/app/domain/third_catalog.json
+backend/logs/

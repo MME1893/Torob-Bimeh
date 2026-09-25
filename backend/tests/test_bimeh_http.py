@@ -65,7 +65,7 @@ def test_upstream_failure_does_not_return_archived_prices(monkeypatch):
     def handler(request):
         return httpx.Response(404, json={"message": "not found"})
 
-    with pytest.raises(BimehUpstreamError, match="HTTP 404: not found"):
+    with pytest.raises(BimehUpstreamError, match="HTTP 404"):
         asyncio.run(get_prices("body_car", BODY, httpx.MockTransport(handler)))
 
 

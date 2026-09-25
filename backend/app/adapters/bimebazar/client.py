@@ -4,10 +4,17 @@ from collections.abc import Mapping
 
 import httpx
 
+from ..errors import InvalidProviderResponse
+from ..response_log import save_response
+
 from .contract import HOST, OFFER_PATHS, validate_offer_params
 
 
 class BimebazarUpstreamError(RuntimeError):
+    pass
+
+
+class BimebazarInvalidResponse(InvalidProviderResponse, BimebazarUpstreamError):
     pass
 
 
@@ -50,9 +57,11 @@ async def get_offers(product: str, params: Mapping[str, object],
     try:
         data = response.json()
     except ValueError as exc:
-        raise BimebazarUpstreamError("پاسخ بیمه‌بازار JSON معتبر نیست") from exc
+        raise BimebazarInvalidResponse("پاسخ بیمه‌بازار JSON معتبر نیست") from exc
+    if transport is None:
+        await save_response("bimebazar", product, data)
     if (not isinstance(data, dict) or data.get("status") != "ok"
             or not isinstance(data.get("data"), dict)
             or not isinstance(data["data"].get("offers"), list)):
-        raise BimebazarUpstreamError("ساختار پاسخ پیشنهادهای بیمه‌بازار شناخته‌شده نیست")
+        raise BimebazarInvalidResponse("ساختار پاسخ پیشنهادهای بیمه‌بازار شناخته‌شده نیست", raw=data)
     return data

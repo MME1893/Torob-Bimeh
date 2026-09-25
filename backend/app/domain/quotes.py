@@ -11,6 +11,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 from .pricing import to_toman
+from .dates import jalali_to_gregorian
 
 Product = Literal["third_car", "body_car", "third_motor"]
 Provider = Literal["azki", "sabim", "bimebazar", "bimeh"]
@@ -29,6 +30,7 @@ class CarVehicle(Contract):
     production_month_jalali: int | None = Field(default=None, ge=1, le=12)
     imported: bool | None = None
     fuel_type_key: str | None = None
+    construction_year_title: str | None = Field(default=None, max_length=80)
 
 
 class MotorVehicle(Contract):
@@ -41,6 +43,8 @@ class PreviousThirdPartyPolicy(Contract):
     previous_insurer_key: str | None = None
     previous_start_date: date | None = None
     previous_expiry_date: date | None = None
+    previous_start_date_jalali: str | None = None
+    previous_expiry_date_jalali: str | None = None
     previous_duration_months: int | None = Field(default=None, ge=1, le=12)
     no_claim_discount_percent: int | None = Field(default=None, ge=0, le=100)
     driver_discount_percent: int | None = Field(default=None, ge=0, le=100)
@@ -51,13 +55,73 @@ class PreviousThirdPartyPolicy(Contract):
     ownership_changed: bool = False
     discount_transferred: bool = False
     first_use_date: date | None = None
+    first_use_date_jalali: str | None = None
+    new_vehicle_expiry_jalali: str | None = None
+    ownership_mode: Literal["unchanged", "no_discount", "same_plate", "other_plate"] = "unchanged"
+    policy_owner: Literal["current", "previous", "transfer"] = "current"
+    supplement_discounts: bool = False
+    transfer_plate: str | None = Field(default=None, max_length=100)
+    transfer_plate_part1: str | None = Field(default=None, max_length=8)
+    transfer_plate_part2: str | None = Field(default=None, max_length=8)
+    transfer_plate_part3: str | None = Field(default=None, max_length=8)
+    transfer_plate_serial: str | None = Field(default=None, max_length=8)
+    transfer_national_id: str | None = Field(default=None, max_length=10)
+    transfer_relationship: str = Field(default="", max_length=40)
+    transfer_inquiry_id: str | None = Field(default=None, max_length=100)
+
+    @model_validator(mode="after")
+    def validate_persian_dates(self):
+        if self.new_vehicle_expiry_jalali:
+            jalali_to_gregorian(self.new_vehicle_expiry_jalali)
+        for prefix, gregorian in (("previous_start", self.previous_start_date),
+                                   ("previous_expiry", self.previous_expiry_date),
+                                   ("first_use", self.first_use_date)):
+            jalali = getattr(self, prefix + "_date_jalali")
+            if jalali and gregorian and jalali_to_gregorian(jalali) != gregorian:
+                raise ValueError("تاریخ شمسی و میلادی بیمه با هم سازگار نیستند")
+            if jalali:
+                jalali_to_gregorian(jalali)
+        return self
+
+
+class ProviderSelection(Contract):
+    model_key: str
+    usage_key: str
+
+
+class SabimHistory(Contract):
+    insurer_key: str
+    start_date_jalali: str
+    expiry_date_jalali: str
+    @model_validator(mode="after")
+    def valid_dates(self):
+        if jalali_to_gregorian(self.start_date_jalali) >= jalali_to_gregorian(self.expiry_date_jalali):
+            raise ValueError("تاریخ پایان سابیم باید پس از شروع باشد")
+        return self
 
 
 class PreviousBodyPolicy(Contract):
     had_policy: bool
     previous_insurer_key: str | None = None
     previous_expiry_date: date | None = None
+    previous_expiry_date_jalali: str | None = None
     claim_free_years: int | None = Field(default=None, ge=0)
+    had_claim: bool = False
+    previous_war_coverage: bool = False
+
+    @model_validator(mode="after")
+    def validate_expiry(self):
+        if self.previous_expiry_date_jalali:
+            converted = jalali_to_gregorian(self.previous_expiry_date_jalali)
+            if self.previous_expiry_date and converted != self.previous_expiry_date:
+                raise ValueError("تاریخ شمسی و میلادی انقضای بیمه بدنه سازگار نیستند")
+        return self
+
+
+class BodyAccessory(Contract):
+    category_key: str = Field(min_length=1)
+    item_keys: list[str] = Field(min_length=1, max_length=100)
+    value_toman: int = Field(gt=0)
 
 
 class ThirdCarSearch(Contract):
@@ -66,6 +130,12 @@ class ThirdCarSearch(Contract):
     previous_policy: PreviousThirdPartyPolicy
     duration_months: int = Field(ge=1, le=12)
     financial_coverage_toman: int = Field(gt=0)
+    provider_selections: dict[Provider, ProviderSelection] = Field(default_factory=dict)
+    sabim_history: SabimHistory | None = None
+    sabim_zero_km_third_discount: bool = False
+    sabim_zero_km_driver_discount: bool = False
+    sabim_yadak: bool = False
+    sabim_transition: bool = False
 
 
 class ThirdMotorSearch(Contract):
@@ -74,25 +144,54 @@ class ThirdMotorSearch(Contract):
     previous_policy: PreviousThirdPartyPolicy
     duration_months: int = Field(ge=1, le=12)
     financial_coverage_toman: int = Field(gt=0)
+    sabim_history: SabimHistory | None = None
+    sabim_zero_km_third_discount: bool = False
+    sabim_zero_km_driver_discount: bool = False
+    sabim_yadak: bool = False
+    sabim_transition: bool = False
+    discount_code: str | None = Field(default=None, max_length=100)
 
 
 class BodyCarSearch(Contract):
     product: Literal["body_car"] = "body_car"
     vehicle: CarVehicle
     previous_policy: PreviousBodyPolicy
+    provider_selections: dict[Provider, ProviderSelection] = Field(default_factory=dict)
+    zero_kilometer: bool = False
+    clearance_date_jalali: str | None = None
     third_party_insurer_key: str | None = None
     third_party_discount_percent: int | None = Field(default=None, ge=0, le=100)
     vehicle_value_toman: int = Field(gt=0)
     accessories_value_toman: int = Field(default=0, ge=0)
+    accessories: list[BodyAccessory] = Field(default_factory=list, max_length=30)
     province_key: str = Field(min_length=1)
     city_key: str = Field(min_length=1)
     region_key: str | None = None
     selected_coverages: list[str] = Field(default_factory=list, max_length=30)
+    theft_parts_percent: Literal[5, 10, 20] | None = None
+    price_fluctuation_percent: Literal[25, 50, 100] | None = None
+    duration_months: int = Field(default=12, ge=1, le=12)
+    cash_discount: bool = True
+    sabim_life_discount_key: str | None = None
+    sabim_other_discount_key: str | None = None
+    sabim_bank_discount_key: str | None = None
+    azki_body_discount_id: int | None = Field(default=None, gt=0)
+    discount_code: str | None = Field(default=None, max_length=100)
 
     @model_validator(mode="after")
     def body_needs_production_month(self):
         if self.vehicle.production_month_jalali is None:
             raise ValueError("ماه تولید برای استعلام بدنه لازم است")
+        if self.zero_kilometer and not self.clearance_date_jalali:
+            raise ValueError("تاریخ ترخیص برای خودروی صفرکیلومتر لازم است")
+        if self.clearance_date_jalali:
+            jalali_to_gregorian(self.clearance_date_jalali)
+        if self.previous_policy.had_policy and (not self.previous_policy.previous_insurer_key
+                or not self.previous_policy.previous_expiry_date_jalali
+                or self.previous_policy.claim_free_years is None):
+            raise ValueError("اطلاعات بیمه بدنه قبلی کامل نیست")
+        if sum(item.value_toman for item in self.accessories) != self.accessories_value_toman:
+            raise ValueError("جمع ارزش لوازم با مبلغ کل لوازم برابر نیست")
         return self
 
 
@@ -114,6 +213,52 @@ class Premium(Contract):
         return self
 
 
+class MoneyDetail(Contract):
+    label: str = Field(min_length=1, max_length=120)
+    amount_toman: int = Field(ge=0)
+
+
+class InstallmentPayment(Contract):
+    sequence: int = Field(ge=0)
+    amount_toman: int = Field(ge=0)
+    months_after_purchase: int | None = Field(default=None, ge=0)
+    due_date: str | None = Field(default=None, max_length=80)
+    is_down_payment: bool = False
+
+
+class InstallmentPlan(Contract):
+    title: str = Field(min_length=1, max_length=160)
+    plan_type: str | None = Field(default=None, max_length=80)
+    is_credit: bool | None = None
+    installment_count: int = Field(ge=0)
+    down_payment_toman: int | None = Field(default=None, ge=0)
+    total_payable_toman: int | None = Field(default=None, ge=0)
+    operation_cost_toman: int | None = Field(default=None, ge=0)
+    operation_cost_in_installments: bool | None = None
+    payments: list[InstallmentPayment] = Field(default_factory=list)
+
+
+class PenaltyDetails(Contract):
+    days: int | None = Field(default=None, ge=0)
+    total_toman: int | None = Field(default=None, ge=0)
+    daily_toman: int | None = Field(default=None, ge=0)
+    forgiven: bool | None = None
+    description: str | None = Field(default=None, max_length=500)
+
+
+class InsurerMetrics(Contract):
+    satisfaction: float | None = Field(default=None, ge=0)
+    financial_strength: float | None = Field(default=None, ge=0)
+    solvency_level: float | None = Field(default=None, ge=0)
+    market_share_percent: float | None = Field(default=None, ge=0)
+    branches_count: int | None = Field(default=None, ge=0)
+    claim_centers_count: int | None = Field(default=None, ge=0)
+    complaint_response_time: float | None = Field(default=None, ge=0)
+    mobile_compensation: bool | None = None
+    online_claims: bool | None = None
+    online_issue: bool | None = None
+
+
 class Offer(Contract):
     provider: Provider
     product: Product
@@ -121,10 +266,23 @@ class Offer(Contract):
     insurer_key: str | None = None
     provider_offer_id: str | None = None
     premium: Premium
+    price_before_discount_toman: int | None = Field(default=None, ge=0)
+    discount_amount_toman: int | None = Field(default=None, ge=0)
+    discount_percent: float | None = Field(default=None, ge=0, le=100)
     duration_months: int | None = Field(default=None, ge=1, le=12)
     financial_coverage_toman: int | None = Field(default=None, ge=0)
     coverage_codes: list[str] = Field(default_factory=list)
     has_installments: bool | None = None
+    installment_plans: list[InstallmentPlan] = Field(default_factory=list)
+    payment_methods: list[str] = Field(default_factory=list)
+    penalty: PenaltyDetails | None = None
+    price_breakdown: list[MoneyDetail] = Field(default_factory=list)
+    discount_breakdown: list[MoneyDetail] = Field(default_factory=list)
+    insurer_metrics: InsurerMetrics | None = None
+    benefits: list[str] = Field(default_factory=list)
+    badges: list[str] = Field(default_factory=list)
+    is_recommended: bool | None = None
+    sale_rank: int | None = Field(default=None, ge=0)
     comparison_url: HttpUrl | None = None
     fetched_at: datetime
     # Exact source row, including fields the common cards do not yet display.
@@ -133,7 +291,7 @@ class Offer(Contract):
 
 class ProviderResult(Contract):
     provider: Provider
-    status: Literal["ok", "empty", "needs_input", "unmapped", "unavailable", "unsupported"]
+    status: Literal["ok", "empty", "needs_input", "unmapped", "unavailable", "invalid_response", "unsupported"]
     offers: list[Offer] = Field(default_factory=list)
     message: str | None = None
     # Preserve the complete upstream JSON in a provider-specific namespace.
