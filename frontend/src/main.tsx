@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { motion, useReducedMotion } from "framer-motion";
 import "./style.css";
 import "./search.css";
-import { ThirdCarWizard } from "./ThirdCarWizard";
+import { ThirdPartyInsuranceFlow } from "./ThirdPartyInsuranceFlow";
 import { ThirdMotorWizard } from "./ThirdMotorWizard";
 import { BodyCarWizard } from "./BodyCarWizard";
 import { InsuranceSelection } from "./InsuranceSelection";
@@ -612,7 +612,7 @@ function App() {
           }}
         />
         {selected === "third_car" && (
-          <ThirdCarWizard
+          <ThirdPartyInsuranceFlow
             onStart={() => setResult(null)}
             onResult={(r) => {
               setResult(r);
