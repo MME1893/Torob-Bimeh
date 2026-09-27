@@ -12,6 +12,7 @@ from .routers.bimeh import router as bimeh_router
 from .routers.bimebazar import router as bimebazar_router
 from .routers.sabim import router as sabim_router
 from .routers.search import router as search_router
+from .routers.ai import router as ai_router
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +24,7 @@ app.include_router(bimeh_router)
 app.include_router(bimebazar_router)
 app.include_router(sabim_router)
 app.include_router(search_router)
+app.include_router(ai_router)
 app.mount("/labs", StaticFiles(directory=ROOT / "frontend" / "labs"), name="labs")
 DIST = ROOT / "frontend" / "dist"
 if DIST.is_dir():
@@ -44,3 +46,16 @@ def home():
 @app.get("/logo.png", include_in_schema=False)
 def logo():
     return FileResponse(ROOT / "frontend" / "public" / "logo.png")
+
+
+@app.get("/ai_logo.png", include_in_schema=False)
+def ai_logo():
+    return FileResponse(ROOT / "frontend" / "public" / "ai_logo.png")
+
+
+@app.get("/results/{inquiry_id}", include_in_schema=False)
+def stored_result(inquiry_id: str):
+    """Serve the SPA entry point; the browser restores this inquiry from IndexedDB."""
+    if (DIST / "index.html").is_file():
+        return FileResponse(DIST / "index.html")
+    return RedirectResponse(url="/")

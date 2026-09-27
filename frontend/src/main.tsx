@@ -7,6 +7,10 @@ import { ThirdPartyInsuranceFlow } from "./ThirdPartyInsuranceFlow";
 import { ThirdMotorWizard } from "./ThirdMotorWizard";
 import { BodyCarWizard } from "./BodyCarWizard";
 import { InsuranceSelection } from "./InsuranceSelection";
+import { InsuranceResults } from "./InsuranceResults";
+import { RecentInquiries } from "./RecentInquiries";
+import { getInquiry, markInquiryOpened, stableInquiryId } from "./storage/inquiryHistory";
+import type { InsuranceKind } from "./ai/normalizeQuote";
 import type {
   InstallmentPlan,
   Metrics,
@@ -508,11 +512,32 @@ function TrustJourney() {
 }
 
 function App() {
-  const [selected, setSelected] = useState<"third_car" | "body_car" | "third_motor" | null>(
-    null,
-  );
+  const [selected, setSelected] = useState<InsuranceKind | null>(null);
   const [result, setResult] = useState<SearchResult | null>(null);
-  const [all, setAll] = useState(false);
+  const [inquiryId, setInquiryId] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState(false);
+  useEffect(() => {
+    const match = window.location.pathname.match(/^\/results\/([^/]+)$/);
+    if (!match) return;
+    const id = decodeURIComponent(match[1]);
+    getInquiry(id).then((stored) => {
+      if (!stored) {
+        setRestoreError(true);
+        return;
+      }
+      setSelected(stored.insuranceKind);
+      setResult(stored.result);
+      setInquiryId(stored.id);
+      void markInquiryOpened(stored.id);
+    }).catch(() => setRestoreError(true));
+  }, []);
+  const showFreshResult = (next: SearchResult) => {
+    const id = stableInquiryId(next);
+    setResult(next);
+    setInquiryId(id);
+    setRestoreError(false);
+    window.history.replaceState({ inquiryId: id }, "", `/results/${encodeURIComponent(id)}`);
+  };
   useEffect(() => {
     if (result)
       document
@@ -604,6 +629,8 @@ function App() {
           </div>
         </section>
         <TrustJourney />
+        <RecentInquiries />
+        {restoreError && <div className="stored-inquiry-error" role="status">این استعلام در حافظهٔ مرورگر پیدا نشد یا پاک شده است. می‌توانید استعلام تازه‌ای شروع کنید.</div>}
         <InsuranceSelection
           selected={selected}
           onSelect={(kind) => {
@@ -615,8 +642,7 @@ function App() {
           <ThirdPartyInsuranceFlow
             onStart={() => setResult(null)}
             onResult={(r) => {
-              setResult(r);
-              setAll(false);
+              showFreshResult(r);
             }}
           />
         )}
@@ -624,8 +650,7 @@ function App() {
           <BodyCarWizard
             onStart={() => setResult(null)}
             onResult={(r) => {
-              setResult(r);
-              setAll(false);
+              showFreshResult(r);
             }}
           />
         )}
@@ -633,63 +658,12 @@ function App() {
           <ThirdMotorWizard
             onStart={() => setResult(null)}
             onResult={(r) => {
-              setResult(r);
-              setAll(false);
+              showFreshResult(r);
             }}
           />
         )}
-        {result && (
-          <section className="results" aria-live="polite">
-            <div className="section-title">
-              <div>
-                <span className="overline">نتیجهٔ استعلام</span>
-                <h2>پیشنهادها و وضعیت منابع</h2>
-              </div>
-              <span className="timestamp">
-                دریافت: {new Date(result.fetched_at).toLocaleString("fa-IR")}
-              </span>
-            </div>
-            <div className="providers">
-              {result.providers.map((p) => (
-                <div key={p.provider} className={"provider " + p.status}>
-                  <b>{names[p.provider]}</b>
-                  <span>{statusNames[p.status]}</span>
-                  <small>
-                    {p.message ||
-                      `${formatter.format(p.offers.length)} پیشنهاد`}
-                  </small>
-                </div>
-              ))}
-            </div>
-            <div className="result-head">
-              <h3>{formatter.format(offers.length)} پیشنهاد دریافت شد</h3>
-              <span>همهٔ قیمت‌ها به تومان و از کمترین مبلغ مرتب شده‌اند.</span>
-            </div>
-            {offers.length ? (
-              <div className="offer-grid">
-                {(all ? offers : offers.slice(0, 8)).map((offer, index) => (
-                  <OfferCard
-                    offer={offer}
-                    index={index}
-                    key={`${offer.provider}-${index}`}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="alert">
-                هیچ پیشنهاد قابل‌نمایشی از منابع پاسخ‌دهنده دریافت نشد.
-              </p>
-            )}
-            {offers.length > 8 && (
-              <button className="secondary more" onClick={() => setAll(!all)}>
-                {all
-                  ? "نمایش کمتر"
-                  : `نمایش همهٔ ${formatter.format(offers.length)} پیشنهاد`}
-              </button>
-            )}
-          </section>
-        )}
       </main>
+      {result && selected && inquiryId && <InsuranceResults result={result} insuranceKind={selected} inquiryId={inquiryId} />}
       <footer className="footer wrap">
         <span>ترب بیمه</span>
         <span>استعلام چند منبع، در یک فرم ساده</span>

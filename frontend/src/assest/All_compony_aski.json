@@ -1,0 +1,179 @@
+{
+  "Companies": [
+    {
+      "Id": 1031,
+      "Title": "آرمان",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Arman_Insurance_f5b190c2d4.svg"
+    },
+    {
+      "Id": 1044,
+      "Title": "آسماری",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Asmari_Insurance_25753f319d.svg"
+    },
+    {
+      "Id": 1024,
+      "Title": "آسیا",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Asia_Insurance_42a0269abe.svg"
+    },
+    {
+      "Id": 1034,
+      "Title": "البرز",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/alborz_insurance_a81e2a52db.svg"
+    },
+    {
+      "Id": 1026,
+      "Title": "ایران",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Iran_Insurance_5c719fdf20.svg"
+    },
+    {
+      "Id": 1048,
+      "Title": "ایران معین",
+      "LogoUrl": "https://assets.bimeh.com/resources/images/companies-logo/Iranmoeen.png"
+    },
+    {
+      "Id": 1061,
+      "Title": "باران",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Brand_baran_Size_80_be0162aa86.png"
+    },
+    {
+      "Id": 1023,
+      "Title": "پارسیان",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/parsian_insurance_5c44428283.svg"
+    },
+    {
+      "Id": 1022,
+      "Title": "پاسارگاد",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/pasargad_insurance_5ddd849de5.svg"
+    },
+    {
+      "Id": 1066,
+      "Title": "پردیس",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/pardis_insurance_jpg_ea0ea474b0.svg"
+    },
+    {
+      "Id": 1039,
+      "Title": "تجارت نو",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Tejjaratno_Insurance_52b91a91dd.svg"
+    },
+    {
+      "Id": 1028,
+      "Title": "تعاون",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/taavon_insurance_3207043beb.svg"
+    },
+    {
+      "Id": 1047,
+      "Title": "حافظ",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/hafez_insurance_46e7b32ad3.svg"
+    },
+    {
+      "Id": 1060,
+      "Title": "حکمت",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/hekmat_Insurance_5c1ca808ab.svg"
+    },
+    {
+      "Id": null,
+      "Title": "حکمت صبا",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/hekmat_Insurance_5c1ca808ab.svg"
+    },
+    {
+      "Id": 1054,
+      "Title": "خاورمیانه",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Insurance_brands_32_68f5c984b3.svg"
+    },
+    {
+      "Id": 1029,
+      "Title": "دانا",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Dana_Insurance_c3dabfa08d.svg"
+    },
+    {
+      "Id": 1019,
+      "Title": "دی",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Day_Insurance_5ca9e0fee0.svg"
+    },
+    {
+      "Id": 1025,
+      "Title": "رازی",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Razi_Insurance_52a5055bf3.svg"
+    },
+    {
+      "Id": 1021,
+      "Title": "سامان",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Saman_Insurance_0c7e8348ff.svg"
+    },
+    {
+      "Id": 1027,
+      "Title": "سرمد",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/sarmad_insurance_2a08ba7332.svg"
+    },
+    {
+      "Id": 1032,
+      "Title": "سینا",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/sina_insurance_e878a1422d.svg"
+    },
+    {
+      "Id": 1036,
+      "Title": "کارآفرین",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/karafarin_insurance_affe95134f.svg"
+    },
+    {
+      "Id": 1038,
+      "Title": "کوثر",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Kosar_Insurance_2436757ac1.svg"
+    },
+    {
+      "Id": 1037,
+      "Title": "ما",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Maa_Insurance_c41033b787.svg"
+    },
+    {
+      "Id": 1020,
+      "Title": "معلم",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/moalem_insurance_5fbaec5037.svg"
+    },
+    {
+      "Id": 1018,
+      "Title": "ملت",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Mellat_Insurance_33833b0167.svg"
+    },
+    {
+      "Id": 1030,
+      "Title": "میهن",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/mihan_insurance_febb4e0db7.svg"
+    },
+    {
+      "Id": 1033,
+      "Title": "نوین",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/novin_insurance_c6cc57cace.svg"
+    },
+    {
+      "Id": 1067,
+      "Title": "هوشمند فردا",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Brand_hooshmand_Size_80_b33051bc76.png"
+    },
+    {
+      "Id": null,
+      "Title": "توسعه",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/tose_insurance_d6cec5b895.svg"
+    },
+    {
+      "Id": null,
+      "Title": "امید",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/omid_Insurance_359655ebc5.svg"
+    },
+    {
+      "Id": null,
+      "Title": "هامرز",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Brand_hamerz_Size_80_ffa25a2549.png"
+    },
+    {
+      "Id": null,
+      "Title": "کاریزما",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Brand_karizma_Size_80_1e71163f5b.png"
+    },
+    {
+      "Id": null,
+      "Title": "آگاه",
+      "LogoUrl": "https://www.azki.com/file/strapi-bucket/Brand_Agah_Size_80_2e5f551067.png"
+    }
+  ]
+}
