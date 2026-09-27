@@ -103,6 +103,7 @@ const isValidDate = (value: string) => {
   return day <= (month <= 6 ? 31 : 30);
 };
 const formatNumber = (value: number) => value.toLocaleString("fa-IR");
+const yearLabel = (value: number) => String(value);
 const unique = <T extends { key: string }>(items: T[]) =>
   [...new Map(items.map((item) => [item.key, item])).values()];
 
@@ -707,7 +708,7 @@ export function ThirdPartyInsuranceFlow({
                     {model?.usages.map((item) => <option value={item.key} key={item.key}>{item.label}</option>)}
                   </SelectField>
                   <SelectField label="سال ساخت" icon="calendar" value={year} onChange={(value) => setYear(Number(value))} disabled={!catalog}>
-                    {catalog?.production_years_jalali.map((item) => <option value={item} key={item}>{formatNumber(item)}</option>)}
+                    {catalog?.production_years_jalali.map((item) => <option value={item} key={item}>{yearLabel(item)}</option>)}
                   </SelectField>
                 </div>
                 <details className="tp-optional">
@@ -862,7 +863,7 @@ export function ThirdPartyInsuranceFlow({
               >
                 <div className="tp-summary-grid">
                   <SummaryItem editLabel="ویرایش خودرو" onEdit={() => setCurrentStep(1)}>
-                    {model?.category} • {model?.brand} • {model?.model} • {model?.usages.find((item) => item.key === usage)?.label} • {formatNumber(year)}
+                    {model?.category} • {model?.brand} • {model?.model} • {model?.usages.find((item) => item.key === usage)?.label} • {yearLabel(year)}
                   </SummaryItem>
                   <SummaryItem editLabel="ویرایش سابقه" onEdit={() => setCurrentStep(2)}>
                     {policyLabels[status]}

@@ -105,6 +105,7 @@ const validDate = (value: string) => {
   return d <= (m <= 6 ? 31 : 30);
 };
 const number = (value: number) => value.toLocaleString("fa-IR");
+const yearLabel = (value: number) => String(value);
 const unique = <T extends { key: string }>(items: T[]) => [
   ...new Map(items.map((item) => [item.key, item])).values(),
 ];
@@ -561,7 +562,7 @@ export function BodyCarWizard({
                 >
                   {catalog?.production_years_jalali.map((item) => (
                     <option key={item} value={item}>
-                      {number(item)}
+                      {yearLabel(item)}
                     </option>
                   ))}
                 </select>
@@ -1101,7 +1102,7 @@ export function BodyCarWizard({
               <span>
                 <b>
                   {model?.category} · {model?.brand} · {model?.model} ·{" "}
-                  {number(year)}/{number(month)}
+                  {yearLabel(year)}/{month}
                 </b>
                 <button
                   type="button"
