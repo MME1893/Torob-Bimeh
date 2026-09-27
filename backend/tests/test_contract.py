@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch
 from urllib.parse import urlencode
 
-from app.adapters.azki.contract import (
+from torob_bimeh.adapters.azki.contract import (
     InvalidPriceRequest, make_headers, price_params_from_url, validate_body_payload,
     validate_price_params,
 )

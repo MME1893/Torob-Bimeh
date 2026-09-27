@@ -3,7 +3,7 @@
 import unittest
 from urllib.parse import urlencode
 
-from app.adapters.bimebazar.contract import (
+from torob_bimeh.adapters.bimebazar.contract import (
     InvalidOfferRequest, OFFER_PATHS, offer_params_from_url,
     validate_offer_params,
 )

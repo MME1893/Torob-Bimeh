@@ -7,9 +7,9 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from app.adapters.bimeh.client import BimehUpstreamError, get_prices
-from app.adapters.bimeh.contract import BASE_URL, PATHS
-from app.main import app
+from torob_bimeh.adapters.bimeh.client import BimehUpstreamError, get_prices
+from torob_bimeh.adapters.bimeh.contract import BASE_URL, PATHS
+from torob_bimeh.main import app
 from tests.test_bimeh_contract import BODY, MOTOR, THIRD
 
 
@@ -50,7 +50,7 @@ def test_body_coverages_add_from_filter_header(monkeypatch):
 
 
 def test_missing_token_returns_configuration_error(monkeypatch):
-    from app.adapters.bimeh.client import BimehConfigurationError
+    from torob_bimeh.adapters.bimeh.client import BimehConfigurationError
     monkeypatch.delenv("BIMEH_TOKEN", raising=False)
     with pytest.raises(BimehConfigurationError, match="BIMEH_TOKEN"):
         asyncio.run(get_prices("third_car", THIRD))
@@ -74,7 +74,7 @@ def test_route_validates_product_and_forwards_inquiry(monkeypatch):
         assert product == "third_motor" and body == MOTOR
         return {"Inquiries": [], "Companies": []}
 
-    monkeypatch.setattr("app.routers.bimeh.get_prices", upstream)
+    monkeypatch.setattr("torob_bimeh.routers.bimeh.get_prices", upstream)
     with TestClient(app) as client:
         assert client.get("/labs/bimeh.html").status_code == 200
         result = client.post("/api/bimeh/prices", json={"product": "third_motor", "body": MOTOR})

@@ -11,5 +11,9 @@ __pycache__/
 .DS_Store
 *.har
 *.log
-backend/app/domain/third_catalog.json
+backend/src/torob_bimeh/domain/third_catalog.json
 backend/logs/
+
+*.cmd
+
+.omo

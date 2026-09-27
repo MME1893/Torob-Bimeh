@@ -5,8 +5,8 @@ import asyncio
 import httpx
 from fastapi.testclient import TestClient
 
-from app.adapters.sabim.client import get_prices
-from app.main import app
+from torob_bimeh.adapters.sabim.client import get_prices
+from torob_bimeh.main import app
 from tests.test_sabim_contract import BODY, THIRD
 
 
@@ -34,7 +34,7 @@ def test_body_coverages_are_repeated_and_errors_are_not_fake_prices():
         assert request.content == b"{}"
         return httpx.Response(500, json={"message": "upstream unavailable"})
 
-    from app.adapters.sabim.client import SabimUpstreamError
+    from torob_bimeh.adapters.sabim.client import SabimUpstreamError
     import pytest
     with pytest.raises(SabimUpstreamError, match="HTTP 500"):
         asyncio.run(get_prices("body_car", body, httpx.MockTransport(handler)))
@@ -46,7 +46,7 @@ def test_route_rejects_motor_body_and_forwards_car_quotes(monkeypatch):
         assert query == THIRD
         return {"prices": [123]}
 
-    monkeypatch.setattr("app.routers.sabim.get_prices", upstream)
+    monkeypatch.setattr("torob_bimeh.routers.sabim.get_prices", upstream)
     with TestClient(app) as client:
         assert client.get("/labs/sabim.html").status_code == 200
         result = client.post("/api/sabim/prices", json={"product": "third_car", "query": THIRD})

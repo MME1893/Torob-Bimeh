@@ -12,10 +12,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 import httpx
 
-from app.ai.client import AIMessage, OpenRouterClient
-from app.ai.quote_schema import QuoteAnalysisResponse
-from app.domain.normalizers import normalize
-from app.main import app
+from torob_bimeh.ai.client import AIMessage, OpenRouterClient
+from torob_bimeh.ai.quote_schema import QuoteAnalysisResponse
+from torob_bimeh.domain.normalizers import normalize
+from torob_bimeh.main import app
 
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")

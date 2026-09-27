@@ -1,0 +1,3895 @@
+{
+  "top": [],
+  "bottom": [],
+  "others": [
+    {
+      "id": 18,
+      "title": "رازی",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/18.png",
+      "satisfaction": 5.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 31.0,
+      "branchNumber": 47,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه رازی، از خدمات پرداخت خسارت آنلاین بیمیتو بهره‌مند شوید.",
+      "giftTitle": "",
+      "onlineDamage": true,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 5,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 11 قسط",
+          "label": "در ۱۱ قسط",
+          "description": "",
+          "credit": true,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.09090909,
+              "month": 1
+            },
+            {
+              "percent": 0.09090909,
+              "month": 2
+            },
+            {
+              "percent": 0.09090909,
+              "month": 3
+            },
+            {
+              "percent": 0.09090909,
+              "month": 4
+            },
+            {
+              "percent": 0.09090909,
+              "month": 5
+            },
+            {
+              "percent": 0.09090909,
+              "month": 6
+            },
+            {
+              "percent": 0.09090909,
+              "month": 7
+            },
+            {
+              "percent": 0.09090909,
+              "month": 8
+            },
+            {
+              "percent": 0.09090909,
+              "month": 9
+            },
+            {
+              "percent": 0.09090909,
+              "month": 10
+            },
+            {
+              "percent": 0.09090909,
+              "month": 11
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "b7b75e8f-1747-4d85-b893-7edd9804a1d9",
+          "default": false
+        },
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 10 قسط",
+          "label": "در ۱۰ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.07,
+              "month": 1
+            },
+            {
+              "percent": 0.07,
+              "month": 2
+            },
+            {
+              "percent": 0.07,
+              "month": 3
+            },
+            {
+              "percent": 0.07,
+              "month": 4
+            },
+            {
+              "percent": 0.07,
+              "month": 5
+            },
+            {
+              "percent": 0.07,
+              "month": 6
+            },
+            {
+              "percent": 0.07,
+              "month": 7
+            },
+            {
+              "percent": 0.07,
+              "month": 8
+            },
+            {
+              "percent": 0.07,
+              "month": 9
+            },
+            {
+              "percent": 0.07,
+              "month": 10
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "a6ad8c9f-ba1e-4e65-a692-ea7849cb63c9",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 20386030,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 2979047,
+          "bimitoDiscountDisplay": 2979047,
+          "giftCodeImpact": null,
+          "installmentPrice": 23365077,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "در 11 قسط",
+              "label": "در ۱۱ قسط با پیش‌پرداخت",
+              "description": "",
+              "type": 5,
+              "toWallet": 0,
+              "credit": true,
+              "installments": [
+                {
+                  "price": 3994077,
+                  "month": 0,
+                  "percent": 0.0,
+                  "dueDate": "2026-09-23",
+                  "difference": 3994077,
+                  "hasDifference": true
+                },
+                {
+                  "price": 1818181,
+                  "month": 1,
+                  "percent": 0.09090909,
+                  "dueDate": "2026-10-23",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 2,
+                  "percent": 0.09090909,
+                  "dueDate": "2026-11-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 3,
+                  "percent": 0.09090909,
+                  "dueDate": "2026-12-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 4,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-01-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 5,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-02-20",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 6,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-03-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 7,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-04-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 8,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-05-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 9,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-06-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 10,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-07-23",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 11,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-08-23",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "b7b75e8f-1747-4d85-b893-7edd9804a1d9",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": true,
+              "creditInsufficient": false
+            },
+            {
+              "title": "در 10 قسط",
+              "label": "در ۱۰ قسط با 30% پیش‌پرداخت",
+              "description": "",
+              "type": 4,
+              "toWallet": 0,
+              "credit": false,
+              "installments": [
+                {
+                  "price": 7638523,
+                  "month": 0,
+                  "percent": 0.3,
+                  "dueDate": null,
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 1,
+                  "percent": 0.07,
+                  "dueDate": "2026-10-27",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 2,
+                  "percent": 0.07,
+                  "dueDate": "2026-11-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 3,
+                  "percent": 0.07,
+                  "dueDate": "2026-12-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 4,
+                  "percent": 0.07,
+                  "dueDate": "2027-01-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 5,
+                  "percent": 0.07,
+                  "dueDate": "2027-02-24",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 6,
+                  "percent": 0.07,
+                  "dueDate": "2027-03-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 7,
+                  "percent": 0.07,
+                  "dueDate": "2027-04-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 8,
+                  "percent": 0.07,
+                  "dueDate": "2027-05-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 9,
+                  "percent": 0.07,
+                  "dueDate": "2027-06-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 10,
+                  "percent": 0.07,
+                  "dueDate": "2027-07-27",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "a6ad8c9f-ba1e-4e65-a692-ea7849cb63c9",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": false,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 11,
+      "ratingInfo": {
+        "id": 18,
+        "companyName": "رازی",
+        "comment": false,
+        "totalReviews": 1621,
+        "rate": 4.15,
+        "premiumAmountRate": 4.27,
+        "insuranceCoverageRate": 4.2,
+        "amountDamageRate": 2.08,
+        "supportRate": 2.19
+      }
+    },
+    {
+      "id": 31,
+      "title": "پردیس",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/31.png",
+      "satisfaction": 9.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 58.0,
+      "branchNumber": 16,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه پردیس، از خدمات پرداخت خسارت آنلاین ازکی در تهران بهره‌مند شوید.",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 5,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۴ قسط",
+          "label": "در ۴ قسط",
+          "description": "",
+          "credit": true,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.25,
+              "month": 1
+            },
+            {
+              "percent": 0.25,
+              "month": 2
+            },
+            {
+              "percent": 0.25,
+              "month": 3
+            },
+            {
+              "percent": 0.25,
+              "month": 4
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "c5dc8465-0902-4ec0-93ea-6d3e8e4e2331",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 20393040,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 2972037,
+          "bimitoDiscountDisplay": 2972037,
+          "giftCodeImpact": null,
+          "installmentPrice": 23365077,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "در ۴ قسط",
+              "label": "در ۴ قسط با پیش‌پرداخت",
+              "description": "",
+              "type": 5,
+              "toWallet": 0,
+              "credit": true,
+              "installments": [
+                {
+                  "price": 3994077,
+                  "month": 0,
+                  "percent": 0.0,
+                  "dueDate": "2026-09-23",
+                  "difference": 3994077,
+                  "hasDifference": true
+                },
+                {
+                  "price": 5000000,
+                  "month": 1,
+                  "percent": 0.25,
+                  "dueDate": "2026-10-23",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 5000000,
+                  "month": 2,
+                  "percent": 0.25,
+                  "dueDate": "2026-11-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 5000000,
+                  "month": 3,
+                  "percent": 0.25,
+                  "dueDate": "2026-12-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 5000000,
+                  "month": 4,
+                  "percent": 0.25,
+                  "dueDate": "2027-01-21",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "c5dc8465-0902-4ec0-93ea-6d3e8e4e2331",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": true,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [
+            {
+              "title": "پرداخت خسارت سیار (تمامی شهر‌ها)",
+              "description": "کارشناسان شرکت بیمه به محل تصادف میان و بعد از ارزیابی خسارت در صورتی که خسارت شما تا سقف مشخصی باشه خسارت شما رو پرداخت میکنن. کارشناسی توسط شرکت ارزیاب خسارت سامان نگار یا محک خسارت انجام میشه.",
+              "icon": "POSITIVE",
+              "newRelease": false
+            }
+          ],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 4,
+      "ratingInfo": {
+        "id": 31,
+        "companyName": "پردیس",
+        "comment": false,
+        "totalReviews": 13,
+        "rate": 4.31,
+        "premiumAmountRate": 4.23,
+        "insuranceCoverageRate": 4.38,
+        "amountDamageRate": 0.0,
+        "supportRate": 0.0
+      }
+    },
+    {
+      "id": 4,
+      "title": "سینا",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/4.png",
+      "satisfaction": 9.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 58.0,
+      "branchNumber": 58,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه سینا، از خدمات پرداخت خسارت آنلاین ازکی بهره‌مند شوید.\n",
+      "giftTitle": "",
+      "onlineDamage": true,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 10 قسط",
+          "label": "در ۱۰ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.07,
+              "month": 1
+            },
+            {
+              "percent": 0.07,
+              "month": 2
+            },
+            {
+              "percent": 0.07,
+              "month": 3
+            },
+            {
+              "percent": 0.07,
+              "month": 4
+            },
+            {
+              "percent": 0.07,
+              "month": 5
+            },
+            {
+              "percent": 0.07,
+              "month": 6
+            },
+            {
+              "percent": 0.07,
+              "month": 7
+            },
+            {
+              "percent": 0.07,
+              "month": 8
+            },
+            {
+              "percent": 0.07,
+              "month": 9
+            },
+            {
+              "percent": 0.07,
+              "month": 10
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "772f2b45-47e0-4531-8840-2bb646125189",
+          "default": false
+        },
+        {
+          "type": 5,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۸ قسط",
+          "label": "در ۸ قسط",
+          "description": "",
+          "credit": true,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.125,
+              "month": 1
+            },
+            {
+              "percent": 0.125,
+              "month": 2
+            },
+            {
+              "percent": 0.125,
+              "month": 3
+            },
+            {
+              "percent": 0.125,
+              "month": 4
+            },
+            {
+              "percent": 0.125,
+              "month": 5
+            },
+            {
+              "percent": 0.125,
+              "month": 6
+            },
+            {
+              "percent": 0.125,
+              "month": 7
+            },
+            {
+              "percent": 0.125,
+              "month": 8
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "07f7c0b4-ab11-41ff-9e15-e776e859202b",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 20420844,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 2944233,
+          "bimitoDiscountDisplay": 2944233,
+          "giftCodeImpact": null,
+          "installmentPrice": 23365077,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "در 10 قسط",
+              "label": "در ۱۰ قسط با 30% پیش‌پرداخت",
+              "description": "",
+              "type": 4,
+              "toWallet": 0,
+              "credit": false,
+              "installments": [
+                {
+                  "price": 7638523,
+                  "month": 0,
+                  "percent": 0.3,
+                  "dueDate": null,
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 1,
+                  "percent": 0.07,
+                  "dueDate": "2026-10-27",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 2,
+                  "percent": 0.07,
+                  "dueDate": "2026-11-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 3,
+                  "percent": 0.07,
+                  "dueDate": "2026-12-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 4,
+                  "percent": 0.07,
+                  "dueDate": "2027-01-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 5,
+                  "percent": 0.07,
+                  "dueDate": "2027-02-24",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 6,
+                  "percent": 0.07,
+                  "dueDate": "2027-03-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 7,
+                  "percent": 0.07,
+                  "dueDate": "2027-04-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 8,
+                  "percent": 0.07,
+                  "dueDate": "2027-05-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 9,
+                  "percent": 0.07,
+                  "dueDate": "2027-06-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 10,
+                  "percent": 0.07,
+                  "dueDate": "2027-07-27",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "772f2b45-47e0-4531-8840-2bb646125189",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": false,
+              "creditInsufficient": false
+            },
+            {
+              "title": "در ۸ قسط",
+              "label": "در ۸ قسط با پیش‌پرداخت",
+              "description": "",
+              "type": 5,
+              "toWallet": 0,
+              "credit": true,
+              "installments": [
+                {
+                  "price": 3994077,
+                  "month": 0,
+                  "percent": 0.0,
+                  "dueDate": "2026-09-23",
+                  "difference": 3994077,
+                  "hasDifference": true
+                },
+                {
+                  "price": 2500000,
+                  "month": 1,
+                  "percent": 0.125,
+                  "dueDate": "2026-10-23",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2500000,
+                  "month": 2,
+                  "percent": 0.125,
+                  "dueDate": "2026-11-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2500000,
+                  "month": 3,
+                  "percent": 0.125,
+                  "dueDate": "2026-12-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2500000,
+                  "month": 4,
+                  "percent": 0.125,
+                  "dueDate": "2027-01-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2500000,
+                  "month": 5,
+                  "percent": 0.125,
+                  "dueDate": "2027-02-20",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2500000,
+                  "month": 6,
+                  "percent": 0.125,
+                  "dueDate": "2027-03-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2500000,
+                  "month": 7,
+                  "percent": 0.125,
+                  "dueDate": "2027-04-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2500000,
+                  "month": 8,
+                  "percent": 0.125,
+                  "dueDate": "2027-05-22",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "07f7c0b4-ab11-41ff-9e15-e776e859202b",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": true,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [
+            {
+              "title": "پرداخت خسارت آنلاین (تهران و البرز)",
+              "description": "با خرید از شرکت بیمه سینا، از خدمات پرداخت خسارت آنلاین ازکی بهره‌مند شوید.",
+              "icon": "POSITIVE",
+              "newRelease": false
+            }
+          ],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 8,
+      "ratingInfo": {
+        "id": 4,
+        "companyName": "سینا",
+        "comment": false,
+        "totalReviews": 963,
+        "rate": 4.1,
+        "premiumAmountRate": 4.23,
+        "insuranceCoverageRate": 4.16,
+        "amountDamageRate": 1.84,
+        "supportRate": 1.98
+      }
+    },
+    {
+      "id": 17,
+      "title": "تعاون",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/17.png",
+      "satisfaction": 1.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 26.0,
+      "branchNumber": 49,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه تعاون، از خدمات پرداخت خسارت آنلاین ازکی بهره‌مند شوید.",
+      "giftTitle": "",
+      "onlineDamage": true,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 200000,
+      "installments": [
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 10 قسط",
+          "label": "در ۱۰ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.07,
+              "month": 1
+            },
+            {
+              "percent": 0.07,
+              "month": 2
+            },
+            {
+              "percent": 0.07,
+              "month": 3
+            },
+            {
+              "percent": 0.07,
+              "month": 4
+            },
+            {
+              "percent": 0.07,
+              "month": 5
+            },
+            {
+              "percent": 0.07,
+              "month": 6
+            },
+            {
+              "percent": 0.07,
+              "month": 7
+            },
+            {
+              "percent": 0.07,
+              "month": 8
+            },
+            {
+              "percent": 0.07,
+              "month": 9
+            },
+            {
+              "percent": 0.07,
+              "month": 10
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "58918cc6-d2f4-4d24-b8bd-ae5e86d9977b",
+          "default": false
+        },
+        {
+          "type": 5,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۱۱ قسط",
+          "label": "در ۱۱ قسط",
+          "description": "",
+          "credit": true,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.09090909,
+              "month": 1
+            },
+            {
+              "percent": 0.09090909,
+              "month": 2
+            },
+            {
+              "percent": 0.09090909,
+              "month": 3
+            },
+            {
+              "percent": 0.09090909,
+              "month": 4
+            },
+            {
+              "percent": 0.09090909,
+              "month": 5
+            },
+            {
+              "percent": 0.09090909,
+              "month": 6
+            },
+            {
+              "percent": 0.09090909,
+              "month": 7
+            },
+            {
+              "percent": 0.09090909,
+              "month": 8
+            },
+            {
+              "percent": 0.09090909,
+              "month": 9
+            },
+            {
+              "percent": 0.09090909,
+              "month": 10
+            },
+            {
+              "percent": 0.09090909,
+              "month": 11
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "fba7c17c-2b4b-4630-bfa5-579d6c7c7afb",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 20420844,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 2944233,
+          "bimitoDiscountDisplay": 2944233,
+          "giftCodeImpact": null,
+          "installmentPrice": 23365077,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "در 10 قسط",
+              "label": "در ۱۰ قسط با 30% پیش‌پرداخت",
+              "description": "",
+              "type": 4,
+              "toWallet": 0,
+              "credit": false,
+              "installments": [
+                {
+                  "price": 7638523,
+                  "month": 0,
+                  "percent": 0.3,
+                  "dueDate": null,
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 1,
+                  "percent": 0.07,
+                  "dueDate": "2026-10-27",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 2,
+                  "percent": 0.07,
+                  "dueDate": "2026-11-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 3,
+                  "percent": 0.07,
+                  "dueDate": "2026-12-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 4,
+                  "percent": 0.07,
+                  "dueDate": "2027-01-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 5,
+                  "percent": 0.07,
+                  "dueDate": "2027-02-24",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 6,
+                  "percent": 0.07,
+                  "dueDate": "2027-03-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 7,
+                  "percent": 0.07,
+                  "dueDate": "2027-04-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 8,
+                  "percent": 0.07,
+                  "dueDate": "2027-05-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 9,
+                  "percent": 0.07,
+                  "dueDate": "2027-06-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1635555,
+                  "month": 10,
+                  "percent": 0.07,
+                  "dueDate": "2027-07-27",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "58918cc6-d2f4-4d24-b8bd-ae5e86d9977b",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": false,
+              "creditInsufficient": false
+            },
+            {
+              "title": "در ۱۱ قسط",
+              "label": "در ۱۱ قسط با پیش‌پرداخت",
+              "description": "",
+              "type": 5,
+              "toWallet": 0,
+              "credit": true,
+              "installments": [
+                {
+                  "price": 3994077,
+                  "month": 0,
+                  "percent": 0.0,
+                  "dueDate": "2026-09-23",
+                  "difference": 3994077,
+                  "hasDifference": true
+                },
+                {
+                  "price": 1818181,
+                  "month": 1,
+                  "percent": 0.09090909,
+                  "dueDate": "2026-10-23",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 2,
+                  "percent": 0.09090909,
+                  "dueDate": "2026-11-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 3,
+                  "percent": 0.09090909,
+                  "dueDate": "2026-12-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 4,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-01-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 5,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-02-20",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 6,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-03-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 7,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-04-21",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 8,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-05-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 9,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-06-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 10,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-07-23",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1818181,
+                  "month": 11,
+                  "percent": 0.09090909,
+                  "dueDate": "2027-08-23",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "fba7c17c-2b4b-4630-bfa5-579d6c7c7afb",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": true,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [
+            {
+              "title": "پرداخت خسارت سیار (تمامی شهرها)",
+              "description": "کارشناسان شرکت بیمه به محل تصادف میان و بعد از ارزیابی خسارت در صورتی که خسارت شما تا سقف مشخصی باشه خسارت شما رو پرداخت میکنن.",
+              "icon": "POSITIVE",
+              "newRelease": false
+            }
+          ],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 11,
+      "ratingInfo": {
+        "id": 17,
+        "companyName": "تعاون",
+        "comment": false,
+        "totalReviews": 2774,
+        "rate": 4.2,
+        "premiumAmountRate": 4.35,
+        "insuranceCoverageRate": 4.21,
+        "amountDamageRate": 2.27,
+        "supportRate": 2.41
+      }
+    },
+    {
+      "id": 6,
+      "title": "دی",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/6.png",
+      "satisfaction": 11.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 222.0,
+      "branchNumber": 49,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 8 قسط",
+          "label": "در ۸ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.4,
+              "month": 0
+            },
+            {
+              "percent": 0.075,
+              "month": 1
+            },
+            {
+              "percent": 0.075,
+              "month": 2
+            },
+            {
+              "percent": 0.075,
+              "month": 3
+            },
+            {
+              "percent": 0.075,
+              "month": 4
+            },
+            {
+              "percent": 0.075,
+              "month": 5
+            },
+            {
+              "percent": 0.075,
+              "month": 6
+            },
+            {
+              "percent": 0.075,
+              "month": 7
+            },
+            {
+              "percent": 0.075,
+              "month": 8
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "321b076e-b1b3-4db0-8ce9-0bc1aad6dc3c",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 20420844,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 2944233,
+          "bimitoDiscountDisplay": 2944233,
+          "giftCodeImpact": null,
+          "installmentPrice": 23365077,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "در 8 قسط",
+              "label": "در ۸ قسط با 40% پیش‌پرداخت",
+              "description": "",
+              "type": 4,
+              "toWallet": 0,
+              "credit": false,
+              "installments": [
+                {
+                  "price": 9975031,
+                  "month": 0,
+                  "percent": 0.4,
+                  "dueDate": null,
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1752380,
+                  "month": 1,
+                  "percent": 0.075,
+                  "dueDate": "2026-10-27",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1752380,
+                  "month": 2,
+                  "percent": 0.075,
+                  "dueDate": "2026-11-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1752380,
+                  "month": 3,
+                  "percent": 0.075,
+                  "dueDate": "2026-12-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1752380,
+                  "month": 4,
+                  "percent": 0.075,
+                  "dueDate": "2027-01-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1752380,
+                  "month": 5,
+                  "percent": 0.075,
+                  "dueDate": "2027-02-24",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1752380,
+                  "month": 6,
+                  "percent": 0.075,
+                  "dueDate": "2027-03-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1752380,
+                  "month": 7,
+                  "percent": 0.075,
+                  "dueDate": "2027-04-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 1752380,
+                  "month": 8,
+                  "percent": 0.075,
+                  "dueDate": "2027-05-26",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "321b076e-b1b3-4db0-8ce9-0bc1aad6dc3c",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": false,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 6,
+        "companyName": "دی",
+        "comment": false,
+        "totalReviews": 1467,
+        "rate": 4.26,
+        "premiumAmountRate": 4.3,
+        "insuranceCoverageRate": 4.27,
+        "amountDamageRate": 1.61,
+        "supportRate": 1.66
+      }
+    },
+    {
+      "id": 1,
+      "title": "البرز",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/1.png",
+      "satisfaction": 19.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 11.0,
+      "branchNumber": 68,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه البرز، از خدمات پرداخت خسارت آنلاین بیمیتو بهره‌مند شوید.",
+      "giftTitle": "",
+      "onlineDamage": true,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 6 قسط",
+          "label": "در ۶ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.11666667,
+              "month": 1
+            },
+            {
+              "percent": 0.11666667,
+              "month": 2
+            },
+            {
+              "percent": 0.11666667,
+              "month": 3
+            },
+            {
+              "percent": 0.11666667,
+              "month": 4
+            },
+            {
+              "percent": 0.11666667,
+              "month": 5
+            },
+            {
+              "percent": 0.11666667,
+              "month": 6
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "a5483d97-a103-4862-a1b4-cfda3cd23a51",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 20561268,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 2803809,
+          "bimitoDiscountDisplay": 2803809,
+          "giftCodeImpact": null,
+          "installmentPrice": 23365077,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "در 6 قسط",
+              "label": "در ۶ قسط با 30% پیش‌پرداخت",
+              "description": "",
+              "type": 4,
+              "toWallet": 0,
+              "credit": false,
+              "installments": [
+                {
+                  "price": 7638523,
+                  "month": 0,
+                  "percent": 0.3,
+                  "dueDate": null,
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2725925,
+                  "month": 1,
+                  "percent": 0.11666667,
+                  "dueDate": "2026-10-27",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2725925,
+                  "month": 2,
+                  "percent": 0.11666667,
+                  "dueDate": "2026-11-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2725925,
+                  "month": 3,
+                  "percent": 0.11666667,
+                  "dueDate": "2026-12-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2725925,
+                  "month": 4,
+                  "percent": 0.11666667,
+                  "dueDate": "2027-01-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2725925,
+                  "month": 5,
+                  "percent": 0.11666667,
+                  "dueDate": "2027-02-24",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2725925,
+                  "month": 6,
+                  "percent": 0.11666667,
+                  "dueDate": "2027-03-25",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "a5483d97-a103-4862-a1b4-cfda3cd23a51",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": false,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [
+            {
+              "title": "پرداخت خسارت سیار (تمامی شهر‌ها)",
+              "description": "کارشناسان شرکت بیمه به محل تصادف میان و بعد از ارزیابی خسارت در صورتی که خسارت شما تا سقف مشخصی باشه خسارت شما رو پرداخت میکنن. کارشناسی توسط شرکت ارزیاب خسارت سامان نگار یا محک خسارت انجام میشه.",
+              "icon": "POSITIVE",
+              "newRelease": false
+            }
+          ],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 1,
+        "companyName": "البرز",
+        "comment": false,
+        "totalReviews": 657,
+        "rate": 4.13,
+        "premiumAmountRate": 4.19,
+        "insuranceCoverageRate": 4.2,
+        "amountDamageRate": 3.03,
+        "supportRate": 3.2
+      }
+    },
+    {
+      "id": 10,
+      "title": "ما",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/10.png",
+      "satisfaction": 7.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 16.0,
+      "branchNumber": 49,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 22895439,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 469638,
+          "bimitoDiscountDisplay": 469638,
+          "giftCodeImpact": null,
+          "installmentPrice": 0,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [],
+          "features": [],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 10,
+        "companyName": "ما",
+        "comment": false,
+        "totalReviews": 115,
+        "rate": 4.21,
+        "premiumAmountRate": 4.22,
+        "insuranceCoverageRate": 4.23,
+        "amountDamageRate": 3.13,
+        "supportRate": 3.28
+      }
+    },
+    {
+      "id": 3,
+      "title": "آسیا",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/3.png",
+      "satisfaction": 3.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 6.0,
+      "branchNumber": 105,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه آسیا، از خدمات پرداخت خسارت آنلاین ازکی در تهران بهره‌مند شوید.",
+      "giftTitle": "بیمه آتش سوزی رایگان (با سقف تعهد ۴۰ میلیون تومان) ",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [
+        {
+          "initialPenalty": 10250268,
+          "penalty": 10250268,
+          "totalPenalty": 10250268,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23102250,
+          "discountedPrice": 23102250,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 0,
+          "bimitoDiscountDisplay": 0,
+          "giftCodeImpact": null,
+          "installmentPrice": 0,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10250268,
+          "installmentPenalty": 10250268,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [],
+          "features": [],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 3,
+        "companyName": "آسیا",
+        "comment": false,
+        "totalReviews": 2191,
+        "rate": 4.25,
+        "premiumAmountRate": 4.28,
+        "insuranceCoverageRate": 4.32,
+        "amountDamageRate": 3.68,
+        "supportRate": 3.8
+      }
+    },
+    {
+      "id": 22,
+      "title": "حکمت صبا",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/22.png",
+      "satisfaction": 0.0,
+      "wealthLevel": 4.0,
+      "complaintResponseTime": 10.0,
+      "branchNumber": 25,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": " ",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 100000,
+      "installments": [
+        {
+          "type": 5,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 4 قسط",
+          "label": "در ۴ قسط",
+          "description": "",
+          "credit": true,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.25,
+              "month": 1
+            },
+            {
+              "percent": 0.25,
+              "month": 2
+            },
+            {
+              "percent": 0.25,
+              "month": 3
+            },
+            {
+              "percent": 0.25,
+              "month": 4
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "d8fbc810-5513-4e5d-abda-e3efde59a8a3",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 23365077,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 0,
+          "bimitoDiscountDisplay": 0,
+          "giftCodeImpact": null,
+          "installmentPrice": 23365077,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "در 4 قسط",
+              "label": "در ۴ قسط با پیش‌پرداخت",
+              "description": "",
+              "type": 5,
+              "toWallet": 0,
+              "credit": true,
+              "installments": [
+                {
+                  "price": 3994077,
+                  "month": 0,
+                  "percent": 0.0,
+                  "dueDate": "2026-09-23",
+                  "difference": 3994077,
+                  "hasDifference": true
+                },
+                {
+                  "price": 5000000,
+                  "month": 1,
+                  "percent": 0.25,
+                  "dueDate": "2026-10-23",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 5000000,
+                  "month": 2,
+                  "percent": 0.25,
+                  "dueDate": "2026-11-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 5000000,
+                  "month": 3,
+                  "percent": 0.25,
+                  "dueDate": "2026-12-22",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 5000000,
+                  "month": 4,
+                  "percent": 0.25,
+                  "dueDate": "2027-01-21",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "d8fbc810-5513-4e5d-abda-e3efde59a8a3",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": true,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [
+            {
+              "title": "پرداخت خسارت سیار (تمامی شهرها)",
+              "description": "کارشناسان شرکت بیمه به محل تصادف میان و بعد از ارزیابی خسارت در صورتی که خسارت شما تا سقف مشخصی باشه خسارت شما رو پرداخت میکنن. کارشناسی توسط شرکت ارزیاب خسارت پارس مهر انجام میشه.",
+              "icon": "POSITIVE",
+              "newRelease": false
+            }
+          ],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 4,
+      "ratingInfo": {
+        "id": 22,
+        "companyName": "حکمت",
+        "comment": false,
+        "totalReviews": 2,
+        "rate": 5.0,
+        "premiumAmountRate": 5.0,
+        "insuranceCoverageRate": 5.0,
+        "amountDamageRate": 0.0,
+        "supportRate": 0.0
+      }
+    },
+    {
+      "id": 21,
+      "title": "نوین",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/21.png",
+      "satisfaction": 12.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 10.0,
+      "branchNumber": 48,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 100000,
+      "installments": [
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "\tدر ۱۰ قسط",
+          "label": "در ۱۰ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.0875,
+              "month": 1
+            },
+            {
+              "percent": 0.0875,
+              "month": 2
+            },
+            {
+              "percent": 0.0875,
+              "month": 3
+            },
+            {
+              "percent": 0.0875,
+              "month": 4
+            },
+            {
+              "percent": 0.0875,
+              "month": 5
+            },
+            {
+              "percent": 0.0875,
+              "month": 6
+            },
+            {
+              "percent": 0.0875,
+              "month": 7
+            },
+            {
+              "percent": 0.0875,
+              "month": 8
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "3a85eab4-4b36-4839-a176-1a40689ec29c",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 23365077,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 0,
+          "bimitoDiscountDisplay": 0,
+          "giftCodeImpact": null,
+          "installmentPrice": 23365077,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "\tدر ۱۰ قسط",
+              "label": "در ۱۰ قسط با 30% پیش‌پرداخت",
+              "description": "",
+              "type": 4,
+              "toWallet": 0,
+              "credit": false,
+              "installments": [
+                {
+                  "price": 7638523,
+                  "month": 0,
+                  "percent": 0.3,
+                  "dueDate": null,
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2044444,
+                  "month": 1,
+                  "percent": 0.0875,
+                  "dueDate": "2026-10-27",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2044444,
+                  "month": 2,
+                  "percent": 0.0875,
+                  "dueDate": "2026-11-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2044444,
+                  "month": 3,
+                  "percent": 0.0875,
+                  "dueDate": "2026-12-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2044444,
+                  "month": 4,
+                  "percent": 0.0875,
+                  "dueDate": "2027-01-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2044444,
+                  "month": 5,
+                  "percent": 0.0875,
+                  "dueDate": "2027-02-24",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2044444,
+                  "month": 6,
+                  "percent": 0.0875,
+                  "dueDate": "2027-03-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2044444,
+                  "month": 7,
+                  "percent": 0.0875,
+                  "dueDate": "2027-04-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2044444,
+                  "month": 8,
+                  "percent": 0.0875,
+                  "dueDate": "2027-05-26",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "3a85eab4-4b36-4839-a176-1a40689ec29c",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": false,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 21,
+        "companyName": "نوین",
+        "comment": false,
+        "totalReviews": 51,
+        "rate": 4.32,
+        "premiumAmountRate": 4.33,
+        "insuranceCoverageRate": 4.27,
+        "amountDamageRate": 0.27,
+        "supportRate": 0.27
+      }
+    },
+    {
+      "id": 16,
+      "title": "تجارت نو",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/16.png",
+      "satisfaction": 0.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 3.0,
+      "branchNumber": 37,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه تجارت نو، از خدمات پرداخت خسارت آنلاین بیمیتو بهره‌مند شوید.",
+      "giftTitle": "",
+      "onlineDamage": true,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23365077,
+          "discountedPrice": 23365077,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 0,
+          "bimitoDiscountDisplay": 0,
+          "giftCodeImpact": null,
+          "installmentPrice": 0,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [],
+          "features": [
+            {
+              "title": "پرداخت خسارت سیار (تمامی شهر‌ها)",
+              "description": "کارشناسان شرکت بیمه به محل تصادف میان و بعد از ارزیابی خسارت در صورتی که خسارت شما تا سقف مشخصی باشه خسارت شما رو پرداخت میکنن. کارشناسی توسط شرکت ارزیاب خسارت سامان نگار یا محک خسارت انجام میشه.",
+              "icon": "POSITIVE",
+              "newRelease": false
+            }
+          ],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 16,
+        "companyName": "تجارت نو",
+        "comment": false,
+        "totalReviews": 1237,
+        "rate": 4.14,
+        "premiumAmountRate": 4.28,
+        "insuranceCoverageRate": 4.18,
+        "amountDamageRate": 2.81,
+        "supportRate": 2.92
+      }
+    },
+    {
+      "id": 19,
+      "title": "سامان",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/19.png",
+      "satisfaction": 18.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 13.0,
+      "branchNumber": 35,
+      "discountTitle": "۱۴٪ تخفیف بیمه بدنه",
+      "description": "با خرید از شرکت بیمه سامان، از خدمات پرداخت خسارت آنلاین بیمیتو بهره‌مند شوید.",
+      "giftTitle": "",
+      "onlineDamage": true,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 100000,
+      "installments": [],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23694615,
+          "discountedPrice": 23694615,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 0,
+          "bimitoDiscountDisplay": 0,
+          "giftCodeImpact": null,
+          "installmentPrice": 0,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [],
+          "features": [
+            {
+              "title": "پرداخت خسارت سیار (تمامی شهر‌ها)",
+              "description": "کارشناسان شرکت بیمه به محل تصادف میان و بعد از ارزیابی خسارت در صورتی که خسارت شما تا سقف مشخصی باشه خسارت شما رو پرداخت میکنن. کارشناسی توسط شرکت ارزیاب خسارت سامان نگار یا محک خسارت انجام میشه.",
+              "icon": "POSITIVE",
+              "newRelease": false
+            }
+          ],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 19,
+        "companyName": "سامان",
+        "comment": false,
+        "totalReviews": 967,
+        "rate": 4.13,
+        "premiumAmountRate": 4.22,
+        "insuranceCoverageRate": 4.04,
+        "amountDamageRate": 2.98,
+        "supportRate": 3.18
+      }
+    },
+    {
+      "id": 7,
+      "title": "ایران",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/7.png",
+      "satisfaction": 2.0,
+      "wealthLevel": 4.0,
+      "complaintResponseTime": 15.0,
+      "branchNumber": 250,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": true,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۵ قسط",
+          "label": "در ۵ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.5,
+              "month": 0
+            },
+            {
+              "percent": 0.1,
+              "month": 1
+            },
+            {
+              "percent": 0.1,
+              "month": 2
+            },
+            {
+              "percent": 0.1,
+              "month": 3
+            },
+            {
+              "percent": 0.1,
+              "month": 4
+            },
+            {
+              "percent": 0.1,
+              "month": 5
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "a0be7e2e-9afe-4e4d-ab2c-52116fd32bf9",
+          "default": false
+        }
+      ],
+      "prices": [
+        {
+          "initialPenalty": 10513095,
+          "penalty": 10513095,
+          "totalPenalty": 10513095,
+          "penaltyAmount": 28803,
+          "penaltyDays": 365,
+          "penaltyForgiveness": false,
+          "forgivenessDescription": "با خرید بیمه‌نامه یکساله از تاریخ ۲ شهریور تا ۱۳ شهریور، جریمه دیرکرد شما بخشیده می‌شود.",
+          "enableExpireDatePayment": false,
+          "durationID": 12,
+          "durationTitle": "یک ساله",
+          "coverID": 47,
+          "coverAmount": 70000000,
+          "price": 23694615,
+          "discountedPrice": 23694615,
+          "driverDiscountPercent": 0.0,
+          "thirdDiscountPercent": 0.0,
+          "bimitoDiscount": 0,
+          "bimitoDiscountDisplay": 0,
+          "giftCodeImpact": null,
+          "installmentPrice": 23694615,
+          "discountedInstallmentPrice": 0,
+          "installmentDiscountedPrice": 0,
+          "discountedInstallmentPercentage": 0.0,
+          "installmentTotalPenalty": 10513095,
+          "installmentPenalty": 10513095,
+          "azkiPenaltyDiscountAmount": 0,
+          "azkiInstallmentPenaltyDiscountAmount": 0,
+          "monthlyInstallments": [
+            {
+              "title": "در ۵ قسط",
+              "label": "در ۵ قسط با 50% پیش‌پرداخت",
+              "description": "",
+              "type": 4,
+              "toWallet": 0,
+              "credit": false,
+              "installments": [
+                {
+                  "price": 12476308,
+                  "month": 0,
+                  "percent": 0.5,
+                  "dueDate": null,
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2369461,
+                  "month": 1,
+                  "percent": 0.1,
+                  "dueDate": "2026-10-27",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2369461,
+                  "month": 2,
+                  "percent": 0.1,
+                  "dueDate": "2026-11-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2369461,
+                  "month": 3,
+                  "percent": 0.1,
+                  "dueDate": "2026-12-26",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2369461,
+                  "month": 4,
+                  "percent": 0.1,
+                  "dueDate": "2027-01-25",
+                  "difference": 0,
+                  "hasDifference": false
+                },
+                {
+                  "price": 2369461,
+                  "month": 5,
+                  "percent": 0.1,
+                  "dueDate": "2027-02-24",
+                  "difference": 0,
+                  "hasDifference": false
+                }
+              ],
+              "installmentId": "a0be7e2e-9afe-4e4d-ab2c-52116fd32bf9",
+              "cashBackAmount": null,
+              "cashBackPercent": null,
+              "operationCostType": "FIXED",
+              "operationCost": 629000.0,
+              "operationCostInInstallment": false,
+              "creditInsufficient": false
+            }
+          ],
+          "features": [],
+          "badges": [],
+          "primaryBusinessProperty": null,
+          "azkiRecommendation": false,
+          "hasCoupon": false,
+          "giftAmount": 0,
+          "giftAmountDisplay": 0,
+          "compareBenefitDiscountAmount": 0,
+          "hasAzkiloanCredit": false,
+          "azkiloanCashCredit": 0,
+          "azkiloanInstallmentCredit": 0,
+          "discountedItems": [],
+          "cashBackAmount": null,
+          "cashBackPercent": null
+        }
+      ],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 7,
+        "companyName": "ایران",
+        "comment": false,
+        "totalReviews": 3029,
+        "rate": 4.25,
+        "premiumAmountRate": 4.18,
+        "insuranceCoverageRate": 4.34,
+        "amountDamageRate": 2.85,
+        "supportRate": 2.95
+      }
+    }
+  ],
+  "experiment": null,
+  "couponCode": "ESA",
+  "couponDiscountPercent": 12.0,
+  "showBnplCampaignCard": true,
+  "noPriceStatus": "SEMI_NON_REVIVABLE",
+  "noPriceReasons": [],
+  "revivablePrices": [],
+  "nonRevivablePrices": [
+    {
+      "id": 2,
+      "title": "آرمان",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/2.png",
+      "satisfaction": 16.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 33.0,
+      "branchNumber": 35,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 4,
+          "enable": false,
+          "enableForSellers": true,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۱۰ قسط",
+          "label": "در ۱۰ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.07,
+              "month": 1
+            },
+            {
+              "percent": 0.07,
+              "month": 2
+            },
+            {
+              "percent": 0.07,
+              "month": 3
+            },
+            {
+              "percent": 0.07,
+              "month": 4
+            },
+            {
+              "percent": 0.07,
+              "month": 5
+            },
+            {
+              "percent": 0.07,
+              "month": 6
+            },
+            {
+              "percent": 0.07,
+              "month": 7
+            },
+            {
+              "percent": 0.07,
+              "month": 8
+            },
+            {
+              "percent": 0.07,
+              "month": 9
+            },
+            {
+              "percent": 0.07,
+              "month": 10
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "a075e00a-1d93-4914-8683-cc2a07fc1b0f",
+          "default": false
+        },
+        {
+          "type": 5,
+          "enable": false,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۱۱ قسط",
+          "label": "در ۱۱ قسط",
+          "description": "",
+          "credit": true,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.09090909,
+              "month": 1
+            },
+            {
+              "percent": 0.09090909,
+              "month": 2
+            },
+            {
+              "percent": 0.09090909,
+              "month": 3
+            },
+            {
+              "percent": 0.09090909,
+              "month": 4
+            },
+            {
+              "percent": 0.09090909,
+              "month": 5
+            },
+            {
+              "percent": 0.09090909,
+              "month": 6
+            },
+            {
+              "percent": 0.09090909,
+              "month": 7
+            },
+            {
+              "percent": 0.09090909,
+              "month": 8
+            },
+            {
+              "percent": 0.09090909,
+              "month": 9
+            },
+            {
+              "percent": 0.09090909,
+              "month": 10
+            },
+            {
+              "percent": 0.09090909,
+              "month": 11
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "593ad562-1c1f-4c12-85fd-8f393b714eba",
+          "default": false
+        },
+        {
+          "type": 4,
+          "enable": false,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۱۰ قسط",
+          "label": "در ۱۰ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.07,
+              "month": 1
+            },
+            {
+              "percent": 0.07,
+              "month": 2
+            },
+            {
+              "percent": 0.07,
+              "month": 3
+            },
+            {
+              "percent": 0.07,
+              "month": 4
+            },
+            {
+              "percent": 0.07,
+              "month": 5
+            },
+            {
+              "percent": 0.07,
+              "month": 6
+            },
+            {
+              "percent": 0.07,
+              "month": 7
+            },
+            {
+              "percent": 0.07,
+              "month": 8
+            },
+            {
+              "percent": 0.07,
+              "month": 9
+            },
+            {
+              "percent": 0.07,
+              "month": 10
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "34d7096d-3392-4ac7-89cd-158d0f1581a4",
+          "default": false
+        },
+        {
+          "type": 5,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 8 قسط",
+          "label": "در ۸ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.125,
+              "month": 1
+            },
+            {
+              "percent": 0.125,
+              "month": 2
+            },
+            {
+              "percent": 0.125,
+              "month": 3
+            },
+            {
+              "percent": 0.125,
+              "month": 4
+            },
+            {
+              "percent": 0.125,
+              "month": 5
+            },
+            {
+              "percent": 0.125,
+              "month": 6
+            },
+            {
+              "percent": 0.125,
+              "month": 7
+            },
+            {
+              "percent": 0.125,
+              "month": 8
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "f59245e5-a047-49b0-93cb-b39178f91836",
+          "default": false
+        },
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 8 قسط",
+          "label": "در ۸ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.15,
+              "month": 0
+            },
+            {
+              "percent": 0.10625,
+              "month": 1
+            },
+            {
+              "percent": 0.10625,
+              "month": 2
+            },
+            {
+              "percent": 0.10625,
+              "month": 3
+            },
+            {
+              "percent": 0.10625,
+              "month": 4
+            },
+            {
+              "percent": 0.10625,
+              "month": 5
+            },
+            {
+              "percent": 0.10625,
+              "month": 6
+            },
+            {
+              "percent": 0.10625,
+              "month": 7
+            },
+            {
+              "percent": 0.10625,
+              "month": 8
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "95e38e52-7701-4f7d-8850-88760fe9e4ff",
+          "default": false
+        }
+      ],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 2,
+        "companyName": "آرمان",
+        "comment": false,
+        "totalReviews": 314,
+        "rate": 3.95,
+        "premiumAmountRate": 4.31,
+        "insuranceCoverageRate": 3.93,
+        "amountDamageRate": 2.63,
+        "supportRate": 2.69
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 5,
+      "title": "دانا",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/5.png",
+      "satisfaction": 4.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 11.0,
+      "branchNumber": 81,
+      "discountTitle": "۱۴٪ تخفیف بیمه بدنه",
+      "description": "",
+      "giftTitle": "بیمه آتش سوزی رایگان (با سقف تعهد ۴۰ میلیون تومان) ",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 5,
+        "companyName": "دانا",
+        "comment": false,
+        "totalReviews": 507,
+        "rate": 4.07,
+        "premiumAmountRate": 4.13,
+        "insuranceCoverageRate": 4.18,
+        "amountDamageRate": 3.11,
+        "supportRate": 3.25
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 8,
+      "title": "كارآفرین",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/8.png",
+      "satisfaction": 15.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 17.0,
+      "branchNumber": 50,
+      "discountTitle": "۱۴٪ تخفیف بیمه بدنه",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 8,
+        "companyName": "كارآفرین",
+        "comment": false,
+        "totalReviews": 20,
+        "rate": 4.64,
+        "premiumAmountRate": 4.55,
+        "insuranceCoverageRate": 4.85,
+        "amountDamageRate": 3.45,
+        "supportRate": 3.45
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 9,
+      "title": "کوثر",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/9.png",
+      "satisfaction": 0.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 4.0,
+      "branchNumber": 41,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه کوثر، از خدمات پرداخت خسارت آنلاین بیمیتو بهره‌مند شوید.",
+      "giftTitle": "بیمه عمر",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 9,
+        "companyName": "كوثر",
+        "comment": false,
+        "totalReviews": 1122,
+        "rate": 4.16,
+        "premiumAmountRate": 4.33,
+        "insuranceCoverageRate": 4.21,
+        "amountDamageRate": 3.17,
+        "supportRate": 3.36
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 11,
+      "title": "ملت",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/11.png",
+      "satisfaction": 13.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 16.0,
+      "branchNumber": 28,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 11,
+        "companyName": "ملت",
+        "comment": false,
+        "totalReviews": 187,
+        "rate": 4.05,
+        "premiumAmountRate": 4.18,
+        "insuranceCoverageRate": 4.13,
+        "amountDamageRate": 3.16,
+        "supportRate": 3.24
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 12,
+      "title": "میهن",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/12.png",
+      "satisfaction": 10.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 46.0,
+      "branchNumber": 40,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 12,
+        "companyName": "میهن",
+        "comment": false,
+        "totalReviews": 9,
+        "rate": 3.56,
+        "premiumAmountRate": 3.56,
+        "insuranceCoverageRate": 3.56,
+        "amountDamageRate": 3.0,
+        "supportRate": 3.0
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 13,
+      "title": "معلم",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/13.png",
+      "satisfaction": 6.0,
+      "wealthLevel": 4.0,
+      "complaintResponseTime": 10.0,
+      "branchNumber": 84,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 4,
+          "enable": false,
+          "enableForSellers": true,
+          "underInstallmentLimitPrice": false,
+          "title": "اقساط 6 ماهه",
+          "label": "در ۶ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.15,
+              "month": 0
+            },
+            {
+              "percent": 0.14166667,
+              "month": 1
+            },
+            {
+              "percent": 0.14166667,
+              "month": 2
+            },
+            {
+              "percent": 0.14166667,
+              "month": 3
+            },
+            {
+              "percent": 0.14166667,
+              "month": 4
+            },
+            {
+              "percent": 0.14166667,
+              "month": 5
+            },
+            {
+              "percent": 0.14166667,
+              "month": 6
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "f4f1f66c-e73a-4179-a4fe-799a4d6c2ba1",
+          "default": false
+        },
+        {
+          "type": 5,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۴ قسط",
+          "label": "در ۴ قسط",
+          "description": "",
+          "credit": true,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.25,
+              "month": 1
+            },
+            {
+              "percent": 0.25,
+              "month": 2
+            },
+            {
+              "percent": 0.25,
+              "month": 3
+            },
+            {
+              "percent": 0.25,
+              "month": 4
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "f331d8dc-9b44-405d-8683-2b12effdaec7",
+          "default": false
+        },
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در 7 قسط",
+          "label": "در ۷ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.1,
+              "month": 1
+            },
+            {
+              "percent": 0.1,
+              "month": 2
+            },
+            {
+              "percent": 0.1,
+              "month": 3
+            },
+            {
+              "percent": 0.1,
+              "month": 4
+            },
+            {
+              "percent": 0.1,
+              "month": 5
+            },
+            {
+              "percent": 0.1,
+              "month": 6
+            },
+            {
+              "percent": 0.1,
+              "month": 7
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "71781b5c-ec4f-494f-842c-26cb766f6ef9",
+          "default": false
+        }
+      ],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 13,
+        "companyName": "معلم",
+        "comment": false,
+        "totalReviews": 70,
+        "rate": 4.15,
+        "premiumAmountRate": 4.2,
+        "insuranceCoverageRate": 4.17,
+        "amountDamageRate": 1.64,
+        "supportRate": 1.71
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 14,
+      "title": "پاسارگاد",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/14.png",
+      "satisfaction": 14.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 11.0,
+      "branchNumber": 91,
+      "discountTitle": "۱۴٪ تخفیف بیمه بدنه",
+      "description": "با خرید از شرکت بیمه پاسارگاد، از خدمات پرداخت خسارت آنلاین بیمیتو بهره‌مند شوید.",
+      "giftTitle": "بیمه آتش سوزی رایگان (با سقف تعهد ۴۰ میلیون تومان)",
+      "onlineDamage": true,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 14,
+        "companyName": "پاسارگاد",
+        "comment": false,
+        "totalReviews": 392,
+        "rate": 4.17,
+        "premiumAmountRate": 4.16,
+        "insuranceCoverageRate": 4.23,
+        "amountDamageRate": 3.66,
+        "supportRate": 3.81
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 15,
+      "title": "پارسیان",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/15.png",
+      "satisfaction": 8.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 14.0,
+      "branchNumber": 66,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 4,
+          "enable": false,
+          "enableForSellers": true,
+          "underInstallmentLimitPrice": false,
+          "title": "اقساط 5 ماهه",
+          "label": "در ۵ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.14,
+              "month": 1
+            },
+            {
+              "percent": 0.14,
+              "month": 2
+            },
+            {
+              "percent": 0.14,
+              "month": 3
+            },
+            {
+              "percent": 0.14,
+              "month": 4
+            },
+            {
+              "percent": 0.14,
+              "month": 5
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "1b0ec75f-6faf-4d97-93bf-1e7a777243bb",
+          "default": false
+        }
+      ],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 15,
+        "companyName": "پارسیان",
+        "comment": false,
+        "totalReviews": 1315,
+        "rate": 4.15,
+        "premiumAmountRate": 4.27,
+        "insuranceCoverageRate": 4.22,
+        "amountDamageRate": 3.23,
+        "supportRate": 3.34
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 20,
+      "title": "سرمد",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/20.png",
+      "satisfaction": 17.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 9.0,
+      "branchNumber": 39,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه سرمد، از خدمات پرداخت خسارت آنلاین بیمیتو بهره‌مند شوید.",
+      "giftTitle": "",
+      "onlineDamage": true,
+      "hasGift": false,
+      "hideDiscount": true,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 100000,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 20,
+        "companyName": "سرمد",
+        "comment": false,
+        "totalReviews": 404,
+        "rate": 4.03,
+        "premiumAmountRate": 4.35,
+        "insuranceCoverageRate": 4.08,
+        "amountDamageRate": 3.73,
+        "supportRate": 3.88
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 23,
+      "title": "آسماری",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/23.png",
+      "satisfaction": 0.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 5.0,
+      "branchNumber": 6,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 23,
+        "companyName": "آسماری",
+        "comment": false,
+        "totalReviews": 5,
+        "rate": 3.6,
+        "premiumAmountRate": 3.6,
+        "insuranceCoverageRate": 2.8,
+        "amountDamageRate": 2.0,
+        "supportRate": 2.0
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": [
+        "عدم پشتیبانی برخی شرکت‌ها از کاربری خودرو"
+      ]
+    },
+    {
+      "id": 28,
+      "title": "حافظ",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/28.png",
+      "satisfaction": 7.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 5.0,
+      "branchNumber": 29,
+      "discountTitle": "",
+      "description": "",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 28,
+        "companyName": "حافظ",
+        "comment": false,
+        "totalReviews": 10,
+        "rate": 4.0,
+        "premiumAmountRate": 3.9,
+        "insuranceCoverageRate": 4.4,
+        "amountDamageRate": 4.0,
+        "supportRate": 3.7
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    },
+    {
+      "id": 32,
+      "title": "هوشمند فردا",
+      "stick": null,
+      "icon": "https://bimito.com/file/public/HC/InsureCompany/32.png",
+      "satisfaction": 4.0,
+      "wealthLevel": 5.0,
+      "complaintResponseTime": 11.0,
+      "branchNumber": 41,
+      "discountTitle": "",
+      "description": "با خرید از شرکت بیمه هوشمند‌فردا، از خدمات پرداخت خسارت آنلاین بیمیتو بهره‌مند شوید.",
+      "giftTitle": "",
+      "onlineDamage": false,
+      "hasGift": false,
+      "hideDiscount": false,
+      "cashPayment": false,
+      "azkiPenaltyDiscountEnable": false,
+      "maxAzkiPenaltyDiscount": 0,
+      "installments": [
+        {
+          "type": 4,
+          "enable": false,
+          "enableForSellers": true,
+          "underInstallmentLimitPrice": false,
+          "title": "اقساط 8 ماهه",
+          "label": "در ۸ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.15,
+              "month": 0
+            },
+            {
+              "percent": 0.10625,
+              "month": 1
+            },
+            {
+              "percent": 0.10625,
+              "month": 2
+            },
+            {
+              "percent": 0.10625,
+              "month": 3
+            },
+            {
+              "percent": 0.10625,
+              "month": 4
+            },
+            {
+              "percent": 0.10625,
+              "month": 5
+            },
+            {
+              "percent": 0.10625,
+              "month": 6
+            },
+            {
+              "percent": 0.10625,
+              "month": 7
+            },
+            {
+              "percent": 0.10625,
+              "month": 8
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "77c73200-6e0e-4221-b5a2-80cc6b776034",
+          "default": false
+        },
+        {
+          "type": 5,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۱۱ قسط",
+          "label": "در ۱۱ قسط",
+          "description": "",
+          "credit": true,
+          "installments": [
+            {
+              "percent": 0.0,
+              "month": 0
+            },
+            {
+              "percent": 0.09090909,
+              "month": 1
+            },
+            {
+              "percent": 0.09090909,
+              "month": 2
+            },
+            {
+              "percent": 0.09090909,
+              "month": 3
+            },
+            {
+              "percent": 0.09090909,
+              "month": 4
+            },
+            {
+              "percent": 0.09090909,
+              "month": 5
+            },
+            {
+              "percent": 0.09090909,
+              "month": 6
+            },
+            {
+              "percent": 0.09090909,
+              "month": 7
+            },
+            {
+              "percent": 0.09090909,
+              "month": 8
+            },
+            {
+              "percent": 0.09090909,
+              "month": 9
+            },
+            {
+              "percent": 0.09090909,
+              "month": 10
+            },
+            {
+              "percent": 0.09090909,
+              "month": 11
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": true,
+          "installmentId": "dcfca803-9510-4241-8af2-0cb33656f4fe",
+          "default": false
+        },
+        {
+          "type": 4,
+          "enable": true,
+          "enableForSellers": false,
+          "underInstallmentLimitPrice": false,
+          "title": "در ۱۰ قسط",
+          "label": "در ۱۰ قسط",
+          "description": "",
+          "credit": false,
+          "installments": [
+            {
+              "percent": 0.3,
+              "month": 0
+            },
+            {
+              "percent": 0.07,
+              "month": 1
+            },
+            {
+              "percent": 0.07,
+              "month": 2
+            },
+            {
+              "percent": 0.07,
+              "month": 3
+            },
+            {
+              "percent": 0.07,
+              "month": 4
+            },
+            {
+              "percent": 0.07,
+              "month": 5
+            },
+            {
+              "percent": 0.07,
+              "month": 6
+            },
+            {
+              "percent": 0.07,
+              "month": 7
+            },
+            {
+              "percent": 0.07,
+              "month": 8
+            },
+            {
+              "percent": 0.07,
+              "month": 9
+            },
+            {
+              "percent": 0.07,
+              "month": 10
+            }
+          ],
+          "operationCostType": "FIXED",
+          "operationCost": 616000.0,
+          "operationCostInInstallment": false,
+          "installmentId": "65a864b2-d9b6-4d40-8451-61a4264e68e1",
+          "default": false
+        }
+      ],
+      "prices": [],
+      "numberOfCreditInstallments": 0,
+      "ratingInfo": {
+        "id": 32,
+        "companyName": "هوشمند فردا",
+        "comment": false,
+        "totalReviews": 399,
+        "rate": 4.59,
+        "premiumAmountRate": 4.5,
+        "insuranceCoverageRate": 4.67,
+        "amountDamageRate": 0.04,
+        "supportRate": 0.04
+      },
+      "noPriceStatus": "NON_REVIVABLE",
+      "noPriceReasons": []
+    }
+  ],
+  "disablePrices": [],
+  "thirdPriceSuggestionsDto": null
+}

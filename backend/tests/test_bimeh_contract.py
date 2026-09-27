@@ -2,7 +2,7 @@
 
 import unittest
 
-from app.adapters.bimeh.contract import InvalidBimehRequest, PATHS, validate_inquiry
+from torob_bimeh.adapters.bimeh.contract import InvalidBimehRequest, PATHS, validate_inquiry
 
 
 THIRD = {

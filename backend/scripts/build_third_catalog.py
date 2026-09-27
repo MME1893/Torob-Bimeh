@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 LABS = ROOT / "frontend" / "labs"
-OUTPUT = ROOT / "backend" / "app" / "domain" / "third_catalog.json"
+OUTPUT = ROOT / "backend" / "src" / "torob_bimeh" / "domain" / "third_catalog.json"
 
 
 def embedded(file, element):
