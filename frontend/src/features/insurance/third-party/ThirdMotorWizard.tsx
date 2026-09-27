@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { ComboBox } from "./ComboBox";
-import type { SearchResult } from "./searchTypes";
+import { ComboBox } from "../../../components/common/ComboBox";
+import type { SearchResult } from "../../search/searchTypes";
 
 type PolicyStatus = "no_previous_policy" | "had_previous_policy" | "new_vehicle";
 type OwnershipMode = "unchanged" | "no_discount" | "same_plate" | "other_plate";

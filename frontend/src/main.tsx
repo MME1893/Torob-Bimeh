@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { motion, useReducedMotion } from "framer-motion";
-import "./style.css";
-import "./search.css";
-import { ThirdPartyInsuranceFlow } from "./ThirdPartyInsuranceFlow";
-import { ThirdMotorWizard } from "./ThirdMotorWizard";
-import { BodyCarWizard } from "./BodyCarWizard";
-import { InsuranceSelection } from "./InsuranceSelection";
-import { InsuranceResults } from "./InsuranceResults";
-import { RecentInquiries } from "./RecentInquiries";
-import { getInquiry, markInquiryOpened, stableInquiryId } from "./storage/inquiryHistory";
-import type { InsuranceKind } from "./ai/normalizeQuote";
+import "./styles/global.css";
+import "./features/search/search.css";
+import { ThirdPartyInsuranceFlow } from "./features/insurance/third-party/ThirdPartyInsuranceFlow";
+import { ThirdMotorWizard } from "./features/insurance/third-party/ThirdMotorWizard";
+import { BodyCarWizard } from "./features/insurance/body/BodyCarWizard";
+import { InsuranceSelection } from "./features/insurance/selection/InsuranceSelection";
+import { InsuranceResults } from "./features/insurance/results/InsuranceResults";
+import { RecentInquiries } from "./features/inquiries/RecentInquiries";
+import { getInquiry, markInquiryOpened, stableInquiryId } from "./features/inquiries/storage/inquiryHistory";
+import type { InsuranceKind } from "./features/ai-analysis/lib/normalizeQuote";
 import type {
   InstallmentPlan,
   Metrics,
@@ -18,7 +18,7 @@ import type {
   Offer,
   SearchResult,
   Status,
-} from "./searchTypes";
+} from "./features/search/searchTypes";
 
 const names: Record<string, string> = {
   azki: "ازکی",

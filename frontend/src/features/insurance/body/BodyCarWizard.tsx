@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { ComboBox } from "./ComboBox";
-import type { SearchResult } from "./searchTypes";
+import { ComboBox } from "../../../components/common/ComboBox";
+import type { SearchResult } from "../../search/searchTypes";
 
 type Provider = "azki" | "sabim" | "bimebazar" | "bimeh";
 type Usage = { key: string; label: string };

@@ -1,20 +1,20 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { AccentSpark } from "./AccentSpark";
-import { FeatureBar } from "./FeatureBar";
-import { InsuranceCard, type InsuranceCardVariant } from "./InsuranceCard";
+import { AccentSpark } from "../../../components/common/AccentSpark";
+import { FeatureBar } from "../../../components/common/FeatureBar";
+import { InsuranceCard, type InsuranceCardVariant } from "../../../components/common/InsuranceCard";
 import "./insurance-selection.css";
 
 const thirdPartyCar = new URL(
-  "./assest/insurance/third-party-car.png",
+  "../../../assets/insurance/third-party-car.png",
   import.meta.url,
 ).href;
-const bodyCar = new URL("./assest/insurance/body-car.png", import.meta.url).href;
+const bodyCar = new URL("../../../assets/insurance/body-car.png", import.meta.url).href;
 const motorcycle = new URL(
-  "./assest/insurance/motorcycle.png",
+  "../../../assets/insurance/motorcycle.png",
   import.meta.url,
 ).href;
 const torobMini = new URL(
-  "./assest/insurance/torob-mini.png",
+  "../../../assets/insurance/torob-mini.png",
   import.meta.url,
 ).href;
 

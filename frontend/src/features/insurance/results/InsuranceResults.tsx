@@ -16,16 +16,16 @@ import {
   Star,
   WalletCards,
 } from "lucide-react";
-import type { Offer, ProviderResult, SearchResult, Status } from "./searchTypes";
+import type { Offer, ProviderResult, SearchResult, Status } from "../../search/searchTypes";
 import { resolveInsurerLogo } from "./insurerLogos";
-import { AIAnalysisPanel } from "./AIAnalysisPanel";
-import { useQuoteAIAnalysis } from "./ai/useQuoteAIAnalysis";
-import type { InsuranceKind } from "./ai/normalizeQuote";
-import motorResult from "./assest/insurance/motor_result.png";
-import azkiLogo from "./assest/insurance/azki.png";
-import sabimLogo from "./assest/insurance/sabim.png";
-import bimehBazarLogo from "./assest/insurance/bimehbazar.png";
-import bimehLogo from "./assest/insurance/bimeh.com.png";
+import { AIAnalysisPanel } from "../../ai-analysis/AIAnalysisPanel";
+import { useQuoteAIAnalysis } from "../../ai-analysis/lib/useQuoteAIAnalysis";
+import type { InsuranceKind } from "../../ai-analysis/lib/normalizeQuote";
+import motorResult from "../../../assets/insurance/motor_result.png";
+import azkiLogo from "../../../assets/insurance/azki.png";
+import sabimLogo from "../../../assets/insurance/sabim.png";
+import bimehBazarLogo from "../../../assets/insurance/bimehbazar.png";
+import bimehLogo from "../../../assets/insurance/bimeh.com.png";
 import "./insurance-results.css";
 
 const number = new Intl.NumberFormat("fa-IR");

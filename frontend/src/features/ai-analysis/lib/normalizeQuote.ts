@@ -1,4 +1,4 @@
-import type { Offer, SearchResult } from "../searchTypes";
+import type { Offer, SearchResult } from "../../search/searchTypes";
 
 export type InsuranceKind = "third_car" | "body_car" | "third_motor";
 

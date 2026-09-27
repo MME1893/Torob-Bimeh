@@ -22,11 +22,11 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
-import type { SearchResult } from "./searchTypes";
-import stepOneIllustration from "./assest/insurance/bimeh_shakhs_1.png";
-import stepTwoIllustration from "./assest/insurance/bimeh_shakhs_2.png";
-import stepThreeIllustration from "./assest/insurance/bimeh_shakhs_3.png";
-import stepFourIllustration from "./assest/insurance/bimeh_shakhs_4.png";
+import type { SearchResult } from "../../search/searchTypes";
+import stepOneIllustration from "../../../assets/insurance/bimeh_shakhs_1.png";
+import stepTwoIllustration from "../../../assets/insurance/bimeh_shakhs_2.png";
+import stepThreeIllustration from "../../../assets/insurance/bimeh_shakhs_3.png";
+import stepFourIllustration from "../../../assets/insurance/bimeh_shakhs_4.png";
 import "./third-party-insurance.css";
 
 type Step = 1 | 2 | 3 | 4;

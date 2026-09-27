@@ -2,7 +2,7 @@
 
 import unittest
 
-from app.domain.pricing import to_toman
+from torob_bimeh.domain.pricing import to_toman
 
 
 class PricingTest(unittest.TestCase):

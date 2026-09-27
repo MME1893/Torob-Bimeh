@@ -1,6 +1,6 @@
 # ترب بیمه — آزمایشگاه اتصال API
 
-نقشهٔ راه رابط واحد، قرارداد داده، وضعیت واقعی چهار منبع و برنامهٔ AI در [docs/mvp-roadmap.md](docs/mvp-roadmap.md) و جهت بصری در [docs/ui-concepts.md](docs/ui-concepts.md) آمده است. مدل‌های ورودی و خروجی در `backend/app/domain/quotes.py` و نخستین برش جست‌وجوی واحد در `backend/app/routers/search.py` هستند. JSON کامل پاسخ هر منبع در `ProviderResult.raw_response` حفظ می‌شود.
+نقشهٔ راه رابط واحد، قرارداد داده، وضعیت واقعی چهار منبع و برنامهٔ AI در [docs/mvp-roadmap.md](docs/mvp-roadmap.md) و جهت بصری در [docs/ui-concepts.md](docs/ui-concepts.md) آمده است. مدل‌های ورودی و خروجی در `backend/src/torob_bimeh/domain/quotes.py` و نخستین برش جست‌وجوی واحد در `backend/src/torob_bimeh/routers/search.py` هستند. JSON کامل پاسخ هر منبع در `ProviderResult.raw_response` حفظ می‌شود.
 
 **برش قابل اجرا:** فرم یکپارچهٔ ثالث خودرو با کمبوباکس دارای جست‌وجوی داخلی، اجتماع ۸۹۰۲ شناسهٔ مدل/برند چهار HTML، سه وضعیت بیمه، تاریخ شمسی، مالکیت/تعویض پلاک، انتقال تخفیف، خسارت و پوشش. چهار تب نگاشت، انتخاب معادل هر سایت و URL/query/body واقعی را نشان می‌دهند؛ `POST /api/search/preview` و استعلام از همان سازندهٔ درخواست استفاده می‌کنند. پارسر هر چهار منبع با پاسخ واقعی آزموده شده است. سابیم برای حالت بدون بیمه/نو به اطلاعات مبنای صریح نیاز دارد؛ تاریخ یا شرکت فرضی تولید نمی‌شود. بدنه و موتور غیرفعال‌اند؛ واحد حق بیمه نامشخص است و رتبه‌بندی قیمت انجام نمی‌شود. [ممیزی نگاشت و گزارش آزمون/اجرای زنده](docs/third-car-mapping-audit.md).
 
@@ -11,13 +11,13 @@ frontend/labs/                         آزمایشگاه‌های HTML چهار
 frontend/src/                          صفحهٔ اصلی، پرسش‌ها و نتایج
 frontend/labs/bimebazar-live.js        اتصال سه تب بیمه‌بازار و نمایش پیشنهادها
 frontend/labs/bimeh-live.js            اتصال سه تب بیمه‌دات‌کام و نمایش نتایج تازه
-backend/app/adapters/azki/             قرارداد و کلاینت ازکی
-backend/app/adapters/sabim/            قرارداد و کلاینت سابیم
-backend/app/adapters/bimebazar/        قرارداد و کلاینت بیمه‌بازار
-backend/app/adapters/bimeh/            قرارداد و کلاینت بیمه‌دات‌کام
-backend/app/routers/                   روتر مستقل هر سایت
-backend/app/domain/crosswalk.py        شناسه‌های بررسی‌شدهٔ نخستین مدل مشترک
-backend/app/domain/normalizers.py      استخراج پیشنهاد همراه پاسخ خام
+backend/src/torob_bimeh/adapters/azki/             قرارداد و کلاینت ازکی
+backend/src/torob_bimeh/adapters/sabim/            قرارداد و کلاینت سابیم
+backend/src/torob_bimeh/adapters/bimebazar/        قرارداد و کلاینت بیمه‌بازار
+backend/src/torob_bimeh/adapters/bimeh/            قرارداد و کلاینت بیمه‌دات‌کام
+backend/src/torob_bimeh/routers/                   روتر مستقل هر سایت
+backend/src/torob_bimeh/domain/crosswalk.py        شناسه‌های بررسی‌شدهٔ نخستین مدل مشترک
+backend/src/torob_bimeh/domain/normalizers.py      استخراج پیشنهاد همراه پاسخ خام
 backend/tests/                         آزمون قرارداد و پاسخ آزمایشی سرور
 ```
 
@@ -29,7 +29,7 @@ backend/tests/                         آزمون قرارداد و پاسخ آ�
 cd backend
 uv sync --extra test
 cp .env.example .env
-uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+uv run uvicorn torob_bimeh.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 برای ساخت و اجرای رابط جدید در پنجرهٔ دیگری:

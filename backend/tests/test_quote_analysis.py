@@ -3,8 +3,8 @@ import json
 
 import pytest
 
-from app.ai.quote_schema import QuoteAnalysisRequest, QuoteAnalysisResponse
-from app.ai.quote_service import AIResponseValidationError, QuoteAnalysisService, _clean_json
+from torob_bimeh.ai.quote_schema import QuoteAnalysisRequest, QuoteAnalysisResponse
+from torob_bimeh.ai.quote_service import AIResponseValidationError, QuoteAnalysisService, _clean_json
 
 
 def request_payload():

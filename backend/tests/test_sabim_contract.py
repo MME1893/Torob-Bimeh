@@ -2,7 +2,7 @@
 
 import unittest
 
-from app.adapters.sabim.contract import InvalidSabimRequest, validate_query
+from torob_bimeh.adapters.sabim.contract import InvalidSabimRequest, validate_query
 
 THIRD = {
     "command": "get_price", "thirdparty_lastcompany": "1",

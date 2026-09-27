@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { AlertTriangle, LoaderCircle, RotateCw, ShieldCheck, Sparkles, X } from "lucide-react";
-import type { SearchResult } from "./searchTypes";
-import { offersById } from "./ai/normalizeQuote";
-import type { AIState, AnalysisSectionKey } from "./ai/types";
-import { resolveInsurerLogo } from "./insurerLogos";
+import type { SearchResult } from "../search/searchTypes";
+import { offersById } from "./lib/normalizeQuote";
+import type { AIState, AnalysisSectionKey } from "./lib/types";
+import { resolveInsurerLogo } from "../insurance/results/insurerLogos";
 
 const number = new Intl.NumberFormat("fa-IR");
 const meta: Array<{ key: AnalysisSectionKey; title: string; processing: string }> = [

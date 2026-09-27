@@ -5,8 +5,8 @@ import asyncio
 import httpx
 from fastapi.testclient import TestClient
 
-from app.adapters.bimebazar.client import get_offers
-from app.main import app
+from torob_bimeh.adapters.bimebazar.client import get_offers
+from torob_bimeh.main import app
 from tests.test_bimebazar_contract import CAR_BODY, CAR_THIRD, MOTOR_THIRD
 
 
@@ -40,7 +40,7 @@ def test_local_route_rejects_compare_url_and_returns_upstream_json(monkeypatch):
         assert params == MOTOR_THIRD
         return {"status": "ok", "data": {"offers": []}}
 
-    monkeypatch.setattr("app.routers.bimebazar.get_offers", fake_upstream)
+    monkeypatch.setattr("torob_bimeh.routers.bimebazar.get_offers", fake_upstream)
     with TestClient(app) as client:
         assert client.get("/labs/bimebazar.html").status_code == 200
         result = client.post("/api/bimebazar/offers", json={"product": "third_motor", "params": MOTOR_THIRD})

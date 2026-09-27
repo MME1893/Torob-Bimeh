@@ -5,8 +5,8 @@ import json
 import httpx
 from fastapi.testclient import TestClient
 
-from app.adapters.azki.client import get_body_prices, get_third_prices
-from app.main import app
+from torob_bimeh.adapters.azki.client import get_body_prices, get_third_prices
+from torob_bimeh.main import app
 from tests.test_contract import BASE, BODY, QUERY
 
 
@@ -31,7 +31,7 @@ def test_route_and_lab_are_on_same_origin(monkeypatch):
         assert params["vehicleModelID"] == QUERY["vehicleModelID"]
         return {"top": [], "bottom": [], "others": []}
 
-    monkeypatch.setattr("app.routers.azki.get_third_prices", fake_upstream)
+    monkeypatch.setattr("torob_bimeh.routers.azki.get_third_prices", fake_upstream)
     with TestClient(app) as client:
         assert client.get("/api/health").json() == {"status": "ok"}
         assert 'id="fetch-quotes"' in client.get("/labs/azki.html").text
@@ -69,7 +69,7 @@ def test_body_route_forwards_payload_and_rejects_wrong_types(monkeypatch):
         assert body == BODY
         return {"top": [], "bottom": [], "others": []}
 
-    monkeypatch.setattr("app.routers.azki.get_body_prices", fake_upstream)
+    monkeypatch.setattr("torob_bimeh.routers.azki.get_body_prices", fake_upstream)
     with TestClient(app) as client:
         valid = client.post("/api/azki/prices/body", json={"body": BODY})
         assert valid.status_code == 200

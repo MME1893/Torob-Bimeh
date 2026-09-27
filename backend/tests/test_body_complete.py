@@ -4,15 +4,15 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from app.adapters.azki.contract import validate_body_payload
-from app.adapters.bimebazar.contract import validate_offer_params
-from app.adapters.bimeh.contract import validate_inquiry
-from app.adapters.sabim.contract import validate_query
-from app.domain.body_mapping import preview
-from app.domain.crosswalk import catalog as source_catalog
-from app.domain.normalizers import normalize
-from app.domain.quotes import BodyCarSearch
-from app.main import app
+from torob_bimeh.adapters.azki.contract import validate_body_payload
+from torob_bimeh.adapters.bimebazar.contract import validate_offer_params
+from torob_bimeh.adapters.bimeh.contract import validate_inquiry
+from torob_bimeh.adapters.sabim.contract import validate_query
+from torob_bimeh.domain.body_mapping import preview
+from torob_bimeh.domain.crosswalk import catalog as source_catalog
+from torob_bimeh.domain.normalizers import normalize
+from torob_bimeh.domain.quotes import BodyCarSearch
+from torob_bimeh.main import app
 
 
 client = TestClient(app)

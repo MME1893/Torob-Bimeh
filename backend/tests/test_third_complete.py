@@ -8,18 +8,18 @@ from unittest.mock import AsyncMock
 import httpx
 import pytest
 from fastapi.testclient import TestClient
-from app.main import app
-from app.domain.crosswalk import catalog
-from app.domain.quotes import ThirdCarSearch
-from app.domain.third_mapping import prepare, preview, resolve_car
-from app.domain.normalizers import normalize
-from app.domain.pricing import to_toman
-from app.routers import search
-from app.adapters.azki.contract import validate_price_params
-from app.adapters.sabim.contract import validate_query
-from app.adapters.bimebazar.contract import validate_offer_params
-from app.adapters.bimeh.contract import validate_inquiry
-from app.adapters.azki.client import _read_price_response
+from torob_bimeh.main import app
+from torob_bimeh.domain.crosswalk import catalog
+from torob_bimeh.domain.quotes import ThirdCarSearch
+from torob_bimeh.domain.third_mapping import prepare, preview, resolve_car
+from torob_bimeh.domain.normalizers import normalize
+from torob_bimeh.domain.pricing import to_toman
+from torob_bimeh.routers import search
+from torob_bimeh.adapters.azki.contract import validate_price_params
+from torob_bimeh.adapters.sabim.contract import validate_query
+from torob_bimeh.adapters.bimebazar.contract import validate_offer_params
+from torob_bimeh.adapters.bimeh.contract import validate_inquiry
+from torob_bimeh.adapters.azki.client import _read_price_response
 from tests.test_search import FORM
 
 OLD = {**FORM, 'previous_policy': {

@@ -1,7 +1,7 @@
 import asyncio
 from types import SimpleNamespace
 
-from app.ai.client import (
+from torob_bimeh.ai.client import (
     AIMessage,
     AIProviderError,
     AISettings,

@@ -4,11 +4,11 @@ from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
 
-from app.main import app
-from app.routers import search
-from app.domain.crosswalk import catalog
-from app.domain.dates import jalali_to_gregorian
-from app.adapters.sabim.contract import validate_query
+from torob_bimeh.main import app
+from torob_bimeh.routers import search
+from torob_bimeh.domain.crosswalk import catalog
+from torob_bimeh.domain.dates import jalali_to_gregorian
+from torob_bimeh.adapters.sabim.contract import validate_query
 
 
 FORM = {
@@ -188,8 +188,8 @@ def test_jalali_conversion_and_invalid_esfand():
 
 def test_each_lab_contributes_provider_scoped_models_and_uses():
     from collections import Counter
-    from app.domain.crosswalk import match_car
-    from app.domain.quotes import CarVehicle
+    from torob_bimeh.domain.crosswalk import match_car
+    from torob_bimeh.domain.quotes import CarVehicle
     rows = catalog()["models"]
     assert Counter(m["provider"] for m in rows) == {
         "sabim": 4061, "azki": 1879, "bimeh": 1750, "bimebazar": 1212}
@@ -255,8 +255,8 @@ def test_previous_policy_builds_four_different_lab_requests_and_isolates_respons
 
 
 def test_new_vehicle_requires_real_release_date_and_converts_per_provider():
-    from app.domain.quotes import ThirdCarSearch
-    from app.domain.crosswalk import CAR_MODELS
+    from torob_bimeh.domain.quotes import ThirdCarSearch
+    from torob_bimeh.domain.crosswalk import CAR_MODELS
     form = {**FORM, "previous_policy": {"status": "new_vehicle",
                                         "first_use_date_jalali": "1405/07/01",
                                         "new_vehicle_expiry_jalali": "1405/07/01"}}

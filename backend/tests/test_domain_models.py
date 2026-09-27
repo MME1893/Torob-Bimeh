@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError
 
-from app.domain.quotes import Offer, Premium, ProviderResult, SearchResult
+from torob_bimeh.domain.quotes import Offer, Premium, ProviderResult, SearchResult
 
 
 def test_preserves_full_source_json_and_unknown_price_unit():

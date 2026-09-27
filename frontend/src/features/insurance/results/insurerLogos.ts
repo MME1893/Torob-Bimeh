@@ -1,4 +1,4 @@
-import logoCatalog from "./assest/All_company_logos.json";
+import logoCatalog from "../../../assets/All_company_logos.json";
 
 type LogoCompany = { Title: string; LogoUrl: string };
 

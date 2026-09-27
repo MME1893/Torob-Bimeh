@@ -15,7 +15,7 @@ from .routers.search import router as search_router
 from .routers.ai import router as ai_router
 
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 load_dotenv(ROOT / "backend" / ".env")
 
 app = FastAPI(title="Torob Bimeh API", version="0.1.0")

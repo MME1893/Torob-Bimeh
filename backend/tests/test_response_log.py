@@ -1,7 +1,7 @@
 import json
 import asyncio
 
-from app.adapters.response_log import save_response
+from torob_bimeh.adapters.response_log import save_response
 
 
 def test_provider_response_log_uses_provider_directory_and_json(monkeypatch, tmp_path):

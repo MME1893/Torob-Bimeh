@@ -28,7 +28,7 @@ MVP سه مسیر دارد: **شخص ثالث خودرو، بدنهٔ خودرو
 
 ## قرارداد فرم واحد
 
-قرارداد پایه در `backend/app/domain/quotes.py` تعریف شده است. `SearchInput` یک union با شاخه‌های `third_car`، `body_car` و `third_motor` است؛ این schema هنوز به مسیر API عمومی وصل نشده است. کلیدهای `brand_key`، `model_key`، `motor_type_key` و مانند آن، کلیدهای داخلی کاتالوگ آینده‌اند و شناسهٔ هیچ‌یک از سایت‌ها نیستند.
+قرارداد پایه در `backend/src/torob_bimeh/domain/quotes.py` تعریف شده است. `SearchInput` یک union با شاخه‌های `third_car`، `body_car` و `third_motor` است؛ این schema هنوز به مسیر API عمومی وصل نشده است. کلیدهای `brand_key`، `model_key`، `motor_type_key` و مانند آن، کلیدهای داخلی کاتالوگ آینده‌اند و شناسهٔ هیچ‌یک از سایت‌ها نیستند.
 
 | مرحلهٔ فرم | ثالث خودرو | بدنهٔ خودرو | ثالث موتور |
 | --- | --- | --- | --- |

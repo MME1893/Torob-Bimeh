@@ -1,6 +1,6 @@
-import type { QuoteAnalysis } from "../ai/types";
-import type { InsuranceKind } from "../ai/normalizeQuote";
-import type { SearchResult } from "../searchTypes";
+import type { QuoteAnalysis } from "../../ai-analysis/lib/types";
+import type { InsuranceKind } from "../../ai-analysis/lib/normalizeQuote";
+import type { SearchResult } from "../../search/searchTypes";
 
 export const DB_NAME = "torobimeh-inquiries";
 export const DB_VERSION = 1;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import type { SearchResult } from "../searchTypes";
-import { getInquiry, saveInquirySnapshot, makeInquiryRecord, updateInquiryAnalysis } from "../storage/inquiryHistory";
+import type { SearchResult } from "../../search/searchTypes";
+import { getInquiry, saveInquirySnapshot, makeInquiryRecord, updateInquiryAnalysis } from "../../inquiries/storage/inquiryHistory";
 import { normalizeQuoteForAI, type InsuranceKind } from "./normalizeQuote";
 import { ANALYSIS_VERSION, type AIState } from "./types";
 import { validateAnalysis } from "./validateAnalysis";

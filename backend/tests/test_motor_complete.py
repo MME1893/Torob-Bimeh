@@ -7,15 +7,15 @@ from unittest.mock import AsyncMock
 
 from fastapi.testclient import TestClient
 
-from app.adapters.azki.contract import validate_price_params
-from app.adapters.bimebazar.contract import validate_offer_params
-from app.adapters.bimeh.contract import validate_inquiry
-from app.adapters.sabim.contract import validate_query
-from app.domain.motor_mapping import preview, resolve_motor
-from app.domain.normalizers import normalize
-from app.domain.quotes import ThirdMotorSearch
-from app.main import app
-from app.routers import search
+from torob_bimeh.adapters.azki.contract import validate_price_params
+from torob_bimeh.adapters.bimebazar.contract import validate_offer_params
+from torob_bimeh.adapters.bimeh.contract import validate_inquiry
+from torob_bimeh.adapters.sabim.contract import validate_query
+from torob_bimeh.domain.motor_mapping import preview, resolve_motor
+from torob_bimeh.domain.normalizers import normalize
+from torob_bimeh.domain.quotes import ThirdMotorSearch
+from torob_bimeh.main import app
+from torob_bimeh.routers import search
 
 
 CLIENT = TestClient(app)
