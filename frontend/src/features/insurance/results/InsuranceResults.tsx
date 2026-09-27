@@ -18,6 +18,19 @@ import {
 } from "lucide-react";
 import type { Offer, ProviderResult, SearchResult, Status } from "../../search/searchTypes";
 import { resolveInsurerLogo } from "./insurerLogos";
+import { OfferFilterPanel } from "./OfferFilterPanel";
+import { SortMenu } from "./SortMenu";
+import {
+  SORT_LABELS,
+  activeFilterCount,
+  buildOfferIndex,
+  emptyFilters,
+  hasAnyFilter,
+  insurerOptions,
+  priceBounds,
+  selectOffers,
+  type OfferFilters,
+} from "./offerFilters";
 import { AIAnalysisPanel } from "../../ai-analysis/AIAnalysisPanel";
 import { useQuoteAIAnalysis } from "../../ai-analysis/lib/useQuoteAIAnalysis";
 import { offerIdsByOffer, offersById, type InsuranceKind } from "../../ai-analysis/lib/normalizeQuote";
@@ -42,6 +55,10 @@ const providerMeta: Record<string, { name: string; logo: string }> = {
   bimeh: { name: "بیمه‌دات‌کام", logo: bimehLogo },
 };
 const providerOrder = ["azki", "sabim", "bimebazar", "bimeh"];
+/** Display names the search box also matches against, beside the insurer name. */
+const providerNames: Record<string, string> = Object.fromEntries(
+  Object.entries(providerMeta).map(([key, meta]) => [key, meta.name]),
+);
 const statusText: Record<Status, string> = {
   ok: "پیشنهاد دریافت شد",
   empty: "پیشنهادی پیدا نشد",
@@ -228,15 +245,25 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
     return (offer.premium.amount_toman ?? Infinity) < (cheapest.premium.amount_toman ?? Infinity) ? offer : cheapest;
   }, null), [sourceOffers]);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(cheapestOffer);
-  const [query, setQuery] = useState("");
-  const [installmentsOnly, setInstallmentsOnly] = useState(false);
-  const [discountOnly, setDiscountOnly] = useState(false);
+  // One filter object backs the search box, the quick chips, the segments, the
+  // sort control and the filter panel, so no control can overwrite another.
+  const [filters, setFilters] = useState<OfferFilters>(() => emptyFilters());
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortButtonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => setSelectedOffer(cheapestOffer), [cheapestOffer]);
-  const offers = useMemo(() => sourceOffers
-    .filter((offer) => offer.insurer_name.includes(query.trim()))
-    .filter((offer) => !installmentsOnly || offer.has_installments === true)
-    .filter((offer) => !discountOnly || !!offer.discount_amount_toman)
-    .sort((a, b) => (a.premium.amount_toman ?? Infinity) - (b.premium.amount_toman ?? Infinity)), [sourceOffers, query, installmentsOnly, discountOnly]);
+  // Provider labels and popularity scores are derived once per result, so the
+  // filter and sort pass only walks the offers.
+  const offerIndex = useMemo(() => buildOfferIndex(result.providers, providerNames), [result.providers]);
+  const offers = useMemo(() => selectOffers(sourceOffers, filters, offerIndex), [sourceOffers, filters, offerIndex]);
+  // The panel may only offer insurers and a price range that exist in this result.
+  const insurerChoices = useMemo(() => insurerOptions(sourceOffers), [sourceOffers]);
+  const bounds = useMemo(() => priceBounds(sourceOffers), [sourceOffers]);
+  const filterCount = activeFilterCount(filters);
+  const patchFilters = useCallback((patch: Partial<OfferFilters>) => {
+    setFilters((current) => ({ ...current, ...patch }));
+  }, []);
+  const resetFilters = useCallback(() => setFilters(emptyFilters()), []);
   const providersByName = new Map(result.providers.map((provider) => [provider.provider, provider]));
 
   // Canonical ids always come from the original unfiltered provider order, so
@@ -293,25 +320,41 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
         {selectedOffer ? <SelectedOfferPanel offer={selectedOffer} kind={insuranceKind} /> : <aside className="ir-selected-panel ir-empty">پیشنهادی برای نمایش جزئیات وجود ندارد.</aside>}
         <section className="ir-offers-panel">
           <div className="ir-toolbar-first">
-            <label className="ir-search"><Search /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="جستجو در شرکت‌های بیمه..." /></label>
-            <div className="ir-segments"><button className={installmentsOnly ? "active" : ""} onClick={() => setInstallmentsOnly(!installmentsOnly)}>اقساط</button><button className={!installmentsOnly ? "active" : ""} onClick={() => setInstallmentsOnly(false)}>ارزان‌ترین</button></div>
-            <button className="ir-sort"><ListFilter />مرتب‌سازی: ارزان‌ترین</button>
+            <label className="ir-search"><Search /><input value={filters.query} onChange={(e) => patchFilters({ query: e.target.value })} placeholder="جستجو در شرکت‌های بیمه..." /></label>
+            <div className="ir-segments"><button className={filters.payment === "installments" ? "active" : ""} onClick={() => patchFilters({ payment: filters.payment === "installments" ? null : "installments" })}>اقساط</button><button className={filters.sort === "cheapest" ? "active" : ""} onClick={() => patchFilters({ sort: "cheapest" })}>ارزان‌ترین</button></div>
+            <button ref={sortButtonRef} className="ir-sort" type="button" aria-haspopup="listbox" aria-expanded={sortOpen} onClick={() => setSortOpen((value) => !value)}><ListFilter />مرتب‌سازی: {SORT_LABELS[filters.sort]}</button>
+            <SortMenu value={filters.sort} open={sortOpen} anchorRef={sortButtonRef} onChange={(sort) => patchFilters({ sort })} onClose={() => setSortOpen(false)} />
             <label className="ir-ready" title="دادهٔ آماده‌بودن برای خرید در پاسخ فعلی وجود ندارد"><span>فقط آماده خرید</span><input type="checkbox" disabled /><i /></label>
-            <button className="ir-filter" disabled title="در دست توسعه"><Filter />فیلترها</button>
+            <button className="ir-filter" type="button" onClick={() => setPanelOpen(true)}><Filter />فیلترها{filterCount > 0 && <span className="ir-filter-count">{number.format(filterCount)}</span>}</button>
           </div>
           <div className="ir-toolbar-second">
             <div><h3>{number.format(offers.length)} پیشنهاد</h3><p>با کلیک یا تپ روی هر پیشنهاد، جزئیات کامل در سمت چپ نمایش داده می‌شود.</p></div>
-            <div className="ir-quick-filters"><button className={!discountOnly ? "active" : ""} onClick={() => setDiscountOnly(false)}>ارزان‌ترین</button><button className={discountOnly ? "active" : ""} onClick={() => setDiscountOnly(!discountOnly)}>تخفیف</button><button disabled title="در دست توسعه">شرکت‌های محبوب</button></div>
+            <div className="ir-quick-filters"><button className={filters.sort === "cheapest" ? "active" : ""} onClick={() => patchFilters({ sort: "cheapest" })}>ارزان‌ترین</button><button className={filters.discountOnly ? "active" : ""} onClick={() => patchFilters({ discountOnly: !filters.discountOnly })}>تخفیف</button><button className={filters.popularOnly ? "active" : ""} onClick={() => patchFilters({ popularOnly: !filters.popularOnly })}>شرکت‌های محبوب</button></div>
           </div>
           <div className="ir-offer-list">
             {offers.map((offer, index) => {
               const id = idByOffer.get(offer) ?? "";
               return <OfferRow key={id || `${offer.provider}-${offer.insurer_name}-${index}`} offer={offer} index={index} kind={insuranceKind} selected={selectedOffer === offer} onSelect={() => setSelectedOffer(offer)} rowRef={(node) => rememberRow(id, node)} />;
             })}
-            {!offers.length && <p className="ir-no-results">هیچ پیشنهاد قابل‌نمایشی با این شرایط پیدا نشد.</p>}
+            {!offers.length && (
+              <p className="ir-no-results">
+                <b>پیشنهادی با این فیلترها پیدا نشد</b>
+                {hasAnyFilter(filters) && <button type="button" onClick={resetFilters}>حذف فیلترها</button>}
+              </p>
+            )}
           </div>
         </section>
       </div>
+
+      {panelOpen && (
+        <OfferFilterPanel
+          filters={filters}
+          insurers={insurerChoices}
+          bounds={bounds}
+          onApply={(next) => { setFilters(next); setPanelOpen(false); }}
+          onClose={() => setPanelOpen(false)}
+        />
+      )}
 
       {!chat.open && <AIChatLauncher onClick={(trigger) => void chat.openChat(trigger)} />}
       <AIChatDrawer
