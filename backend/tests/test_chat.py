@@ -4,7 +4,12 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from torob_bimeh.ai.chat_prompts import CHAT_PROMPT_VERSION, CHAT_SYSTEM_PROMPT
+from torob_bimeh.ai.chat_prompts import (
+    CHAT_PROMPT_VERSION,
+    CHAT_SYSTEM_PROMPT,
+    COMPARISON_CHAT_CONTEXT_PROMPT,
+    chat_system_prompts,
+)
 from torob_bimeh.ai.chat_schema import (
     MAX_ANSWER_CHARS,
     MAX_ATTACHMENT_BYTES,
@@ -480,3 +485,156 @@ class _SequenceClient:
         self.calls += 1
         self.seen.append(messages)
         return self.responses.pop(0) if self.responses else "{}"
+
+
+# ------------------------------------------------------------ comparison context
+
+COMPARISON_OFFER_IDS = [OFFER_ID, OTHER_OFFER_ID, "bimebazar:پردیس:2", "bimeh:سینا:3"]
+COMPARISON_NAMES = ["رازی", "سینا", "پردیس", "سینا"]
+
+
+def comparison_request(**overrides) -> ChatRequest:
+    offers = [
+        offer(OFFER_ID, "رازی"),
+        offer(OTHER_OFFER_ID, "سینا"),
+        offer("bimebazar:پردیس:2", "پردیس"),
+        offer("bimeh:سینا:3", "آیین"),
+    ]
+    payload = request_payload(
+        message="کدام شرایط پرداخت بهتری دارد؟",
+        context={
+            "type": "comparison",
+            "referenced_offer_ids": COMPARISON_OFFER_IDS,
+            "offers": offers,
+        },
+    )
+    payload.update(overrides)
+    return ChatRequest.model_validate(payload)
+
+
+def test_comparison_context_is_accepted():
+    request = comparison_request()
+    assert request.context.type == "comparison"
+    assert request.context.referenced_offer_ids == COMPARISON_OFFER_IDS
+    assert request.context.section_key is None
+
+
+def test_comparison_context_rejects_a_section_key():
+    with pytest.raises(ValidationError):
+        comparison_request(
+            context={
+                "type": "comparison",
+                "section_key": "price_value",
+                "referenced_offer_ids": COMPARISON_OFFER_IDS,
+                "offers": [offer(OFFER_ID, "رازی")],
+            }
+        )
+
+
+def test_comparison_context_rejects_an_offer_outside_the_compared_set():
+    with pytest.raises(ValidationError):
+        comparison_request(
+            context={
+                "type": "comparison",
+                "referenced_offer_ids": [*COMPARISON_OFFER_IDS, "azki:خارجی:9"],
+                "offers": [offer(OFFER_ID, "رازی")],
+            }
+        )
+
+
+def test_unknown_context_type_is_still_rejected():
+    with pytest.raises(ValidationError):
+        ChatRequest.model_validate(
+            request_payload(
+                context={"type": "ranking", "offers": [offer()]}
+            )
+        )
+
+
+def test_comparison_prompt_is_appended_after_the_base_prompt():
+    prompts = chat_system_prompts("comparison")
+    assert prompts[0] == CHAT_SYSTEM_PROMPT
+    assert COMPARISON_CHAT_CONTEXT_PROMPT in prompts
+
+
+def test_non_comparison_contexts_keep_only_the_base_prompt():
+    assert chat_system_prompts("inquiry") == [CHAT_SYSTEM_PROMPT]
+    assert chat_system_prompts("analysis_section") == [CHAT_SYSTEM_PROMPT]
+
+
+def test_comparison_turn_carries_both_prompts_and_the_narrow_context():
+    calls: list = []
+    asyncio.run(
+        ChatService(lambda: _RecordingComparisonClient(calls)).answer(comparison_request())
+    )
+    system_text = "\n".join(message.content for message in calls[0] if message.role == "system")
+    assert CHAT_SYSTEM_PROMPT in system_text
+    assert "COMPARISON SCOPE" in system_text
+    context_text = next(message.content for message in calls[0] if message.role == "user")
+    assert "ONLY the offers this comparison is about" in context_text
+    # Only the compared offers travel, never the raw provider payload.
+    assert "پردیس" in context_text
+    assert "raw_response" not in context_text
+
+
+def test_inquiry_context_keeps_its_existing_scope_wording():
+    calls: list = []
+    asyncio.run(ChatService(lambda: _RecordingClient(calls)).answer(build_request()))
+    system_text = "\n".join(message.content for message in calls[0] if message.role == "system")
+    assert "COMPARISON SCOPE" not in system_text
+    context_text = next(message.content for message in calls[0] if message.role == "user")
+    assert "complete stored inquiry snapshot" in context_text
+
+
+def test_comparison_answer_may_only_reference_compared_offers():
+    seen: list = []
+    request = comparison_request()
+    service = ChatService(lambda: _FixedResponseClient(seen, json.dumps(chat_payload(answer="پاسخ مقایسه‌ای."), ensure_ascii=False)))
+    result = asyncio.run(service.answer(request))
+    assert result.referenced_offer_ids == [OFFER_ID]
+
+    outside = json.dumps(chat_payload(referenced_offer_ids=["not-compared"]), ensure_ascii=False)
+    with pytest.raises(AIResponseValidationError):
+        asyncio.run(
+            ChatService(lambda: _FixedResponseClient(seen, outside)).answer(request)
+        )
+
+
+def test_comparison_answer_accepts_any_of_the_four_compared_ids():
+    for compared_id in COMPARISON_OFFER_IDS:
+        raw = json.dumps(chat_payload(referenced_offer_ids=[compared_id]), ensure_ascii=False)
+        result = asyncio.run(
+            ChatService(lambda: _FixedResponseClient([], raw)).answer(comparison_request())
+        )
+        assert result.referenced_offer_ids == [compared_id]
+
+
+class _RecordingComparisonClient:
+    """Mirrors _RecordingClient but answers a comparison-scoped payload."""
+
+    last_attempt_count = 1
+
+    def __init__(self, seen: list):
+        self.seen = seen
+        self.calls = 0
+
+    async def complete_json(self, messages, **kwargs):
+        self.calls += 1
+        self.seen.append(messages)
+        return json.dumps(chat_payload(answer="در این مقایسه، ..."), ensure_ascii=False)
+
+
+class _FixedResponseClient:
+    """Returns a fixed raw JSON body and records every call."""
+
+    last_attempt_count = 1
+
+    def __init__(self, seen: list, raw: str):
+        self.seen = seen
+        self.raw = raw
+        self.calls = 0
+
+    async def complete_json(self, messages, **kwargs):
+        self.calls += 1
+        self.seen.append(messages)
+        return self.raw

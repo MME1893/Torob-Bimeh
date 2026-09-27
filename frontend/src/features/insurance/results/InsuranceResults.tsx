@@ -31,6 +31,25 @@ import {
   selectOffers,
   type OfferFilters,
 } from "./offerFilters";
+import { number, productName, providerLabel, providerMeta, providerNames, providerOrder } from "./offerPresentation";
+import { ComparisonModal } from "./comparison/ComparisonModal";
+import { useComparisonAnalysis } from "./comparison/useComparisonAnalysis";
+import { ComparisonSelectionBar } from "./comparison/ComparisonSelectionBar";
+import { ComparisonSelector } from "./comparison/ComparisonSelector";
+import {
+  MAX_COMPARISON_OFFERS,
+  closeComparisonModal,
+  enterComparison,
+  exitComparison,
+  idleComparison,
+  isComparisonDisabled,
+  openComparisonModal,
+  reconcileComparison,
+  removeComparisonOffer,
+  toggleComparisonOffer,
+  type ComparisonState,
+} from "./comparison/comparisonSelection";
+import "./comparison/comparison.css";
 import { AIAnalysisPanel } from "../../ai-analysis/AIAnalysisPanel";
 import { useQuoteAIAnalysis } from "../../ai-analysis/lib/useQuoteAIAnalysis";
 import { offerIdsByOffer, offersById, type InsuranceKind } from "../../ai-analysis/lib/normalizeQuote";
@@ -40,25 +59,9 @@ import { AIChatDrawer } from "../../ai-chat/components/AIChatDrawer";
 import { AIChatLauncher } from "../../ai-chat/components/AIChatLauncher";
 import "../../ai-chat/ai-chat.css";
 import motorResult from "../../../assets/insurance/motor_result.png";
-import azkiLogo from "../../../assets/insurance/azki.png";
-import sabimLogo from "../../../assets/insurance/sabim.png";
-import bimehBazarLogo from "../../../assets/insurance/bimehbazar.png";
-import bimehLogo from "../../../assets/insurance/bimeh.com.png";
 import "./insurance-results.css";
 import "../../ai-analysis/ai-analysis.css";
 
-const number = new Intl.NumberFormat("fa-IR");
-const providerMeta: Record<string, { name: string; logo: string }> = {
-  azki: { name: "ازکی", logo: azkiLogo },
-  sabim: { name: "سابیم", logo: sabimLogo },
-  bimebazar: { name: "بیمه‌بازار", logo: bimehBazarLogo },
-  bimeh: { name: "بیمه‌دات‌کام", logo: bimehLogo },
-};
-const providerOrder = ["azki", "sabim", "bimebazar", "bimeh"];
-/** Display names the search box also matches against, beside the insurer name. */
-const providerNames: Record<string, string> = Object.fromEntries(
-  Object.entries(providerMeta).map(([key, meta]) => [key, meta.name]),
-);
 const statusText: Record<Status, string> = {
   ok: "پیشنهاد دریافت شد",
   empty: "پیشنهادی پیدا نشد",
@@ -70,9 +73,6 @@ const statusText: Record<Status, string> = {
 };
 
 type Props = { result: SearchResult; insuranceKind: InsuranceKind; inquiryId: string };
-
-const productName = (kind: InsuranceKind | null) =>
-  kind === "body_car" ? "بیمه بدنه" : kind === "third_motor" ? "بیمه شخص ثالث موتور" : "بیمه شخص ثالث";
 
 function ProviderCard({ provider }: { provider?: ProviderResult }) {
   const key = provider?.provider ?? "";
@@ -106,11 +106,24 @@ type RowProps = {
   onSelect: () => void;
   kind: InsuranceKind | null;
   rowRef: (node: HTMLElement | null) => void;
+  /** The offer row gains a comparison control only while comparison mode is on. */
+  comparison: {
+    active: boolean;
+    checked: boolean;
+    disabled: boolean;
+    atMax: boolean;
+  };
+  onToggleComparison: () => void;
 };
 
-function OfferRow({ offer, index, selected, onSelect, kind, rowRef }: RowProps) {
+function OfferRow({ offer, index, selected, onSelect, kind, rowRef, comparison, onToggleComparison }: RowProps) {
   return (
-    <article ref={rowRef} className={`ir-offer-row ${selected ? "is-selected" : ""}`} onClick={onSelect} tabIndex={-1}>
+    <article
+      ref={rowRef}
+      className={`ir-offer-row ${selected ? "is-selected" : ""}${comparison.checked ? " is-comparing" : ""}`}
+      onClick={onSelect}
+      tabIndex={-1}
+    >
       <span className="ir-rank">{number.format(index + 1)}</span>
       <div className="ir-insurer-cell">
         <InsurerLogo offer={offer} />
@@ -118,6 +131,15 @@ function OfferRow({ offer, index, selected, onSelect, kind, rowRef }: RowProps) 
           {selected && <span className="ir-selected-tag">پیشنهاد منتخب</span>}
           <strong>{offer.insurer_name}</strong>
           <small>{productName(kind)}</small>
+          {comparison.active && (
+            <ComparisonSelector
+              selected={comparison.checked}
+              disabled={comparison.disabled}
+              atMax={comparison.atMax}
+              insurerName={offer.insurer_name}
+              onToggle={onToggleComparison}
+            />
+          )}
         </div>
       </div>
       <div className="ir-price-cell">
@@ -131,7 +153,7 @@ function OfferRow({ offer, index, selected, onSelect, kind, rowRef }: RowProps) 
           {offer.installment_plans.length > 0 && <span>{number.format(offer.installment_plans.length)} برنامه پرداخت</span>}
         </div>
         <small>
-          {providerMeta[offer.provider]?.name ?? offer.provider}
+          {providerLabel(offer.provider)}
           {offer.duration_months ? ` · ${number.format(offer.duration_months)} ماه` : ""}
           {offer.financial_coverage_toman ? ` · ${number.format(offer.financial_coverage_toman)} تومان تعهد مالی` : ""}
         </small>
@@ -193,7 +215,14 @@ function InstallmentPlans({ plans }: { plans: Offer["installment_plans"] }) {
   );
 }
 
-function SelectedOfferPanel({ offer, kind }: { offer: Offer; kind: InsuranceKind | null }) {
+type SelectedPanelProps = {
+  offer: Offer;
+  kind: InsuranceKind | null;
+  comparisonMode: boolean;
+  onStartComparison: () => void;
+};
+
+function SelectedOfferPanel({ offer, kind, comparisonMode, onStartComparison }: SelectedPanelProps) {
   const metrics = offer.insurer_metrics;
   const metricPreview = [
     metrics?.satisfaction != null ? `رضایت ${number.format(metrics.satisfaction)}` : null,
@@ -204,7 +233,7 @@ function SelectedOfferPanel({ offer, kind }: { offer: Offer; kind: InsuranceKind
     <aside className="ir-selected-panel">
       <div className="ir-selected-summary">
         <div className="ir-summary-top">
-          <span className="ir-source-badge"><img src={providerMeta[offer.provider]?.logo} alt="" />{providerMeta[offer.provider]?.name ?? offer.provider}</span>
+          <span className="ir-source-badge"><img src={providerMeta[offer.provider]?.logo} alt="" />{providerLabel(offer.provider)}</span>
           <span className="ir-featured"><Star /> پیشنهاد منتخب</span>
         </div>
         <div className="ir-summary-identity"><InsurerLogo offer={offer} /><div><h3>{offer.insurer_name}</h3><p>{productName(kind)}</p></div></div>
@@ -212,11 +241,19 @@ function SelectedOfferPanel({ offer, kind }: { offer: Offer; kind: InsuranceKind
         <div className="ir-summary-price"><span>حق بیمه</span><b>{number.format(offer.premium.amount_toman ?? 0)}</b><small>تومان</small></div>
         {offer.discount_amount_toman ? <div className="ir-summary-discount"><b>تخفیف</b><span>{number.format(offer.discount_amount_toman)} تومان</span></div> : null}
         <button className="ir-buy" type="button" disabled title="مسیر خرید در نسخه فعلی تعریف نشده است"><ShoppingCart />خرید این پیشنهاد</button>
-        <button className="ir-compare" type="button" disabled title="در دست توسعه">＋ مقایسه با سایر پیشنهادها</button>
+        <button
+          className={`ir-compare${comparisonMode ? " is-active" : ""}`}
+          type="button"
+          aria-pressed={comparisonMode}
+          disabled={comparisonMode}
+          onClick={onStartComparison}
+        >
+          {comparisonMode ? "＋ حالت مقایسه فعال است" : "＋ مقایسه با سایر پیشنهادها"}
+        </button>
       </div>
       <h3 className="ir-details-title">جزئیات پیشنهاد</h3>
       <div className="ir-detail-table">
-        <DetailLine icon={<Link2 />} label="منبع ارائه‌دهنده" value={providerMeta[offer.provider]?.name ?? offer.provider} />
+        <DetailLine icon={<Link2 />} label="منبع ارائه‌دهنده" value={providerLabel(offer.provider)} />
         <DetailLine icon={<ShieldCheck />} label="مدت پوشش" value={offer.duration_months ? `${number.format(offer.duration_months)} ماه` : "—"} />
         <DetailLine icon={<CreditCard />} label="نوع پرداخت" value={offer.has_installments ? "خرید اقساطی" : offer.payment_methods[0] ?? "—"} />
         <DetailLine icon={<WalletCards />} label="برنامه پرداخت" value={offer.installment_plans.length ? `${number.format(offer.installment_plans.length)} برنامه` : "—"} />
@@ -252,6 +289,9 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
   const [sortOpen, setSortOpen] = useState(false);
   const sortButtonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => setSelectedOffer(cheapestOffer), [cheapestOffer]);
+  // Comparison is a temporary mode over the current result. It is intentionally
+  // not persisted and never touches `selectedOffer`.
+  const [comparison, setComparison] = useState<ComparisonState>(idleComparison);
   // Provider labels and popularity scores are derived once per result, so the
   // filter and sort pass only walks the offers.
   const offerIndex = useMemo(() => buildOfferIndex(result.providers, providerNames), [result.providers]);
@@ -276,6 +316,59 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
     else rowRefs.current.delete(id);
   }, []);
 
+  // An offer can leave the result set when a new inquiry loads; drop those ids
+  // instead of keeping a selection the list can no longer show.
+  useEffect(() => {
+    setComparison((current) => reconcileComparison(current, idByOffer.values()));
+  }, [idByOffer]);
+
+  const compareButtonRef = useRef<HTMLButtonElement>(null);
+
+  const comparedColumns = useMemo(
+    () => comparison.offerIds.flatMap((offerId) => {
+      const offer = lookup.get(offerId);
+      return offer ? [{ offerId, offer }] : [];
+    }),
+    [comparison.offerIds, lookup],
+  );
+
+  // The AI layer only runs while the dialog is open, and never blocks the table.
+  const comparisonAnalysis = useComparisonAnalysis({
+    inquiryId,
+    insuranceKind,
+    result,
+    offerIds: comparison.offerIds,
+    enabled: comparison.modalOpen,
+  });
+
+  const insurerNameById = useCallback(
+    (offerId: string) => lookup.get(offerId)?.insurer_name,
+    [lookup],
+  );
+
+  const startComparison = useCallback(() => {
+    const currentId = selectedOffer ? idByOffer.get(selectedOffer) ?? null : null;
+    setComparison((current) => (current.mode ? current : enterComparison(currentId)));
+  }, [idByOffer, selectedOffer]);
+
+  const cancelComparison = useCallback(() => setComparison(exitComparison()), []);
+  const removeCompared = useCallback(
+    (offerId: string) => setComparison((current) => removeComparisonOffer(current, offerId)),
+    [],
+  );
+  const toggleCompared = useCallback(
+    (offerId: string) => setComparison((current) => toggleComparisonOffer(current, offerId)),
+    [],
+  );
+  const openComparison = useCallback(
+    () => setComparison((current) => openComparisonModal(current)),
+    [],
+  );
+  const closeComparison = useCallback(
+    () => setComparison((current) => closeComparisonModal(current)),
+    [],
+  );
+
   const chat = useAIChat({
     inquiryId,
     insuranceKind,
@@ -293,6 +386,28 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
     row?.focus({ preventScroll: true });
   }, [lookup]);
 
+  /**
+   * Hands the comparison over to the existing chat as a brand-new thread.
+   *
+   * The thread stores only the compared offer ids; the modal closes and the
+   * existing drawer opens. No AI request happens here.
+   */
+  const askAboutComparison = useCallback(async () => {
+    const offerIds = comparison.offerIds;
+    if (!offerIds.length) return;
+    setComparison((current) => closeComparisonModal(current));
+    await chat.openComparisonThread(
+      offerIds,
+      comparisonAnalysis.state.status === "ready" ? comparisonAnalysis.state.analysis : undefined,
+    );
+  }, [chat, comparison.offerIds, comparisonAnalysis.state]);
+
+  /** Closes the dialog, keeps the selection, and focuses the compared offer. */
+  const viewComparedOffer = useCallback((offerId: string) => {
+    setComparison((current) => closeComparisonModal(current));
+    selectReferencedOffer(offerId);
+  }, [selectReferencedOffer]);
+
   const askAboutSection = useCallback((sectionKey: AnalysisSectionKey) => {
     if (aiState.status !== "ready") return;
     void chat.openSectionThread(sectionKey, aiState.analysis.sections[sectionKey]);
@@ -300,7 +415,9 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
 
   const chatTitle = chat.sectionKey
     ? `گفتگو درباره ${ANALYSIS_SECTION_TITLES[chat.sectionKey]}`
-    : "گفتگو با هوش مصنوعی";
+    : chat.contextType === "comparison"
+      ? "گفتگو درباره مقایسه پیشنهادها"
+      : "گفتگو با هوش مصنوعی";
 
   return (
     <section className="insurance-results results" aria-live="polite">
@@ -317,7 +434,14 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
         onSelectReferencedOffer={selectReferencedOffer}
       />
       <div className="ir-workspace">
-        {selectedOffer ? <SelectedOfferPanel offer={selectedOffer} kind={insuranceKind} /> : <aside className="ir-selected-panel ir-empty">پیشنهادی برای نمایش جزئیات وجود ندارد.</aside>}
+        {selectedOffer ? (
+          <SelectedOfferPanel
+            offer={selectedOffer}
+            kind={insuranceKind}
+            comparisonMode={comparison.mode}
+            onStartComparison={startComparison}
+          />
+        ) : <aside className="ir-selected-panel ir-empty">پیشنهادی برای نمایش جزئیات وجود ندارد.</aside>}
         <section className="ir-offers-panel">
           <div className="ir-toolbar-first">
             <label className="ir-search"><Search /><input value={filters.query} onChange={(e) => patchFilters({ query: e.target.value })} placeholder="جستجو در شرکت‌های بیمه..." /></label>
@@ -331,10 +455,36 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
             <div><h3>{number.format(offers.length)} پیشنهاد</h3><p>با کلیک یا تپ روی هر پیشنهاد، جزئیات کامل در سمت چپ نمایش داده می‌شود.</p></div>
             <div className="ir-quick-filters"><button className={filters.sort === "cheapest" ? "active" : ""} onClick={() => patchFilters({ sort: "cheapest" })}>ارزان‌ترین</button><button className={filters.discountOnly ? "active" : ""} onClick={() => patchFilters({ discountOnly: !filters.discountOnly })}>تخفیف</button><button className={filters.popularOnly ? "active" : ""} onClick={() => patchFilters({ popularOnly: !filters.popularOnly })}>شرکت‌های محبوب</button></div>
           </div>
+          {comparison.mode && (
+            <ComparisonSelectionBar
+              selected={comparedColumns}
+              onRemove={removeCompared}
+              onOpen={openComparison}
+              onCancel={cancelComparison}
+              openButtonRef={compareButtonRef}
+            />
+          )}
           <div className="ir-offer-list">
             {offers.map((offer, index) => {
               const id = idByOffer.get(offer) ?? "";
-              return <OfferRow key={id || `${offer.provider}-${offer.insurer_name}-${index}`} offer={offer} index={index} kind={insuranceKind} selected={selectedOffer === offer} onSelect={() => setSelectedOffer(offer)} rowRef={(node) => rememberRow(id, node)} />;
+              return (
+                <OfferRow
+                  key={id || `${offer.provider}-${offer.insurer_name}-${index}`}
+                  offer={offer}
+                  index={index}
+                  kind={insuranceKind}
+                  selected={selectedOffer === offer}
+                  onSelect={() => setSelectedOffer(offer)}
+                  rowRef={(node) => rememberRow(id, node)}
+                  comparison={{
+                    active: comparison.mode && !!id,
+                    checked: comparison.offerIds.includes(id),
+                    disabled: isComparisonDisabled(comparison, id),
+                    atMax: comparison.offerIds.length >= MAX_COMPARISON_OFFERS,
+                  }}
+                  onToggleComparison={() => toggleCompared(id)}
+                />
+              );
             })}
             {!offers.length && (
               <p className="ir-no-results">
@@ -345,6 +495,19 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
           </div>
         </section>
       </div>
+
+      {comparison.modalOpen && (
+        <ComparisonModal
+          columns={comparedColumns}
+          kind={insuranceKind}
+          insurerName={insurerNameById}
+          comparisonAnalysis={comparisonAnalysis.state}
+          onClose={closeComparison}
+          onAskAI={() => void askAboutComparison()}
+          onViewOffer={viewComparedOffer}
+          openerRef={compareButtonRef}
+        />
+      )}
 
       {panelOpen && (
         <OfferFilterPanel
@@ -362,6 +525,9 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
         title={chatTitle}
         contextType={chat.contextType}
         sectionKey={chat.sectionKey}
+        contextOfferCount={chat.contextOfferCount}
+        contextOfferNames={chat.contextOfferNames}
+        contextMissingOfferIds={chat.contextMissingOfferIds}
         isHistorical={chat.isHistorical}
         fetchedAt={chat.savedFetchedAt}
         messages={chat.messages}

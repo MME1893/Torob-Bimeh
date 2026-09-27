@@ -3,7 +3,9 @@ import type { AnalysisSection, QuoteAnalysis } from "../../ai-analysis/lib/types
 import type { NormalizedQuoteOffer } from "../../ai-analysis/lib/normalizeQuote";
 import {
   buildChatRequest,
+  comparisonNameLabel,
   contextLabel,
+  resolveThreadContext,
   sectionReferencedOfferIds,
   snapshotFromSection,
   threadTitle,
@@ -241,5 +243,121 @@ describe("validateChatResponse", () => {
     ["a blank suggestion", { ...valid, suggested_questions: ["  "] }],
   ])("rejects %s", (_label, value) => {
     expect(validateChatResponse(value, allowed)).toBeNull();
+  });
+});
+
+describe("comparisonNameLabel", () => {
+  it("joins two, three and four insurer names the Persian way", () => {
+    expect(comparisonNameLabel(["رازی", "میهن"])).toBe("رازی و میهن");
+    expect(comparisonNameLabel(["رازی", "میهن", "پردیس"])).toBe("رازی، میهن و پردیس");
+    expect(comparisonNameLabel(["رازی", "میهن", "پردیس", "سینا"])).toBe("رازی، میهن، پردیس و سینا");
+  });
+
+  it("handles a single name and an empty list", () => {
+    expect(comparisonNameLabel(["رازی"])).toBe("رازی");
+    expect(comparisonNameLabel([])).toBe("");
+  });
+
+  it("never lists more than four insurers", () => {
+    expect(comparisonNameLabel(["a", "b", "c", "d", "e"])).toBe("a، b، c و d");
+  });
+});
+
+describe("comparison thread title", () => {
+  it("names the thread after the compared insurers", () => {
+    expect(threadTitle("comparison", null, undefined, comparisonNameLabel(["رازی", "میهن", "پردیس", "سینا"])))
+      .toBe("مقایسه رازی، میهن، پردیس و سینا");
+  });
+
+  it("never uses a user message to name a comparison thread", () => {
+    expect(threadTitle("comparison", null, "یک پرسش کاملاً متفاوت")).toBe(DEFAULT_GENERAL_THREAD_TITLE);
+  });
+});
+
+describe("comparison context label", () => {
+  it("names the compared insurers when they are known", () => {
+    expect(contextLabel("comparison", null, 2, ["رازی", "میهن"])).toBe("مقایسه رازی و میهن");
+  });
+
+  it("falls back to the offer count so the badge is never blank", () => {
+    expect(contextLabel("comparison", null, 4, [])).toBe("مقایسه ۴ پیشنهاد");
+    expect(contextLabel("comparison", null, 2, ["   "])).toBe("مقایسه ۲ پیشنهاد");
+  });
+
+  it("leaves the other context types untouched", () => {
+    expect(contextLabel("inquiry", null, 4, ["رازی"])).toBe("کل این استعلام");
+    expect(contextLabel("analysis_section", "price_value", 4, [])).toBe("قیمت و ارزش خرید");
+  });
+});
+
+describe("buildChatRequest for a comparison thread", () => {
+  const manyOffers: NormalizedQuoteOffer[] = [
+    offers[0],
+    { ...offers[0], offer_id: OFFER_B, insurer_name: "سینا" },
+    { ...offers[0], offer_id: "bimebazar:پردیس:2", insurer_name: "پردیس" },
+    { ...offers[0], offer_id: "bimeh:آیین:3", insurer_name: "آیین" },
+    { ...offers[0], offer_id: "azki:میهن:4", insurer_name: "میهن" },
+  ];
+  const comparisonBase = {
+    ...base,
+    contextType: "comparison" as const,
+    sectionKey: null,
+    referencedOfferIds: [OFFER_A, OFFER_B],
+    analysisSectionSnapshot: null,
+    history: [],
+  };
+
+  it("sends only the compared offers, never the whole inquiry", () => {
+    const request = buildChatRequest({ ...comparisonBase, offers: manyOffers });
+    expect(request.context.type).toBe("comparison");
+    expect(request.context.offers.map((offer) => (offer as { offer_id: string }).offer_id)).toEqual([OFFER_A, OFFER_B]);
+  });
+
+  it("carries the compared set as the referenced ids, with no new field", () => {
+    const request = buildChatRequest({ ...comparisonBase, offers: manyOffers });
+    expect(request.context.referenced_offer_ids).toEqual([OFFER_A, OFFER_B]);
+    expect(Object.keys(request.context).sort()).toEqual(["offers", "referenced_offer_ids", "type"]);
+  });
+
+  it("never sends section keys or section snapshots", () => {
+    const request = buildChatRequest({ ...comparisonBase, offers: manyOffers });
+    expect(request.context.section_key).toBeUndefined();
+    expect(request.context.analysis_section).toBeUndefined();
+  });
+
+  it("keeps an inquiry context unscoped so it still carries every offer", () => {
+    const request = buildChatRequest({
+      ...base,
+      contextType: "inquiry",
+      sectionKey: null,
+      referencedOfferIds: [],
+      analysisSectionSnapshot: null,
+      offers: manyOffers,
+      history: [],
+    });
+    expect(request.context.offers).toHaveLength(manyOffers.length);
+  });
+});
+
+describe("resolveThreadContext", () => {
+  it("resolves a restored comparison thread from the stored inquiry", () => {
+    const resolved = resolveThreadContext([OFFER_A, OFFER_B], [
+      offers[0],
+      { ...offers[0], offer_id: OFFER_B, insurer_name: "سینا" },
+    ]);
+    expect(resolved.offers.map((offer) => offer.offer_id)).toEqual([OFFER_A, OFFER_B]);
+    expect(resolved.names).toEqual(["ایران", "سینا"]);
+    expect(resolved.missingIds).toEqual([]);
+  });
+
+  it("reports ids that no longer resolve instead of widening the context", () => {
+    const resolved = resolveThreadContext([OFFER_A, "removed:قدیمی:9"], offers);
+    expect(resolved.offers.map((offer) => offer.offer_id)).toEqual([OFFER_A]);
+    expect(resolved.missingIds).toEqual(["removed:قدیمی:9"]);
+  });
+
+  it("reports every id as missing for a fully stale thread", () => {
+    expect(resolveThreadContext(["a", "b"], offers).missingIds).toEqual(["a", "b"]);
+    expect(resolveThreadContext(["a", "b"], offers).offers).toEqual([]);
   });
 });

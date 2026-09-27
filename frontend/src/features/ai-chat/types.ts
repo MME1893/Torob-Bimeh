@@ -15,7 +15,14 @@ export const MAX_INITIAL_QUESTIONS = 4;
 /** Sent instead of an empty composer when the user only attaches a text file. */
 export const ATTACHMENT_FALLBACK_MESSAGE = "این فایل را در زمینه همین استعلام بررسی کن.";
 
-export type ChatContextType = "inquiry" | "analysis_section";
+/**
+ * `comparison` is a conversation scoped to a user-picked set of 2-4 offers.
+ *
+ * The compared set is stored in the existing `referencedOfferIds` field: for a
+ * comparison thread "the offers this thread is about" and "the offers being
+ * compared" are the same list, so no parallel id field is introduced.
+ */
+export type ChatContextType = "inquiry" | "analysis_section" | "comparison";
 export type ChatRole = "user" | "assistant";
 export type ChatMessageStatus = "ready" | "pending" | "error";
 

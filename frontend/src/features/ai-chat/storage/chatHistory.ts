@@ -29,6 +29,9 @@ export type NewMessageInput = {
   attachments?: ChatAttachment[];
   status: ChatMessage["status"];
   seq: number;
+  /** Set when a thread is seeded with already-known assistant content. */
+  referencedOfferIds?: string[];
+  suggestedQuestions?: string[];
 };
 
 export type MessagePatch = Partial<
@@ -59,8 +62,8 @@ function makeMessage(input: NewMessageInput, timestamp: string): ChatMessage {
     role: input.role,
     content: input.content,
     attachments: input.attachments ?? [],
-    referencedOfferIds: [],
-    suggestedQuestions: [],
+    referencedOfferIds: input.referencedOfferIds ?? [],
+    suggestedQuestions: input.suggestedQuestions ?? [],
     status: input.status,
     createdAt: timestamp,
     seq: input.seq,

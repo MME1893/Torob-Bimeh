@@ -268,3 +268,133 @@ function forceTimestamp(threadId: string, value: string) {
     };
   });
 }
+
+/** Four compared offers, shared by the comparison thread suites. */
+const comparedIds = ["azki:رازی:0", "sabim:میهن:1", "bimebazar:پردیس:2", "bimeh:سینا:3"];
+
+describe("comparison thread persistence", () => {
+
+  it("persists the context type and the compared offer ids", async () => {
+    const thread = await createThread(
+      threadInput({
+        contextType: "comparison",
+        sectionKey: null,
+        title: "مقایسه رازی، میهن، پردیس و سینا",
+        referencedOfferIds: comparedIds,
+      }),
+    );
+    expect(thread.contextType).toBe("comparison");
+    expect(thread.referencedOfferIds).toEqual(comparedIds);
+    expect(thread.analysisSectionSnapshot).toBeNull();
+  });
+
+  it("stores no offer objects, only ids, so the snapshot stays the single source", async () => {
+    const thread = await createThread(
+      threadInput({ contextType: "comparison", referencedOfferIds: comparedIds }),
+    );
+    const stored = await getThread(thread.id);
+    expect(JSON.stringify(stored)).not.toContain("raw_offer");
+    expect(JSON.stringify(stored)).not.toContain("final_price");
+  });
+
+  it("survives a reload and still resolves its compared ids", async () => {
+    const thread = await createThread(
+      threadInput({ contextType: "comparison", referencedOfferIds: comparedIds }),
+    );
+    const listed = await getThreadsForInquiry("inq_a");
+    const restored = listed.find((item) => item.id === thread.id);
+    expect(restored?.contextType).toBe("comparison");
+    expect(restored?.referencedOfferIds).toEqual(comparedIds);
+  });
+
+  it("keeps earlier comparison conversations of the same inquiry", async () => {
+    const first = await createThread(
+      threadInput({ contextType: "comparison", title: "مقایسه رازی و میهن", referencedOfferIds: comparedIds.slice(0, 2) }),
+    );
+    await saveMessage({ threadId: first.id, role: "user", content: "کدام ارزان‌تر است؟", status: "ready", seq: 0 });
+    const second = await createThread(
+      threadInput({ contextType: "comparison", title: "مقایسه پردیس و سینا", referencedOfferIds: comparedIds.slice(2) }),
+    );
+    const comparisons = (await getThreadsForInquiry("inq_a")).filter((item) => item.contextType === "comparison");
+    expect(comparisons.map((item) => item.id)).toContain(first.id);
+    expect(comparisons.map((item) => item.id)).toContain(second.id);
+    expect(await getMessagesForThread(first.id)).toHaveLength(1);
+  });
+
+  it("creates a comparison thread with its first question in one transaction", async () => {
+    const { thread, message } = await createThreadWithFirstMessage(
+      threadInput({ contextType: "comparison", referencedOfferIds: comparedIds.slice(0, 2) }),
+      { threadId: "", role: "user", content: "کدام شرایط پرداخت بهتری دارد؟", status: "ready", seq: 0 },
+    );
+    expect(thread.contextType).toBe("comparison");
+    expect(message.threadId).toBe(thread.id);
+    expect(await getMessagesForThread(thread.id)).toHaveLength(1);
+  });
+
+  it("removes the comparison thread and its messages together", async () => {
+    const thread = await createThread(
+      threadInput({ contextType: "comparison", referencedOfferIds: comparedIds }),
+    );
+    await saveMessage({ threadId: thread.id, role: "user", content: "پرسش", status: "ready", seq: 0 });
+    await deleteThread(thread.id);
+    expect(await getThread(thread.id)).toBeUndefined();
+    expect(await getMessagesForThread(thread.id)).toHaveLength(0);
+  });
+});
+
+describe("a comparison thread seeded with its analysis", () => {
+  it("stores the analysis as the opening assistant message", async () => {
+    const thread = await createThread(
+      threadInput({ contextType: "comparison", referencedOfferIds: comparedIds }),
+    );
+    await saveMessage({
+      threadId: thread.id,
+      role: "assistant",
+      content: "جمع‌بندی و تحلیل هوشمند این مقایسه\nرازی متعادل‌تر است.",
+      referencedOfferIds: ["azki:رازی:0"],
+      suggestedQuestions: ["کدام گزینه به‌صرفه‌تر است؟", "کدام شرایط پرداخت بهتری دارد؟"],
+      status: "ready",
+      seq: 0,
+    });
+    const messages = await getMessagesForThread(thread.id);
+    expect(messages).toHaveLength(1);
+    expect(messages[0].role).toBe("assistant");
+    expect(messages[0].content).toContain("جمع‌بندی و تحلیل هوشمند این مقایسه");
+    expect(messages[0].referencedOfferIds).toEqual(["azki:رازی:0"]);
+    expect(messages[0].suggestedQuestions).toHaveLength(2);
+  });
+
+  it("leaves the message empty of references and suggestions by default", async () => {
+    const thread = await createThread(threadInput());
+    const message = await saveMessage({ threadId: thread.id, role: "user", content: "پرسش", status: "ready", seq: 0 });
+    expect(message.referencedOfferIds).toEqual([]);
+    expect(message.suggestedQuestions).toEqual([]);
+  });
+
+  it("keeps the seeded analysis and later turns in one ordered history", async () => {
+    const thread = await createThread(
+      threadInput({ contextType: "comparison", referencedOfferIds: comparedIds }),
+    );
+    await saveMessage({
+      threadId: thread.id,
+      role: "assistant",
+      content: "تحلیل اولیه مقایسه",
+      referencedOfferIds: [comparedIds[0]],
+      status: "ready",
+      seq: 0,
+    });
+    await saveMessage({ threadId: thread.id, role: "user", content: "کدام ارزان‌تر است؟", status: "ready", seq: 1 });
+    const messages = await getMessagesForThread(thread.id);
+    expect(messages.map((item) => item.role)).toEqual(["assistant", "user"]);
+    // The seeded analysis is part of the history, so the model keeps its context.
+    expect(messages[0].seq).toBeLessThan(messages[1].seq);
+  });
+
+  it("marks an interrupted seeded-free thread as retryable without touching it", async () => {
+    const thread = await createThread(threadInput({ contextType: "comparison", referencedOfferIds: comparedIds }));
+    await saveMessage({ threadId: thread.id, role: "assistant", content: "", status: "pending", seq: 0 });
+    const recovered = await recoverInterruptedMessages(thread.id);
+    expect(recovered[0].status).toBe("error");
+    expect(recovered).toHaveLength(1);
+  });
+});

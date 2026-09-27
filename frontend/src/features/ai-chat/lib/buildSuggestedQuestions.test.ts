@@ -163,6 +163,79 @@ describe("buildSuggestedQuestions", () => {
     const questions = buildSuggestedQuestions(many, "coverage_services");
     expect(questions).toHaveLength(4);
     expect(new Set(questions).size).toBe(questions.length);
-    expect(buildSuggestedQuestions(many, "payment_terms", 2)).toHaveLength(2);
+    expect(buildSuggestedQuestions(many, "payment_terms", { limit: 2 })).toHaveLength(2);
+  });
+});
+
+describe("comparison suggestions", () => {
+  const priced = () => [
+    offer({ offer_id: "azki:رازی:0", final_price: 1_000_000 }),
+    offer({ offer_id: "sabim:سینا:1", final_price: 1_200_000 }),
+  ];
+
+  it("uses the comparison catalog, not the general one", () => {
+    const questions = buildSuggestedQuestions(priced(), null, { contextType: "comparison" });
+    expect(questions).toContain("کدام گزینه از نظر قیمت به‌صرفه‌تر است؟");
+    expect(questions).not.toContain("کدام پیشنهاد ارزش خرید بیشتری دارد؟");
+  });
+
+  it("offers the payment question only when the compared offers differ in payment", () => {
+    const withPlans = [
+      offer({ offer_id: "azki:رازی:0", installment_available: true, payment_program_count: 1 }),
+      offer({ offer_id: "sabim:سینا:1", installment_available: true, payment_program_count: 2 }),
+    ];
+    expect(buildSuggestedQuestions(withPlans, null, { contextType: "comparison" }))
+      .toContain("کدام شرایط پرداخت بهتری دارد؟");
+  });
+
+  it("omits installment suggestions when no compared offer has installment data", () => {
+    const questions = buildSuggestedQuestions(priced(), null, { contextType: "comparison" });
+    expect(questions).not.toContain("اگر خرید اقساطی مهم باشد کدام مناسب‌تر است؟");
+    expect(questions).not.toContain("کدام شرایط پرداخت بهتری دارد؟");
+  });
+
+  it("offers the payment question when a single compared offer has a plan", () => {
+    const one = [
+      offer({ offer_id: "azki:رازی:0" }),
+      offer({ offer_id: "sabim:سینا:1", installment_available: true, payment_program_count: 1 }),
+    ];
+    // `twoWithPayment` needs two plans, so this must NOT offer the payment question.
+    expect(buildSuggestedQuestions(one, null, { contextType: "comparison" }))
+      .not.toContain("کدام شرایط پرداخت بهتری دارد؟");
+  });
+
+  it("offers the benefits question only when a compared offer reports benefits", () => {
+    const withBenefits = [...priced(), offer({ offer_id: "bimeh:میهن:2", benefits: ["خسارت آنلاین"] })];
+    expect(buildSuggestedQuestions(withBenefits, null, { contextType: "comparison" }))
+      .toContain("مزیت اصلی هر کدام چیست؟");
+  });
+
+  it("offers the coverage question only when coverage data exists", () => {
+    const withCoverage = [
+      offer({ offer_id: "azki:رازی:0" }),
+      offer({ offer_id: "sabim:سینا:1", coverage: { financial_coverage_toman: 70_000_000, duration_months: 12 } }),
+    ];
+    expect(buildSuggestedQuestions(withCoverage, null, { contextType: "comparison" }))
+      .toContain("تفاوت پوشش و خدمات این پیشنهادها چیست؟");
+  });
+
+  it("returns nothing for a comparison with no offers", () => {
+    expect(buildSuggestedQuestions([], null, { contextType: "comparison" })).toEqual([]);
+  });
+
+  it("respects the limit and never repeats a question", () => {
+    const rich = [
+      offer({ offer_id: "azki:رازی:0", installment_available: true, payment_program_count: 1 }),
+      offer({ offer_id: "sabim:سینا:1", installment_available: true, payment_program_count: 2 }),
+    ];
+    const questions = buildSuggestedQuestions(rich, null, { contextType: "comparison", limit: 2 });
+    expect(questions).toHaveLength(2);
+    expect(new Set(questions).size).toBe(2);
+  });
+
+  it("never suggests a question the compared offers cannot support", () => {
+    // Only a price exists, so only the price question is offered.
+    expect(buildSuggestedQuestions(priced(), null, { contextType: "comparison" }))
+      .toEqual(["کدام گزینه از نظر قیمت به‌صرفه‌تر است؟"]);
   });
 });

@@ -40,6 +40,9 @@ type Props = {
   title: string;
   contextType: ChatContextType;
   sectionKey: AnalysisSectionKey | null;
+  contextOfferCount: number;
+  contextOfferNames: string[];
+  contextMissingOfferIds: string[];
   isHistorical: boolean;
   fetchedAt: string;
   messages: ChatMessage[];
@@ -66,6 +69,9 @@ export function AIChatDrawer({
   title,
   contextType,
   sectionKey,
+  contextOfferCount,
+  contextOfferNames,
+  contextMissingOfferIds,
   isHistorical,
   fetchedAt,
   messages,
@@ -147,7 +153,7 @@ export function AIChatDrawer({
   }, [fullScreen, open]);
 
   if (!render) return null;
-  const heading = title || contextLabel(contextType, sectionKey);
+  const heading = title || contextLabel(contextType, sectionKey, contextOfferCount, contextOfferNames);
 
   return (
     <>
@@ -173,6 +179,9 @@ export function AIChatDrawer({
             title={heading}
             contextType={contextType}
             sectionKey={sectionKey}
+            contextOfferCount={contextOfferCount}
+            contextOfferNames={contextOfferNames}
+            contextMissingOfferIds={contextMissingOfferIds}
             isHistorical={isHistorical}
             fetchedAt={fetchedAt}
           />

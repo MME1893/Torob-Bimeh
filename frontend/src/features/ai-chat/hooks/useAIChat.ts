@@ -3,7 +3,7 @@ import type { SearchResult } from "../../search/searchTypes";
 import type { InsuranceKind } from "../../ai-analysis/lib/normalizeQuote";
 import { normalizeQuoteForAI } from "../../ai-analysis/lib/normalizeQuote";
 import type { AnalysisSection, AnalysisSectionKey, QuoteAnalysis } from "../../ai-analysis/lib/types";
-import { buildChatRequest, sectionReferencedOfferIds, snapshotFromSection, threadTitle } from "../lib/buildChatContext";
+import { buildChatRequest, resolveThreadContext, sectionReferencedOfferIds, snapshotFromSection, threadTitle, comparisonNameLabel } from "../lib/buildChatContext";
 import { buildSuggestedQuestions } from "../lib/buildSuggestedQuestions";
 import { validateChatResponse } from "../lib/validateChatResponse";
 import {
@@ -16,12 +16,18 @@ import {
   updateMessage,
 } from "../storage/chatHistory";
 import type { ChatAttachment, ChatDraftThread, ChatMessage, ChatThread } from "../types";
+import {
+  buildComparisonAnalysisMessage,
+  type ComparisonAnalysis,
+} from "../../insurance/results/comparison/comparisonAnalysis";
 import { ATTACHMENT_FALLBACK_MESSAGE, CHAT_REQUEST_TIMEOUT_MS, MAX_SUGGESTED_QUESTIONS } from "../types";
 
 const CHAT_ERROR_MESSAGE = "پاسخ‌گویی هوش مصنوعی ممکن نشد. دوباره تلاش کنید.";
 /** A snapshot older than this is presented as a stored result, never as a live quote. */
 const HISTORICAL_SNAPSHOT_MS = 2 * 60 * 60 * 1000;
 const DRAFT_KEY = "draft";
+/** Shared empty list, so a context with no offer ids keeps a stable reference. */
+const NO_OFFER_IDS: string[] = [];
 
 type Options = {
   inquiryId: string;
@@ -59,10 +65,6 @@ export function useAIChat({ inquiryId, insuranceKind, result, analysis }: Option
     () => normalizeQuoteForAI(inquiryId, insuranceKind, result),
     [inquiryId, insuranceKind, result],
   );
-  const allowedIds = useMemo(
-    () => new Set(normalized.offers.map((offer) => offer.offer_id)),
-    [normalized.offers],
-  );
   const isHistorical = useMemo(() => {
     const fetchedAt = Date.parse(result.fetched_at);
     return Number.isFinite(fetchedAt) && Date.now() - fetchedAt > HISTORICAL_SNAPSHOT_MS;
@@ -82,18 +84,35 @@ export function useAIChat({ inquiryId, insuranceKind, result, analysis }: Option
 
   const contextType = draft ? draft.contextType : activeThread?.contextType ?? "inquiry";
   const sectionKey = draft ? draft.sectionKey : activeThread?.sectionKey ?? null;
+  const contextOfferIds = draft
+    ? draft.referencedOfferIds
+    : activeThread?.referencedOfferIds ?? NO_OFFER_IDS;
+
+  // The offers a thread is actually about. A comparison thread resolves to just
+  // its compared offers, so a restored thread with stale ids reports them instead
+  // of silently widening to the whole inquiry.
+  const threadContext = useMemo(
+    () => resolveThreadContext(contextOfferIds, normalized.offers),
+    [contextOfferIds, normalized.offers],
+  );
 
   const suggestions = useMemo(() => {
     if (messages.length) {
       const lastAssistant = [...messages].reverse().find((item) => item.role === "assistant");
       return (lastAssistant?.suggestedQuestions ?? []).slice(0, MAX_SUGGESTED_QUESTIONS);
     }
-    return buildSuggestedQuestions(normalized.offers, sectionKey);
-  }, [messages, normalized.offers, sectionKey]);
+    const offers = contextType === "comparison" ? threadContext.offers : normalized.offers;
+    return buildSuggestedQuestions(offers, sectionKey, { contextType });
+  }, [messages, contextType, normalized.offers, sectionKey, threadContext.offers]);
 
   const runTurn = useCallback(
     async ({ thread, userMessage, placeholderId, history }: Turn) => {
       try {
+        // The allowed set is derived from what is actually sent, so the model can
+        // only ever be credited with referring to offers it was given.
+        const allowed = thread.contextType === "comparison"
+          ? new Set(thread.referencedOfferIds)
+          : new Set(normalized.offers.map((offer) => offer.offer_id));
         const payload = buildChatRequest({
           inquiryId,
           threadId: thread.id,
@@ -123,7 +142,7 @@ export function useAIChat({ inquiryId, insuranceKind, result, analysis }: Option
         } finally {
           window.clearTimeout(timer);
         }
-        const validated = validateChatResponse(body, allowedIds);
+        const validated = validateChatResponse(body, allowed);
         if (!validated) throw new Error("AI chat response did not match the expected shape");
         await updateMessage(placeholderId, {
           status: "ready",
@@ -139,7 +158,7 @@ export function useAIChat({ inquiryId, insuranceKind, result, analysis }: Option
       setMessages(await getMessagesForThread(thread.id));
       setThreads(await getThreadsForInquiry(inquiryId));
     },
-    [allowedIds, analysis, inquiryId, insuranceKind, normalized.offers],
+    [analysis, inquiryId, insuranceKind, normalized.offers],
   );
 
   const selectThread = useCallback(async (thread: ChatThread) => {
@@ -209,6 +228,53 @@ export function useAIChat({ inquiryId, insuranceKind, result, analysis }: Option
       return thread.id;
     },
     [inquiryId],
+  );
+
+  /**
+   * Creates the comparison thread the user asked for from the comparison dialog.
+   *
+   * Only the compared offer ids are stored, never the offer objects: the inquiry
+   * snapshot already holds them, and the thread resolves them on restore.
+   *
+   * When a comparison analysis is already available it is seeded as the thread's
+   * opening assistant message, so the drawer never opens empty and the user
+   * immediately sees the summary and insights. That message is built
+   * deterministically from the already-fetched analysis, so this still performs
+   * no AI call; the first real request waits for the first question.
+   */
+  const openComparisonThread = useCallback(
+    async (offerIds: string[], analysis?: ComparisonAnalysis) => {
+      const resolved = resolveThreadContext(offerIds, normalized.offers);
+      if (!resolved.offers.length) return null;
+      const thread = await createThread({
+        inquiryId,
+        title: threadTitle("comparison", null, undefined, comparisonNameLabel(resolved.names)),
+        contextType: "comparison",
+        sectionKey: null,
+        referencedOfferIds: resolved.offers.map((offer) => offer.offer_id),
+      });
+      const seeded = analysis
+        ? await saveMessage({
+            threadId: thread.id,
+            role: "assistant",
+            ...buildComparisonAnalysisMessage(
+              analysis,
+              resolved.offers,
+              buildSuggestedQuestions(resolved.offers, null, { contextType: "comparison" }),
+            ),
+            status: "ready",
+            seq: 0,
+          })
+        : null;
+      setActiveThread(thread);
+      setDraft(null);
+      setMessages(seeded ? await getMessagesForThread(thread.id) : []);
+      setError(null);
+      setThreads(await getThreadsForInquiry(inquiryId));
+      setOpen(true);
+      return thread.id;
+    },
+    [inquiryId, normalized.offers],
   );
 
   const sendMessage = useCallback(
@@ -319,6 +385,10 @@ export function useAIChat({ inquiryId, insuranceKind, result, analysis }: Option
     error,
     sectionKey,
     contextType,
+    contextOfferCount: contextOfferIds.length,
+    contextOfferNames: threadContext.names,
+    /** Compared ids that no longer resolve against this stored inquiry. */
+    contextMissingOfferIds: threadContext.missingIds,
     isHistorical,
     savedFetchedAt: result.fetched_at,
     suggestions,
@@ -328,6 +398,7 @@ export function useAIChat({ inquiryId, insuranceKind, result, analysis }: Option
     startNewThread,
     openThread,
     openSectionThread,
+    openComparisonThread,
     sendMessage,
     retryMessage,
   };

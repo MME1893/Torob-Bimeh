@@ -6,6 +6,9 @@ type Props = {
   title: string;
   contextType: ChatContextType;
   sectionKey: AnalysisSectionKey | null;
+  contextOfferCount: number;
+  contextOfferNames: string[];
+  contextMissingOfferIds: string[];
   isHistorical: boolean;
   fetchedAt: string;
 };
@@ -19,8 +22,26 @@ const faDate = (value: string) => {
  * White chat header: identity (logo + title) on top, then the context pill
  * and the dynamic metadata. No green-tinted block, matching the reference.
  */
-export function AIChatHeader({ title, contextType, sectionKey, isHistorical, fetchedAt }: Props) {
+export function AIChatHeader({
+  title,
+  contextType,
+  sectionKey,
+  contextOfferCount,
+  contextOfferNames,
+  contextMissingOfferIds,
+  isHistorical,
+  fetchedAt,
+}: Props) {
   const stamp = faDate(fetchedAt);
+  // A comparison thread only promises the compared offers, and a restored thread
+  // says so explicitly when the stored inquiry no longer holds all of them.
+  const hint = contextType === "comparison"
+    ? isHistorical
+      ? "پاسخ‌ها بر اساس نتیجه ذخیره‌شده این استعلام هستند."
+      : "پاسخ‌ها بر اساس پیشنهادهای انتخاب‌شده در همین استعلام هستند."
+    : isHistorical
+      ? "پاسخ‌ها بر اساس نتیجه ذخیره‌شده همین استعلام هستند."
+      : "بر اساس نتایج همین استعلام پاسخ می‌دهم.";
   return (
     <header className="aic-header">
       <div className="aic-header__identity">
@@ -30,13 +51,14 @@ export function AIChatHeader({ title, contextType, sectionKey, isHistorical, fet
       <div className="aic-header__context">
         <span className="aic-header__pill">
           <Target aria-hidden="true" />
-          زمینه: {contextLabel(contextType, sectionKey)}
+          زمینه: {contextLabel(contextType, sectionKey, contextOfferCount, contextOfferNames)}
         </span>
-        <span className="aic-header__hint">
-          {isHistorical
-            ? "پاسخ‌ها بر اساس نتیجه ذخیره‌شده همین استعلام هستند."
-            : "بر اساس نتایج همین استعلام پاسخ می‌دهم."}
-        </span>
+        <span className="aic-header__hint">{hint}</span>
+        {!!contextMissingOfferIds.length && (
+          <span className="aic-header__hint">
+            بخشی از پیشنهادهای این مقایسه در نتیجه ذخیره‌شده موجود نیست.
+          </span>
+        )}
         {stamp && (
           <span className="aic-header__stamp">
             {isHistorical ? "زمان ثبت استعلام" : "ثبت‌شده در"}: {stamp}

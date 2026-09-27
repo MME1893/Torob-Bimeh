@@ -8,7 +8,7 @@ from typing import Any, Callable
 
 from pydantic import ValidationError
 
-from .chat_prompts import CHAT_SYSTEM_PROMPT, chat_repair_prompt
+from .chat_prompts import chat_repair_prompt, chat_system_prompts
 from .chat_schema import (
     MAX_HISTORY_MESSAGES,
     MAX_REFERENCED_OFFER_IDS,
@@ -49,7 +49,7 @@ class ChatService:
                 raise
             repaired = await client.complete_json(
                 [
-                    AIMessage("system", CHAT_SYSTEM_PROMPT),
+                    *(AIMessage("system", prompt) for prompt in chat_system_prompts(request.context.type)),
                     AIMessage("assistant", raw),
                     AIMessage("user", chat_repair_prompt(str(exc), allowed_ids)),
                 ],
@@ -97,7 +97,7 @@ class ChatService:
     @staticmethod
     def _build_messages(request: ChatRequest) -> list[AIMessage]:
         messages: list[AIMessage] = [
-            AIMessage("system", CHAT_SYSTEM_PROMPT),
+            *(AIMessage("system", prompt) for prompt in chat_system_prompts(request.context.type)),
             AIMessage("user", _context_block(request)),
         ]
         for entry in request.history[-MAX_HISTORY_MESSAGES:]:
@@ -110,6 +110,15 @@ def _context_block(request: ChatRequest) -> str:
     context_json = request.context.model_dump_json(exclude_none=True, indent=2)
     source = request.context.type
     section = request.context.section_key or "none"
+    # A comparison context deliberately carries only the compared offers, so the
+    # block states that the narrower set is intentional and not a missing field.
+    scope = (
+        "The JSON above holds ONLY the offers this comparison is about, listed in "
+        "referenced_offer_ids. The rest of the inquiry was intentionally not sent."
+        if source == "comparison"
+        else "The JSON above is the complete stored inquiry snapshot for this conversation. "
+        "It is the only source of insurance facts you may use."
+    )
     return (
         f"{CONTEXT_BLOCK_HEADER}\n"
         f"inquiry_id: {request.inquiry_id}\n"
@@ -119,8 +128,7 @@ def _context_block(request: ChatRequest) -> str:
         f"section_key: {section}\n"
         f"json:\n{context_json}\n"
         f"{CONTEXT_BLOCK_FOOTER}\n\n"
-        "The JSON above is the complete stored inquiry snapshot for this conversation. "
-        "It is the only source of insurance facts you may use."
+        f"{scope}"
     )
 
 

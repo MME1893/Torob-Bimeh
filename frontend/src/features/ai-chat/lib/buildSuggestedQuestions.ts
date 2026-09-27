@@ -1,6 +1,6 @@
 import type { AnalysisSectionKey } from "../../ai-analysis/lib/types";
 import type { NormalizedQuoteOffer, NormalizedQuoteServices } from "../../ai-analysis/lib/normalizeQuote";
-import { MAX_INITIAL_QUESTIONS } from "../types";
+import { MAX_INITIAL_QUESTIONS, type ChatContextType } from "../types";
 
 /**
  * Builds the initial suggestion chips deterministically from the stored inquiry.
@@ -55,12 +55,21 @@ function inspect(offers: NormalizedQuoteOffer[]): Guards {
   };
 }
 
-const CATALOG: Record<AnalysisSectionKey | "inquiry", Array<[string, keyof Guards]>> = {
-  inquiry: [
-    ["کدام پیشنهاد ارزش خرید بیشتری دارد؟", "priced"],
+/** Every catalog variant. A section thread borrows its section's own catalog. */
+type CatalogKey = AnalysisSectionKey | "inquiry" | "comparison";
+
+const CATALOG: Record<CatalogKey, Array<[string, keyof Guards]>> = {
+  inquiry: [    ["کدام پیشنهاد ارزش خرید بیشتری دارد؟", "priced"],
     ["بهترین گزینه اقساطی کدام است؟", "installment"],
     ["سه پیشنهاد اول را مقایسه کن", "threeOffers"],
     ["ارزان‌ترین پیشنهاد چه محدودیت‌هایی دارد؟", "coverage"],
+  ],
+  comparison: [
+    ["کدام گزینه از نظر قیمت به‌صرفه‌تر است؟", "priced"],
+    ["کدام شرایط پرداخت بهتری دارد؟", "twoWithPayment"],
+    ["تفاوت پوشش و خدمات این پیشنهادها چیست؟", "coverage"],
+    ["اگر خرید اقساطی مهم باشد کدام مناسب‌تر است؟", "installment"],
+    ["مزیت اصلی هر کدام چیست؟", "benefits"],
   ],
   smart_summary: [
     ["چرا این پیشنهادها برجسته شده‌اند؟", "priced"],
@@ -87,14 +96,25 @@ const CATALOG: Record<AnalysisSectionKey | "inquiry", Array<[string, keyof Guard
   ],
 };
 
+/**
+ * Builds the initial suggestion chips deterministically from the stored inquiry.
+ *
+ * This never calls the AI: every question is only offered when the normalized
+ * quote actually contains the field that would be needed to answer it. The
+ * caller passes the already-scoped offer list, so a comparison thread only ever
+ * suggests questions its own compared offers can support.
+ */
 export function buildSuggestedQuestions(
   offers: NormalizedQuoteOffer[],
   sectionKey: AnalysisSectionKey | null,
-  limit = MAX_INITIAL_QUESTIONS,
+  options: { contextType?: ChatContextType; limit?: number } = {},
 ): string[] {
   if (!offers.length) return [];
+  const { contextType = "inquiry", limit = MAX_INITIAL_QUESTIONS } = options;
   const guards = inspect(offers);
-  const key: AnalysisSectionKey | "inquiry" = sectionKey ?? "inquiry";
+  const key: CatalogKey = contextType === "comparison"
+    ? "comparison"
+    : sectionKey ?? "inquiry";
   const questions = CATALOG[key].filter(([, guard]) => guards[guard]).map(([question]) => question);
   return questions.slice(0, Math.max(0, limit));
 }

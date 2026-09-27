@@ -31,7 +31,7 @@ AnalysisSectionKey = Literal[
     "payment_terms",
     "price_value",
 ]
-ChatContextType = Literal["inquiry", "analysis_section"]
+ChatContextType = Literal["inquiry", "analysis_section", "comparison"]
 ChatRole = Literal["user", "assistant"]
 
 
@@ -118,7 +118,7 @@ class ChatContext(StrictModel):
             if self.analysis_section is None:
                 raise ValueError("analysis_section is required for an analysis_section context")
         elif self.section_key is not None:
-            raise ValueError("section_key is not allowed for an inquiry context")
+            raise ValueError(f"section_key is not allowed for a {self.type} context")
         if unknown := sorted(set(self.referenced_offer_ids) - allowed):
             raise ValueError(f"context references unknown offer IDs: {unknown}")
         if unknown := sorted(_snapshot_offer_ids(self.analysis_section) - allowed):
