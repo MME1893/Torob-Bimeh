@@ -3,7 +3,7 @@ import type { InsuranceKind } from "../../ai-analysis/lib/normalizeQuote";
 import type { SearchResult } from "../../search/searchTypes";
 
 export const DB_NAME = "torobimeh-inquiries";
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 export const INQUIRY_SCHEMA_VERSION = 1;
 
 export type AIStatus = "idle" | "processing" | "ready" | "error";
@@ -30,30 +30,67 @@ const title: Record<InsuranceKind, string> = {
   third_motor: "بیمه شخص ثالث موتورسیکلت",
 };
 
-const request = <T>(value: IDBRequest<T>) => new Promise<T>((resolve, reject) => {
+export const request = <T>(value: IDBRequest<T>) => new Promise<T>((resolve, reject) => {
   value.onsuccess = () => resolve(value.result);
   value.onerror = () => reject(value.error);
 });
 
 let database: Promise<IDBDatabase> | null = null;
-function openDatabase() {
+
+/**
+ * Creates only the object stores that are still missing.
+ *
+ * Version 1 shipped `inquiries` and `metadata`; version 2 adds the chat stores.
+ * Every store is guarded by an existence check so a 1 -> 2 upgrade never
+ * recreates (and therefore never drops) a store that already holds user data.
+ */
+function upgradeDatabase(opening: IDBOpenDBRequest) {
+  const db = opening.result;
+  if (!db.objectStoreNames.contains("inquiries")) {
+    const inquiries = db.createObjectStore("inquiries", { keyPath: "id" });
+    inquiries.createIndex("createdAt", "createdAt");
+    inquiries.createIndex("lastOpenedAt", "lastOpenedAt");
+  }
+  if (!db.objectStoreNames.contains("metadata")) {
+    db.createObjectStore("metadata", { keyPath: "key" });
+  }
+  if (!db.objectStoreNames.contains("chatThreads")) {
+    const threads = db.createObjectStore("chatThreads", { keyPath: "id" });
+    threads.createIndex("inquiryId", "inquiryId");
+    threads.createIndex("updatedAt", "updatedAt");
+    threads.createIndex("inquiryId_updatedAt", ["inquiryId", "updatedAt"]);
+  }
+  if (!db.objectStoreNames.contains("chatMessages")) {
+    const messages = db.createObjectStore("chatMessages", { keyPath: "id" });
+    messages.createIndex("threadId", "threadId");
+    messages.createIndex("createdAt", "createdAt");
+    messages.createIndex("threadId_createdAt", ["threadId", "createdAt"]);
+  }
+}
+
+export function openDatabase() {
   if (!database) database = new Promise((resolve, reject) => {
     if (!globalThis.indexedDB) return reject(new Error("IndexedDB unavailable"));
     const opening = indexedDB.open(DB_NAME, DB_VERSION);
-    opening.onupgradeneeded = () => {
+    opening.onupgradeneeded = () => upgradeDatabase(opening);
+    opening.onsuccess = () => {
       const db = opening.result;
-      const inquiries = db.createObjectStore("inquiries", { keyPath: "id" });
-      inquiries.createIndex("createdAt", "createdAt");
-      inquiries.createIndex("lastOpenedAt", "lastOpenedAt");
-      db.createObjectStore("metadata", { keyPath: "key" });
+      // Another tab requesting a newer version must not be blocked forever.
+      db.onversionchange = () => {
+        db.close();
+        database = null;
+      };
+      resolve(db);
     };
-    opening.onsuccess = () => resolve(opening.result);
     opening.onerror = () => reject(opening.error);
+    // A stale tab can hold an older version open. Warn and keep waiting instead of
+    // rejecting, because the request still succeeds once that tab releases it.
+    opening.onblocked = () => console.warn("IndexedDB upgrade is waiting for another open tab");
   });
   return database;
 }
 
-const transactionDone = (tx: IDBTransaction) => new Promise<void>((resolve, reject) => {
+export const transactionDone = (tx: IDBTransaction) => new Promise<void>((resolve, reject) => {
   tx.oncomplete = () => resolve();
   tx.onerror = () => reject(tx.error);
   tx.onabort = () => reject(tx.error);

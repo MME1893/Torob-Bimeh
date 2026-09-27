@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BadgeCheck,
   Banknote,
@@ -20,7 +20,12 @@ import type { Offer, ProviderResult, SearchResult, Status } from "../../search/s
 import { resolveInsurerLogo } from "./insurerLogos";
 import { AIAnalysisPanel } from "../../ai-analysis/AIAnalysisPanel";
 import { useQuoteAIAnalysis } from "../../ai-analysis/lib/useQuoteAIAnalysis";
-import type { InsuranceKind } from "../../ai-analysis/lib/normalizeQuote";
+import { offerIdsByOffer, offersById, type InsuranceKind } from "../../ai-analysis/lib/normalizeQuote";
+import { ANALYSIS_SECTION_TITLES, type AnalysisSectionKey } from "../../ai-analysis/lib/types";
+import { useAIChat } from "../../ai-chat/hooks/useAIChat";
+import { AIChatDrawer } from "../../ai-chat/components/AIChatDrawer";
+import { AIChatLauncher } from "../../ai-chat/components/AIChatLauncher";
+import "../../ai-chat/ai-chat.css";
 import motorResult from "../../../assets/insurance/motor_result.png";
 import azkiLogo from "../../../assets/insurance/azki.png";
 import sabimLogo from "../../../assets/insurance/sabim.png";
@@ -76,9 +81,18 @@ function InsurerLogo({ offer }: { offer: Offer }) {
   );
 }
 
-function OfferRow({ offer, index, selected, onSelect, kind }: { offer: Offer; index: number; selected: boolean; onSelect: () => void; kind: InsuranceKind | null }) {
+type RowProps = {
+  offer: Offer;
+  index: number;
+  selected: boolean;
+  onSelect: () => void;
+  kind: InsuranceKind | null;
+  rowRef: (node: HTMLElement | null) => void;
+};
+
+function OfferRow({ offer, index, selected, onSelect, kind, rowRef }: RowProps) {
   return (
-    <article className={`ir-offer-row ${selected ? "is-selected" : ""}`} onClick={onSelect}>
+    <article ref={rowRef} className={`ir-offer-row ${selected ? "is-selected" : ""}`} onClick={onSelect} tabIndex={-1}>
       <span className="ir-rank">{number.format(index + 1)}</span>
       <div className="ir-insurer-cell">
         <InsurerLogo offer={offer} />
@@ -223,6 +237,43 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
     .filter((offer) => !discountOnly || !!offer.discount_amount_toman)
     .sort((a, b) => (a.premium.amount_toman ?? Infinity) - (b.premium.amount_toman ?? Infinity)), [sourceOffers, query, installmentsOnly, discountOnly]);
   const providersByName = new Map(result.providers.map((provider) => [provider.provider, provider]));
+
+  // Canonical ids always come from the original unfiltered provider order, so
+  // filtering and sorting can never change which offer an AI id resolves to.
+  const lookup = useMemo(() => offersById(result), [result]);
+  const idByOffer = useMemo(() => offerIdsByOffer(result), [result]);
+  const rowRefs = useRef(new Map<string, HTMLElement>());
+  const rememberRow = useCallback((id: string, node: HTMLElement | null) => {
+    if (node) rowRefs.current.set(id, node);
+    else rowRefs.current.delete(id);
+  }, []);
+
+  const chat = useAIChat({
+    inquiryId,
+    insuranceKind,
+    result,
+    analysis: aiState.status === "ready" ? aiState.analysis : null,
+  });
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const selectReferencedOffer = useCallback((offerId: string) => {
+    const offer = lookup.get(offerId);
+    if (!offer) return;
+    setSelectedOffer(offer);
+    const row = rowRefs.current.get(offerId);
+    row?.scrollIntoView({ block: "center" });
+    row?.focus({ preventScroll: true });
+  }, [lookup]);
+
+  const askAboutSection = useCallback((sectionKey: AnalysisSectionKey) => {
+    if (aiState.status !== "ready") return;
+    void chat.openSectionThread(sectionKey, aiState.analysis.sections[sectionKey]);
+  }, [aiState, chat]);
+
+  const chatTitle = chat.sectionKey
+    ? `گفتگو درباره ${ANALYSIS_SECTION_TITLES[chat.sectionKey]}`
+    : "گفتگو با هوش مصنوعی";
+
   return (
     <section className="insurance-results results" aria-live="polite">
       <header className="ir-header">
@@ -230,7 +281,13 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
         <img src={motorResult} alt="" />
       </header>
       <div className="ir-providers">{providerOrder.map((key) => <ProviderCard key={key} provider={providersByName.get(key)} />)}</div>
-      <AIAnalysisPanel state={aiState} result={result} onRetry={retryAI} />
+      <AIAnalysisPanel
+        state={aiState}
+        result={result}
+        onRetry={retryAI}
+        onAskAboutSection={askAboutSection}
+        onSelectReferencedOffer={selectReferencedOffer}
+      />
       <div className="ir-workspace">
         {selectedOffer ? <SelectedOfferPanel offer={selectedOffer} kind={insuranceKind} /> : <aside className="ir-selected-panel ir-empty">پیشنهادی برای نمایش جزئیات وجود ندارد.</aside>}
         <section className="ir-offers-panel">
@@ -246,11 +303,45 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
             <div className="ir-quick-filters"><button className={!discountOnly ? "active" : ""} onClick={() => setDiscountOnly(false)}>ارزان‌ترین</button><button className={discountOnly ? "active" : ""} onClick={() => setDiscountOnly(!discountOnly)}>تخفیف</button><button disabled title="در دست توسعه">شرکت‌های محبوب</button></div>
           </div>
           <div className="ir-offer-list">
-            {offers.map((offer, index) => <OfferRow key={`${offer.provider}-${offer.insurer_name}-${index}`} offer={offer} index={index} kind={insuranceKind} selected={selectedOffer === offer} onSelect={() => setSelectedOffer(offer)} />)}
+            {offers.map((offer, index) => {
+              const id = idByOffer.get(offer) ?? "";
+              return <OfferRow key={id || `${offer.provider}-${offer.insurer_name}-${index}`} offer={offer} index={index} kind={insuranceKind} selected={selectedOffer === offer} onSelect={() => setSelectedOffer(offer)} rowRef={(node) => rememberRow(id, node)} />;
+            })}
             {!offers.length && <p className="ir-no-results">هیچ پیشنهاد قابل‌نمایشی با این شرایط پیدا نشد.</p>}
           </div>
         </section>
       </div>
+
+      {!chat.open && <AIChatLauncher onClick={(trigger) => void chat.openChat(trigger)} />}
+      <AIChatDrawer
+        open={chat.open}
+        title={chatTitle}
+        contextType={chat.contextType}
+        sectionKey={chat.sectionKey}
+        isHistorical={chat.isHistorical}
+        fetchedAt={chat.savedFetchedAt}
+        messages={chat.messages}
+        threads={chat.threads}
+        activeThreadId={chat.activeThread?.id ?? null}
+        offersById={lookup}
+        busy={chat.busy}
+        error={chat.error}
+        historyOpen={historyOpen}
+        openerRef={chat.openerRef}
+        suggestions={chat.suggestions}
+        onClose={chat.closeChat}
+        onNewChat={() => {
+          chat.startNewThread();
+          setHistoryOpen(false);
+        }}
+        onOpenThread={(id) => {
+          void chat.openThread(id);
+          setHistoryOpen(false);
+        }}
+        onToggleHistory={() => setHistoryOpen((value) => !value)}
+        onSend={(text, attachments) => void chat.sendMessage(text, attachments)}
+        onRetry={(id) => void chat.retryMessage(id)}
+      />
     </section>
   );
 }

@@ -1,6 +1,5 @@
-import { ANALYSIS_VERSION, type AnalysisSection, type AnalysisSectionKey, type QuoteAnalysis } from "./types";
+import { ANALYSIS_SECTION_KEYS, ANALYSIS_VERSION, type AnalysisSection, type AnalysisSectionKey, type QuoteAnalysis } from "./types";
 
-const sectionKeys: AnalysisSectionKey[] = ["smart_summary", "coverage_services", "payment_terms", "price_value"];
 const isStringArray = (value: unknown, max: number) => Array.isArray(value) && value.length <= max && value.every((item) => typeof item === "string");
 
 function validSection(value: unknown, allowedIds: Set<string>): value is AnalysisSection {
@@ -27,6 +26,6 @@ export function validateAnalysis(value: unknown, allowedIds: Set<string>): Quote
   if (!value || typeof value !== "object") return null;
   const analysis = value as QuoteAnalysis;
   if (analysis.schema_version !== "1.0" || analysis.analysis_version !== ANALYSIS_VERSION || !analysis.sections) return null;
-  return sectionKeys.every((key) => validSection(analysis.sections[key], allowedIds)) ? analysis : null;
+  return ANALYSIS_SECTION_KEYS.every((key: AnalysisSectionKey) => validSection(analysis.sections[key], allowedIds)) ? analysis : null;
 }
 

@@ -2,6 +2,10 @@ import type { Offer, SearchResult } from "../../search/searchTypes";
 
 export type InsuranceKind = "third_car" | "body_car" | "third_motor";
 
+export type NormalizedQuote = ReturnType<typeof normalizeQuoteForAI>;
+export type NormalizedQuoteOffer = NormalizedQuote["offers"][number];
+export type NormalizedQuoteServices = NormalizedQuoteOffer["services"];
+
 export const offerId = (offer: Offer, index: number) =>
   `${offer.provider}:${encodeURIComponent(offer.insurer_name)}:${index}`;
 
@@ -57,5 +61,16 @@ export function offersById(result: SearchResult) {
   let index = 0;
   const entries = result.providers.flatMap((provider) => provider.offers.map((offer) => [offerId(offer, index++), offer] as const));
   return new Map(entries);
+}
+
+/**
+ * Maps every canonical offer object back to its stable `offerId`.
+ *
+ * Ids are always derived from the original unfiltered provider order, so a
+ * filtered or re-sorted list can never change the id of an offer.
+ */
+export function offerIdsByOffer(result: SearchResult) {
+  const entries = [...offersById(result)].map(([id, offer]) => [offer, id] as const);
+  return new Map<Offer, string>(entries);
 }
 

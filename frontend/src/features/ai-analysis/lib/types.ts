@@ -3,6 +3,27 @@ export const ANALYSIS_VERSION = "1" as const;
 export type AnalysisTone = "positive" | "neutral" | "warning";
 export type AnalysisSectionKey = "smart_summary" | "coverage_services" | "payment_terms" | "price_value";
 
+export const ANALYSIS_SECTION_KEYS: AnalysisSectionKey[] = [
+  "smart_summary",
+  "coverage_services",
+  "payment_terms",
+  "price_value",
+];
+
+export const ANALYSIS_SECTION_TITLES: Record<AnalysisSectionKey, string> = {
+  smart_summary: "جمع‌بندی هوشمند",
+  coverage_services: "پوشش و خدمات",
+  payment_terms: "شرایط پرداخت",
+  price_value: "قیمت و ارزش خرید",
+};
+
+export const ANALYSIS_SECTION_PROCESSING: Record<AnalysisSectionKey, string> = {
+  smart_summary: "در حال تحلیل پیشنهادها...",
+  coverage_services: "در حال بررسی پوشش‌ها...",
+  payment_terms: "در حال بررسی شرایط پرداخت...",
+  price_value: "در حال مقایسه قیمت‌ها...",
+};
+
 export type AnalysisPoint = {
   title: string;
   description: string;
