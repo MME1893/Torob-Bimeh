@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { LoaderCircle, Paperclip, SendHorizontal, X } from "lucide-react";
 import {
   attachmentAccept,
@@ -14,14 +14,15 @@ const LINE_HEIGHT = 24;
 type Props = {
   busy: boolean;
   onSend: (text: string, attachments: ChatAttachment[]) => void;
+  /** Owned by the drawer so the rail's attachment button can open the picker. */
+  fileInputRef: RefObject<HTMLInputElement | null>;
 };
 
-export function AIChatComposer({ busy, onSend }: Props) {
+export function AIChatComposer({ busy, onSend, fileInputRef }: Props) {
   const [text, setText] = useState("");
   const [attachments, setAttachments] = useState<ChatAttachment[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // One row minimum, five rows maximum, internal scrolling beyond that.
   useEffect(() => {
@@ -104,26 +105,6 @@ export function AIChatComposer({ busy, onSend }: Props) {
         </p>
       )}
       <div className="aic-composer__row">
-        <button
-          className="aic-composer__attach"
-          type="button"
-          aria-label="افزودن فایل"
-          title="افزودن فایل متنی"
-          disabled={busy}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Paperclip aria-hidden="true" />
-        </button>
-        <input
-          ref={fileInputRef}
-          className="aic-composer__file-input"
-          type="file"
-          multiple
-          accept={attachmentAccept}
-          tabIndex={-1}
-          aria-hidden="true"
-          onChange={(event) => void onPickFiles(event.target.files)}
-        />
         <textarea
           ref={textareaRef}
           className="aic-composer__input"
@@ -131,7 +112,7 @@ export function AIChatComposer({ busy, onSend }: Props) {
           rows={1}
           maxLength={MAX_USER_MESSAGE_CHARS}
           disabled={busy}
-          placeholder="سؤالت را درباره همین استعلام بپرس..."
+          placeholder="سؤال خود را بنویسید..."
           aria-label="متن پیام"
           onChange={(event) => setText(event.target.value)}
           onKeyDown={onKeyDown}
@@ -143,9 +124,23 @@ export function AIChatComposer({ busy, onSend }: Props) {
           aria-label="ارسال پیام"
           title="ارسال پیام"
         >
-          {busy ? <LoaderCircle className="aic-spin" aria-hidden="true" /> : <SendHorizontal aria-hidden="true" />}
+          {busy ? (
+            <LoaderCircle className="aic-spin" aria-hidden="true" />
+          ) : (
+            <SendHorizontal className="aic-composer__send-icon" aria-hidden="true" />
+          )}
         </button>
       </div>
+      <input
+        ref={fileInputRef}
+        className="aic-composer__file-input"
+        type="file"
+        multiple
+        accept={attachmentAccept}
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={(event) => void onPickFiles(event.target.files)}
+      />
     </form>
   );
 }

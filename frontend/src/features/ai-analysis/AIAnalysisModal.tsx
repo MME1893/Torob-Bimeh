@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { AlertTriangle, ArrowLeft, LoaderCircle, Sparkles, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ChevronLeft, Coins, LoaderCircle, ShieldCheck, Sparkles, Star, X } from "lucide-react";
 import type { Offer } from "../search/searchTypes";
 import { resolveInsurerLogo } from "../insurance/results/insurerLogos";
 import type { AIState, AnalysisSection } from "./lib/types";
@@ -132,6 +132,9 @@ export function AIAnalysisModal({
                 <div className="ir-ai-points" data-count={section.key_points.length}>
                   {section.key_points.map((point, index) => (
                     <article className={`tone-${point.tone}`} key={`${point.title}-${index}`}>
+                      <span className="ir-ai-point-icon" aria-hidden="true">
+                        {index % 3 === 0 ? <Star /> : index % 3 === 1 ? <Coins /> : <ShieldCheck />}
+                      </span>
                       <b>{point.title}</b>
                       <p>{point.description}</p>
                     </article>
@@ -148,7 +151,8 @@ export function AIAnalysisModal({
                     const logo = resolveInsurerLogo(offer.insurer_name);
                     return (
                       <div key={id}>
-                        {logo ? <img src={logo} alt="" /> : <span className="ir-ai-reference-mark" />}
+                        <ChevronLeft className="ir-ai-reference-chevron" aria-hidden="true" />
+                        {logo ? <img src={logo} alt="" onError={(event) => { event.currentTarget.hidden = true; }} /> : <span className="ir-ai-reference-mark"><ShieldCheck aria-hidden="true" /></span>}
                         <span>
                           <b>{offer.insurer_name}</b>
                           <small>{offer.provider}</small>

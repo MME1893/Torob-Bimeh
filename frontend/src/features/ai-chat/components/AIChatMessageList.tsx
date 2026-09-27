@@ -8,9 +8,10 @@ type Props = {
   offersById: Map<string, Offer>;
   onRetry: (id: string) => void;
   busy: boolean;
+  onViewOffer?: (offerId: string) => void;
 };
 
-export function AIChatMessageList({ messages, offersById, onRetry, busy }: Props) {
+export function AIChatMessageList({ messages, offersById, onRetry, busy, onViewOffer }: Props) {
   const endRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
@@ -39,6 +40,7 @@ export function AIChatMessageList({ messages, offersById, onRetry, busy }: Props
           offersById={offersById}
           retryDisabled={busy}
           onRetry={() => onRetry(message.id)}
+          onViewOffer={onViewOffer}
         />
       ))}
       <div ref={endRef} />

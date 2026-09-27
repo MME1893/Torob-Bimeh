@@ -9,15 +9,16 @@ import type {
   ChatThread,
 } from "../types";
 import { AIChatComposer } from "./AIChatComposer";
-import { AIChatContextBadge } from "./AIChatContextBadge";
 import { AIChatHeader } from "./AIChatHeader";
 import { AIChatMessageList } from "./AIChatMessageList";
+import { AIChatNavRail } from "./AIChatNavRail";
 import { AIChatSuggestedQuestions } from "./AIChatSuggestedQuestions";
 import { ChatThreadHistory } from "./ChatThreadHistory";
 
 const MOBILE_QUERY = "(max-width: 780px)";
 const FOCUSABLE =
   'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])';
+const EXIT_MS = 260;
 
 /** The drawer is only modal when it covers the whole screen. */
 function useFullScreen() {
@@ -54,8 +55,10 @@ type Props = {
   onNewChat: () => void;
   onOpenThread: (id: string) => void;
   onToggleHistory: () => void;
+  onShowMessages: () => void;
   onSend: (text: string, attachments: ChatAttachment[]) => void;
   onRetry: (id: string) => void;
+  onViewOffer?: (offerId: string) => void;
 };
 
 export function AIChatDrawer({
@@ -78,11 +81,34 @@ export function AIChatDrawer({
   onNewChat,
   onOpenThread,
   onToggleHistory,
+  onShowMessages,
   onSend,
   onRetry,
+  onViewOffer,
 }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const fullScreen = useFullScreen();
+  const [render, setRender] = useState(open);
+  const [closing, setClosing] = useState(false);
+
+  // Enter from the physical LEFT; closing reverses the motion.
+  useEffect(() => {
+    if (open) {
+      setRender(true);
+      setClosing(false);
+      return;
+    }
+    if (!render) return;
+    setClosing(true);
+    const timer = window.setTimeout(() => {
+      setRender(false);
+      setClosing(false);
+      openerRef.current?.focus?.();
+    }, EXIT_MS);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -120,7 +146,7 @@ export function AIChatDrawer({
     panelRef.current?.querySelector<HTMLElement>("textarea,button")?.focus();
   }, [fullScreen, open]);
 
-  if (!open) return null;
+  if (!render) return null;
   const heading = title || contextLabel(contextType, sectionKey);
 
   return (
@@ -128,49 +154,54 @@ export function AIChatDrawer({
       {fullScreen && <div className="aic-backdrop" role="presentation" onMouseDown={onClose} />}
       <div
         ref={panelRef}
-        className={`aic-drawer${fullScreen ? " is-fullscreen" : ""}`}
+        className={`aic-drawer${fullScreen ? " is-fullscreen" : ""}${closing ? " is-closing" : ""}`}
         role="dialog"
         aria-modal={fullScreen}
         aria-label={heading}
       >
-        <AIChatHeader
-          title={heading}
+        <AIChatNavRail
           historyOpen={historyOpen}
           onClose={onClose}
           onNewChat={onNewChat}
-          onOpenHistory={onToggleHistory}
+          onToggleHistory={onToggleHistory}
+          onShowMessages={onShowMessages}
+          onAttach={() => fileInputRef.current?.click()}
+          attachDisabled={busy}
         />
-        <AIChatContextBadge
-          contextType={contextType}
-          sectionKey={sectionKey}
-          isHistorical={isHistorical}
-          fetchedAt={fetchedAt}
-        />
-        {historyOpen && (
-          <ChatThreadHistory
-            threads={threads}
-            activeThreadId={activeThreadId}
-            onSelect={onOpenThread}
-            onNewChat={onNewChat}
+        <div className="aic-main">
+          <AIChatHeader
+            title={heading}
+            contextType={contextType}
+            sectionKey={sectionKey}
+            isHistorical={isHistorical}
+            fetchedAt={fetchedAt}
           />
-        )}
-        <AIChatMessageList
-          messages={messages}
-          offersById={offersById}
-          onRetry={onRetry}
-          busy={busy}
-        />
-        {error && (
-          <p className="aic-drawer__error" role="alert">
-            {error}
-          </p>
-        )}
-        <AIChatSuggestedQuestions
-          questions={suggestions}
-          disabled={busy}
-          onPick={(question) => void onSend(question, [])}
-        />
-        <AIChatComposer busy={busy} onSend={onSend} />
+          {historyOpen ? (
+            <ChatThreadHistory
+              threads={threads}
+              activeThreadId={activeThreadId}
+              onSelect={onOpenThread}
+              onNewChat={onNewChat}
+            />
+          ) : (
+            <div className="aic-conversation-scroll">
+              <AIChatMessageList
+                messages={messages}
+                offersById={offersById}
+                onRetry={onRetry}
+                busy={busy}
+                onViewOffer={onViewOffer}
+              />
+              {error && <p className="aic-drawer__error" role="alert">{error}</p>}
+              <AIChatSuggestedQuestions
+                questions={suggestions}
+                disabled={busy}
+                onPick={(question) => void onSend(question, [])}
+              />
+            </div>
+          )}
+          <AIChatComposer busy={busy} onSend={onSend} fileInputRef={fileInputRef} />
+        </div>
       </div>
     </>
   );

@@ -13,3 +13,7 @@ __pycache__/
 *.log
 backend/src/torob_bimeh/domain/third_catalog.json
 backend/logs/
+
+*.cmd
+
+.omo

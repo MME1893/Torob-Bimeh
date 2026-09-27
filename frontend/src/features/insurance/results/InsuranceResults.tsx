@@ -32,6 +32,7 @@ import sabimLogo from "../../../assets/insurance/sabim.png";
 import bimehBazarLogo from "../../../assets/insurance/bimehbazar.png";
 import bimehLogo from "../../../assets/insurance/bimeh.com.png";
 import "./insurance-results.css";
+import "../../ai-analysis/ai-analysis.css";
 
 const number = new Intl.NumberFormat("fa-IR");
 const providerMeta: Record<string, { name: string; logo: string }> = {
@@ -339,8 +340,10 @@ export function InsuranceResults({ result, insuranceKind, inquiryId }: Props) {
           setHistoryOpen(false);
         }}
         onToggleHistory={() => setHistoryOpen((value) => !value)}
+        onShowMessages={() => setHistoryOpen(false)}
         onSend={(text, attachments) => void chat.sendMessage(text, attachments)}
         onRetry={(id) => void chat.retryMessage(id)}
+        onViewOffer={selectReferencedOffer}
       />
     </section>
   );
