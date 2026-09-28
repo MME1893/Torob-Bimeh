@@ -1,29 +1,246 @@
-# ترب بیمه — آزمایشگاه اتصال API
+# Torob Bimeh
 
-نقشهٔ راه رابط واحد، قرارداد داده، وضعیت واقعی چهار منبع و برنامهٔ AI در [docs/mvp-roadmap.md](docs/mvp-roadmap.md) و جهت بصری در [docs/ui-concepts.md](docs/ui-concepts.md) آمده است. مدل‌های ورودی و خروجی در `backend/src/torob_bimeh/domain/quotes.py` و نخستین برش جست‌وجوی واحد در `backend/src/torob_bimeh/routers/search.py` هستند. JSON کامل پاسخ هر منبع در `ProviderResult.raw_response` حفظ می‌شود.
+AI-powered insurance comparison marketplace.
 
-**برش قابل اجرا:** فرم یکپارچهٔ ثالث خودرو با کمبوباکس دارای جست‌وجوی داخلی، اجتماع ۸۹۰۲ شناسهٔ مدل/برند چهار HTML، سه وضعیت بیمه، تاریخ شمسی، مالکیت/تعویض پلاک، انتقال تخفیف، خسارت و پوشش. چهار تب نگاشت، انتخاب معادل هر سایت و URL/query/body واقعی را نشان می‌دهند؛ `POST /api/search/preview` و استعلام از همان سازندهٔ درخواست استفاده می‌کنند. پارسر هر چهار منبع با پاسخ واقعی آزموده شده است. سابیم برای حالت بدون بیمه/نو به اطلاعات مبنای صریح نیاز دارد؛ تاریخ یا شرکت فرضی تولید نمی‌شود. بدنه و موتور غیرفعال‌اند؛ واحد حق بیمه نامشخص است و رتبه‌بندی قیمت انجام نمی‌شود. [ممیزی نگاشت و گزارش آزمون/اجرای زنده](docs/third-car-mapping-audit.md).
+Torob Bimeh is a modern fintech product experience for comparing insurance offers from multiple providers. It collects provider quotes, normalizes inconsistent upstream responses into a unified offer model, and adds AI-assisted explanations so users can understand price, coverage, discounts, installments, and trade-offs before choosing a policy.
 
-آزمایشگاه‌های ازکی، سابیم، بیمه‌بازار و بیمه‌دات‌کام در `frontend/labs` نگهداری می‌شوند. رابط اصلی React/TypeScript در `frontend/src` است. Backend برای هر سایت یک آداپتور مستقل دارد و پاسخ تازهٔ همان درخواست را برمی‌گرداند. بدنهٔ موتور سابیم همچنان پیش‌نمایش دارد ولی درخواست زنده ندارد.
+![Product](https://img.shields.io/badge/product-insurance%20marketplace-0F766E)
+![AI](https://img.shields.io/badge/AI-quote%20analysis%20%7C%20chat-111827)
+![Backend](https://img.shields.io/badge/backend-FastAPI-009688)
+![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-2563EB)
+![Testing](https://img.shields.io/badge/tests-pytest%20%7C%20vitest-6B7280)
 
-```text
-frontend/labs/                         آزمایشگاه‌های HTML چهار سایت
-frontend/src/                          صفحهٔ اصلی، پرسش‌ها و نتایج
-frontend/labs/bimebazar-live.js        اتصال سه تب بیمه‌بازار و نمایش پیشنهادها
-frontend/labs/bimeh-live.js            اتصال سه تب بیمه‌دات‌کام و نمایش نتایج تازه
-backend/src/torob_bimeh/adapters/azki/             قرارداد و کلاینت ازکی
-backend/src/torob_bimeh/adapters/sabim/            قرارداد و کلاینت سابیم
-backend/src/torob_bimeh/adapters/bimebazar/        قرارداد و کلاینت بیمه‌بازار
-backend/src/torob_bimeh/adapters/bimeh/            قرارداد و کلاینت بیمه‌دات‌کام
-backend/src/torob_bimeh/routers/                   روتر مستقل هر سایت
-backend/src/torob_bimeh/domain/crosswalk.py        شناسه‌های بررسی‌شدهٔ نخستین مدل مشترک
-backend/src/torob_bimeh/domain/normalizers.py      استخراج پیشنهاد همراه پاسخ خام
-backend/tests/                         آزمون قرارداد و پاسخ آزمایشی سرور
+---
+
+## Preview
+
+> Screenshots and demo media can be added here as the product UI stabilizes.
+
+| Insurance Intake | Search Results |
+| --- | --- |
+| `docs/screenshots/insurance-form.png` | `docs/screenshots/search-results.png` |
+
+| Comparison Modal | AI Assistant |
+| --- | --- |
+| `docs/screenshots/comparison-modal.png` | `docs/screenshots/ai-assistant.png` |
+
+---
+
+## Product Overview
+
+Traditional insurance purchasing forces users to compare offers manually across separate provider websites. Each provider has different form fields, identifiers, response shapes, pricing units, discounts, and payment options.
+
+Torob Bimeh creates one comparison experience:
+
+- users enter insurance details once;
+- the backend maps that typed request to each provider's contract;
+- provider responses are normalized into one internal quote schema;
+- users compare price, coverage, installments, discounts, benefits, and insurer metadata in a single results view;
+- AI explains meaningful differences without replacing the deterministic data layer.
+
+The product is designed as a marketplace foundation: provider integrations are isolated, offer normalization is explicit, and the UI can grow from search and comparison into saved comparisons, account flows, and purchase journeys.
+
+---
+
+## Key Features
+
+### Multi-provider Insurance Aggregation
+
+- Independent adapters for Azki, Sabim, BimehBazar, and Bimeh.com.
+- A single `POST /api/search` contract fans out to all providers in parallel.
+- Provider failures are isolated so one unavailable source does not erase other results.
+- Each provider returns an explicit status such as `ok`, `empty`, `needs_input`, `unmapped`, `unavailable`, `invalid_response`, or `unsupported`.
+
+### Smart Comparison Engine
+
+Torob Bimeh turns provider-specific responses into comparable `Offer` records:
+
+- verified premium amount and source currency unit;
+- price before discount, discount amount, and discount percentage when available;
+- duration and financial coverage;
+- installment plans, down payments, payment methods, and credit options;
+- coverage codes, benefits, badges, insurer metrics, and penalties;
+- raw provider offer retention for auditability and UI drill-downs.
+
+### AI Insurance Assistant
+
+AI is used as decision support on top of real quote data.
+
+- Quote analysis: `POST /api/ai/quote-analysis`
+- Comparison analysis: `POST /api/ai/comparison-analysis`
+- Contextual chat: `POST /api/ai/chat`
+
+The deterministic comparison table does not depend on AI. AI summaries and chat responses are scoped to the current search result or selected offers, helping users understand trade-offs without inventing prices, coverage, or provider facts.
+
+### Multiple Insurance Products
+
+The unified search contract supports:
+
+- car third-party insurance;
+- car body insurance;
+- motorcycle third-party insurance.
+
+The legacy provider laboratory pages are still available for validating individual adapters and upstream contracts.
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+    User((User))
+    Frontend[React + TypeScript UI]
+    API[FastAPI Backend]
+    Search[Unified Search Router]
+    Catalog[Catalog + Crosswalks]
+    Normalization[Offer Normalization]
+    Compare[Comparison UI + Rules]
+    AI[AI Analysis + Chat]
+
+    subgraph Providers[Provider Adapter Layer]
+        Azki[Azki Adapter]
+        Sabim[Sabim Adapter]
+        BimeBazar[BimehBazar Adapter]
+        Bimeh[Bimeh.com Adapter]
+    end
+
+    User --> Frontend
+    Frontend -->|/api/search/catalog| Catalog
+    Frontend -->|/api/search| API
+    API --> Search
+    Search --> Catalog
+    Search --> Azki
+    Search --> Sabim
+    Search --> BimeBazar
+    Search --> Bimeh
+    Azki --> Normalization
+    Sabim --> Normalization
+    BimeBazar --> Normalization
+    Bimeh --> Normalization
+    Normalization --> Compare
+    Compare --> Frontend
+    Frontend -->|selected offers| AI
+    AI --> Frontend
 ```
 
-## اجرای محلی
+### Request Lifecycle
 
-با Python 3.11 یا جدیدتر و `uv`:
+```mermaid
+sequenceDiagram
+    participant UI as Product UI
+    participant API as FastAPI
+    participant Map as Provider Mappers
+    participant P as Insurance Providers
+    participant Norm as Normalizers
+    participant AI as AI Services
+
+    UI->>API: SearchInput
+    API->>Map: Resolve product and provider IDs
+    Map->>P: Provider-specific requests
+    P-->>Map: Raw provider responses
+    Map->>Norm: Parse and normalize offers
+    Norm-->>API: SearchResult with ProviderResult[]
+    API-->>UI: Comparable offers + provider status
+    UI->>AI: Optional quote/comparison/chat context
+    AI-->>UI: Explanation grounded in returned offers
+```
+
+---
+
+## Engineering Decisions
+
+### Adapter-based Provider Integration
+
+Every insurance provider has an independent adapter under `backend/src/torob_bimeh/adapters`. This keeps upstream quirks out of the product UI and prevents one provider's request shape, authentication model, or response format from leaking into the shared domain.
+
+### Unified Data Model
+
+Provider responses are normalized into domain models in `backend/src/torob_bimeh/domain/quotes.py`. The API returns one `SearchResult` containing one `ProviderResult` per provider, and each `Offer` keeps the comparable fields needed for sorting, filtering, comparison, and AI context.
+
+### Evidence-preserving Normalization
+
+Torob Bimeh does not silently discard provider details. `ProviderResult.raw_response` stores the upstream JSON response, and `Offer.raw_offer` stores the source row used to create the card. Request headers, tokens, and cookies are not included in raw response payloads.
+
+### AI as Decision Support
+
+AI does not replace the quote pipeline. Prices, coverage, discounts, and provider status come from provider responses and deterministic normalization. AI explains the differences between real offers and is designed to stay grounded in the current result set.
+
+### Graceful Partial Failure
+
+Search executes provider calls independently. If one provider is unavailable or returns an invalid response, the API reports that provider's status while preserving successful results from other providers.
+
+---
+
+## Technical Stack
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Framer Motion |
+| UI Components | Lucide React, React Multi Date Picker |
+| Backend | Python 3.11+, FastAPI, Pydantic, Uvicorn |
+| Provider HTTP | HTTPX |
+| AI | OpenAI SDK-compatible client, OpenRouter configuration |
+| Testing | pytest, unittest, Vitest, Node smoke tests |
+| Data Contracts | Typed Pydantic schemas and provider-specific contracts |
+| Local Tooling | uv, npm |
+
+---
+
+## Project Structure
+
+```text
+torob-bimeh
+|-- backend
+|   |-- scripts
+|   |-- src/torob_bimeh
+|   |   |-- adapters
+|   |   |   |-- azki
+|   |   |   |-- bimebazar
+|   |   |   |-- bimeh
+|   |   |   `-- sabim
+|   |   |-- ai
+|   |   |-- domain
+|   |   `-- routers
+|   `-- tests
+|-- docs
+|-- frontend
+|   |-- labs
+|   |-- public
+|   |-- src
+|   |   |-- assets
+|   |   |-- components
+|   |   |-- features
+|   |   `-- styles
+|   `-- tests
+`-- README.md
+```
+
+---
+
+## Core API Surface
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /api/health` | Backend health check |
+| `GET /api/search/catalog` | Product-facing vehicle, insurer, duration, coverage, and option catalog |
+| `POST /api/search/preview` | Provider readiness preview without leaking provider IDs to the UI |
+| `POST /api/search` | Unified multi-provider insurance search |
+| `POST /api/ai/quote-analysis` | AI explanation for a quote |
+| `POST /api/ai/comparison-analysis` | AI summary for selected comparison offers |
+| `POST /api/ai/chat` | Contextual insurance chat |
+
+Provider-specific lab endpoints also exist for adapter validation and troubleshooting.
+
+---
+
+## Running Locally
+
+### Backend
+
+Requirements:
+
+- Python 3.11 or newer
+- `uv`
 
 ```bash
 cd backend
@@ -32,7 +249,27 @@ cp .env.example .env
 uv run uvicorn torob_bimeh.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-برای ساخت و اجرای رابط جدید در پنجرهٔ دیگری:
+On Windows PowerShell:
+
+```powershell
+cd backend
+uv sync --extra test
+Copy-Item .env.example .env
+uv run uvicorn torob_bimeh.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+FastAPI docs are available at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### Frontend
+
+Requirements:
+
+- Node.js
+- npm
 
 ```bash
 cd frontend
@@ -40,90 +277,150 @@ npm install
 npm run dev
 ```
 
-آدرس توسعهٔ رابط `http://127.0.0.1:5173/` است؛ Vite درخواست‌های `/api` را به Backend محلی می‌فرستد. با `npm run build` رابط ساخته می‌شود و سپس همان Backend آن را در `http://127.0.0.1:8000/` همراه API از یک مبدأ سرو می‌کند. نسخهٔ کوچک‌شدهٔ لوگوی بارگذاری‌شده، با طرح و نوشتار اصلی، در `frontend/public/logo.png` قرار دارد.
+The Vite development server runs at:
 
-در Windows PowerShell به‌جای `cp` می‌توان `Copy-Item .env.example .env` را اجرا کرد. اگر درخواست بدون احراز هویت جواب نداد، **مقدار کامل هدر `Authorization`** را در `backend/.env` زیر `AZKI_AUTHORIZATION` قرار دهید. این فایل در `.gitignore` است و به مرورگر فرستاده نمی‌شود. `Deviceid` با `AZKI_DEVICE_ID` قابل تغییر است. مقدار `Baggage` فقط در صورت نیاز با `AZKI_BAGGAGE` تنظیم می‌شود. برای بیمه‌دات‌کام، **مقدار واقعی هدر `token` از نشست فعلی مرورگر** را در `BIMEH_TOKEN` قرار دهید؛ UUID تصادفی تولید نمی‌شود و نبود توکن خطای `503` می‌دهد. توکن و Cookie نمونه داخل مخزن نیست.
-
-سپس این نشانی‌ها را باز کنید:
-
-- [آزمایشگاه ازکی](http://127.0.0.1:8000/labs/azki.html) — فرم ثالث خودرو/موتور و بدنهٔ خودرو و فراخوانی API از طریق Backend.
-- [مستندات API](http://127.0.0.1:8000/docs)
-- [آزمایشگاه سابیم](http://127.0.0.1:8000/labs/sabim.html) — ثالث خودرو، ثالث موتور و بدنهٔ خودرو به Backend وصل‌اند؛ بدنهٔ موتور فقط پیش‌نمایش Query دارد.
-- [آزمایشگاه بیمه‌بازار](http://127.0.0.1:8000/labs/bimebazar.html) — ثالث خودرو، ثالث موتور و بدنهٔ خودرو به API محلی وصل‌اند؛ کارت‌ها از پاسخ زنده ساخته می‌شوند.
-- [بیمه‌دات‌کام](http://127.0.0.1:8000/labs/bimeh.html) — هر سه فرم به بک‌اند وصل است؛ پس از ساخت پیش‌نمایش، «گرفتن قیمت زنده» را بزنید. چند کارت نخست کنار دکمه، تمام کارت‌ها در بخش پایین و JSON کامل پاسخ برای نمایش و دانلود در دسترس است. نمونه‌های HAR جدا از پاسخ تازه نمایش داده می‌شوند.
-
-صفحهٔ ازکی را از نشانی `127.0.0.1:8000/labs/azki.html` باز کنید، نه با دوبار کلیک روی فایل HTML. صفحه و API محلی در این حالت هم‌مبدأ هستند.
-
-## قرارداد API فعلی
-
-`POST /api/search` یک `SearchInput` دریافت می‌کند و همیشه وضعیت چهار منبع را جداگانه برمی‌گرداند. درخواست هر منبع تنها وقتی شناسه‌های آن مدل و شاخهٔ بیمه‌نامه در همان منبع موجود باشند فرستاده می‌شود. هر `Offer` ردیف خام خودش و هر `ProviderResult` تمام JSON پاسخ همان منبع را نگه می‌دارد. این endpoint فعلاً فقط برای شخص ثالث خودرو فعال است.
-
-`POST /api/azki/prices/third` برای ثالث خودرو و ثالث موتور، ازکی را با GET صدا می‌زند. `POST /api/azki/prices/body` بدنهٔ JSON را بی‌تغییر نوع عددی و boolean، با POST به `/api/aggregator/v1/body/prices/compare` می‌فرستد. هر دو endpoint پاسخ JSON خام ازکی را به آزمایشگاه می‌دهند و خطای سرویس را با کد `502` اعلام می‌کنند.
-
-`POST /api/azki/prices/third` دقیقاً یکی از `url` یا `params` را می‌پذیرد. `product` برابر `third_car` یا `third_motor` است. URL ورودی فقط وقتی پذیرفته می‌شود که HTTPS، میزبان `www.azki.com` و مسیر `/api/aggregator/v1/third/prices/compare` باشد. با `params` هم Backend همین میزبان و مسیر ثابت را صدا می‌زند.
-
-```json
-{
-  "product": "third_car",
-  "params": {
-    "vehicleTypeID": "1",
-    "vehicleModelID": "161821",
-    "vehicleBrandID": "16",
-    "vehicleConstructionYear": "1404",
-    "vehicleUsageID": "1",
-    "withoutInsure": "true",
-    "zeroKilometer": "false",
-    "durationID": "12",
-    "coverID": "47",
-    "orig_cover_amount": "70000000"
-  }
-}
+```text
+http://127.0.0.1:5173/
 ```
 
-این مثال فقط **شکل درخواست** را نشان می‌دهد و باید با مقادیر فرم همان جست‌وجو کامل شود. Backend پاسخ قیمت ساختگی یا HAR را به‌عنوان قیمت روز برنمی‌گرداند. در صورت خطای ارتباط، احراز هویت یا تغییر ساختار پاسخ، `502` به فرانت برمی‌گردد.
+Vite proxies `/api` requests to the local FastAPI backend. For a single-origin production-style preview, build the frontend and serve it from FastAPI:
 
-درخواست بدنه به شکل `{"body": { ... }}` است؛ شیء `body` همان ۲۷ کلید یا کلیدهای شاخهٔ فعال فرم آزکی را دارد. تاریخ‌های `clearanceDate` و `oldInsureExpireDate` در POST به فرمت میلادی `YYYY-MM-DD` هستند. مقدار `vehiclePrice` در بدنه، مبلغ خامی است که آزکی برای ارزش خودرو انتظار دارد. برای دیدن نمونهٔ واقعی همان فرم، بخش «خروجی» آزمایشگاه بدنه را باز کنید. پیشنهادهای بدنه در پاسخ ازکی قیمت را روی خود رکورد شرکت دارند؛ پیشنهادهای ثالث `company.prices[]` دارند.
+```bash
+cd frontend
+npm run build
+cd ../backend
+uv run uvicorn torob_bimeh.main:app --host 127.0.0.1 --port 8000
+```
 
-### سابیم
+---
 
-`POST /api/sabim/prices` مقدارهای `product` و `query` را می‌پذیرد. محصول فقط `third_car`، `third_motor` یا `body_car` است. Backend کلیدهای Query را مطابق خروجی مرحلهٔ پنجم HTML بررسی می‌کند، سپس به یکی از دو URL ثابت `https://api.sabim.com/api/price_thirdparty` یا `https://api.sabim.com/api/price_bodycar` درخواست POST می‌زند. پارامترها در Query String هستند، پوشش‌های بدنه با کلید تکراری `bodycar_coverage_id[]` فرستاده می‌شوند، و بدنهٔ POST دقیقاً `{}` است. هدر Authorization تنظیم نمی‌شود. پاسخ JSON خام به آزمایشگاه برمی‌گردد. در فرم مشترک ثالث خودرو، پارسر `result/data/desc` با پاسخ‌های HAR آزموده شده و کارت قیمت سابیم فعال است.
+## Environment Configuration
 
-در دادهٔ ضبط‌شدهٔ داخل HTML، هر ۲۸ نمونهٔ POST بدنهٔ خودرو از سابیم HTTP `500` داشته‌اند. پس تکمیل فرم و ارسال درخواست ثابت می‌کند قرارداد و اتصال محلی درست ساخته شده‌اند، ولی موفقیت زندهٔ سرویس بدنه را تضمین نمی‌کند. خطای بالادستی به جای قیمت ساختگی با کد `502` و توضیح کد بالادستی نمایش داده می‌شود. بدنهٔ موتور به API وصل نیست زیرا کاتالوگ، شناسهٔ کاربری بدنهٔ موتور ندارد.
+Copy `backend/.env.example` to `backend/.env` and fill only the values needed for your local provider and AI tests.
 
-### بیمه‌بازار
-
-`POST /api/bimebazar/offers` مقدار `product` (`third_car`، `third_motor` یا `body_car`) و دقیقاً یکی از `url` یا `params` را می‌گیرد. URL ورودی فقط برای HTTPS روی `bimebazar.com` و مسیر پیشنهادهای **همان محصول** پذیرفته می‌شود. Backend از روی Query همان فرم به مسیر ثابت مربوطه GET می‌زند:
-
-| محصول | مسیر درخواست پیشنهادها |
+| Variable | Purpose |
 | --- | --- |
-| ثالث خودرو | `/thirdparty/api/offers/` |
-| ثالث موتور | `/thirdpartymotor/api/offers/` |
-| بدنهٔ خودرو | `/carbody/api/offers/` |
+| `AZKI_AUTHORIZATION` | Complete Azki authorization header value when upstream auth is required |
+| `AZKI_DEVICE_ID` | Azki device identifier used by the backend adapter |
+| `AZKI_BAGGAGE` | Optional telemetry header if a request requires it |
+| `BIMEH_TOKEN` | Current Bimeh.com token from a valid browser session |
+| `AI_API_KEY` | Server-side AI API key |
+| `OPENROUTER_MODEL` | Model used for AI analysis and chat |
+| `OPENROUTER_BASE_URL` | OpenAI-compatible provider base URL |
+| `OPENROUTER_TIMEOUT_SECONDS` | AI request timeout |
+| `OPENROUTER_MAX_TOKENS` | AI response token limit |
+| `OPENROUTER_TEMPERATURE` | AI sampling temperature |
 
-URLهای `/compare/.../` فقط برای لینک کارت‌ها هستند و به API محلی قیمت داده نمی‌شوند. Backend پاسخ `status=ok` با `data.offers[]` را برمی‌گرداند. آزمایشگاه بیمه‌بازار `company_name` و `tariff` خام هر پیشنهاد را در کارت نمایش می‌دهد؛ نمونه‌های سه محصول به ترتیب ۱۶، ۶ و ۱۱ ردیف معتبر داشتند. پاسخ ساختگی به‌عنوان قیمت زنده نمایش داده نمی‌شود و در صورت خطای بالادستی، صفحه خطا را نشان می‌دهد.
+Never expose AI keys, provider tokens, cookies, or authorization headers to the browser. The frontend uses backend routes only.
 
-### بیمه‌دات‌کام
+---
 
-`POST /api/bimeh/prices` با `product` برابر `third_car`، `body_car` یا `third_motor` و `body` برابر JSON ساخته‌شده در آزمایشگاه، به یکی از سه مسیر ثابت زیر روی `https://coreapi.bimeh.com` درخواست POST می‌زند:
+## Screenshots / Demo
 
-| محصول | مسیر موفق در HAR |
-| --- | --- |
-| ثالث خودرو | `/v1/insurance/third-party/inquiry` |
-| بدنهٔ خودرو | `/v1/insurance/car-body/inquiry` |
-| ثالث موتور | `/v1/insurance/motor/inquiry` |
+### Insurance Form
 
-نمونهٔ درخواست: `{"product":"third_motor","body":{"MotorTypeId":11,"ProductionYearId":2024,"PreviousInsuranceStatusId":1,"DurationId":2,"isRenewal":false,"InquiryUrl":"https://bimeh.com/thirdpartyMotor/planlist?MotorTypeId=11"}}`. `InquiryUrl` لینک صفحهٔ مقایسه است و Backend آن را تنها برای همان محصول روی `bimeh.com` می‌پذیرد؛ درخواست قیمت به `coreapi.bimeh.com` فرستاده می‌شود. هدرهای `referer-data` و `token` از تنظیمات سمت سرور اضافه می‌شوند؛ هیچ‌یک از ۵۷ درخواست موفق HAR هدر Cookie نداشته است. خطای بالادستی کد HTTP و پیام کوتاه JSON را نشان می‌دهد، بدون چاپ توکن یا کل payload. پاسخ JSON باید آرایه‌های `Inquiries` و `Companies` داشته باشد؛ آزمایشگاه کارت‌ها را از پاسخ تازه می‌سازد و نمونه‌های ضبط‌شده را جداگانه نشان می‌دهد. مسیر `Car-Price-Inquiry` در HARهای بدنه ۴۰۴ داشته و در مسیر اصلی قیمت‌گیری استفاده نمی‌شود. شناسهٔ موتور سه‌چرخ ۱۱ و برقی ۱۲ است؛ ۱۳ در HAR درخواست موفق دارد، اما نام آن تأیید نشده است. فهرست مدل ۲۰۲ ترکیب بدنه از کاتالوگ مدل‌های مشترک ثالث استفاده می‌کند.
+```text
+Add screenshot: docs/screenshots/insurance-form.png
+```
 
-## آزمون
+### Search Results
+
+```text
+Add screenshot: docs/screenshots/search-results.png
+```
+
+### Comparison Modal
+
+```text
+Add screenshot: docs/screenshots/comparison-modal.png
+```
+
+### AI Assistant
+
+```text
+Add screenshot: docs/screenshots/ai-assistant.png
+```
+
+---
+
+## Testing
+
+Backend:
 
 ```bash
 cd backend
 python -m unittest discover -s tests -p 'test_contract.py' -v
 uv run pytest -q
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm run build
+npm run test
+```
+
+Provider lab smoke tests:
+
+```bash
+cd backend
 node ../frontend/tests/azki_lab_smoke.cjs
 node ../frontend/tests/sabim_lab_smoke.cjs
 node ../frontend/tests/bimebazar_lab_smoke.cjs
 node ../frontend/tests/bimeh_lab_smoke.cjs
 ```
 
-آزمون HTTP با پاسخ ساختگی فقط قرارداد Backend را می‌سنجد. دریافت قیمت واقعی به دسترسی شبکه و اعتبارنامهٔ معتبر در محیط اجرا وابسته است. فرم مشترک ثالث خودرو اکنون شاخه‌های سابقه/مالکیت و پارسر چهار منبع را دارد؛ گزارش استعلام زنده و موارد باقی‌مانده در سند ممیزی است. بدنه و موتور مربوط به مرحلهٔ بعد هستند.
+Live provider pricing depends on network access, current provider behavior, and valid local credentials. Tests that use recorded or synthetic responses validate contracts and parsing behavior, not guaranteed live market availability.
+
+---
+
+## Provider Labs
+
+The repository keeps provider laboratory pages under `frontend/labs` for integration work:
+
+| Lab | URL when backend runs locally |
+| --- | --- |
+| Azki | `http://127.0.0.1:8000/labs/azki.html` |
+| Sabim | `http://127.0.0.1:8000/labs/sabim.html` |
+| BimehBazar | `http://127.0.0.1:8000/labs/bimebazar.html` |
+| Bimeh.com | `http://127.0.0.1:8000/labs/bimeh.html` |
+
+Open lab pages through `127.0.0.1:8000`, not by double-clicking the HTML files, so the pages and API share the same origin.
+
+---
+
+## Current Implementation Notes
+
+- The unified search API returns the status of all four providers for each search.
+- Car third-party, car body, and motorcycle third-party products are represented in the typed `SearchInput` union.
+- The frontend contains product flows, results UI, comparison components, AI analysis UI, chat UI, and local inquiry history.
+- Some provider calls require valid current credentials or tokens in `backend/.env`.
+- Historical HAR/sample data is used for contract validation only and should not be presented as live pricing.
+
+---
+
+## Roadmap
+
+- Add more insurance providers through the adapter layer.
+- Expand provider mapping coverage for edge-case vehicle models and policy histories.
+- Improve personalized recommendation explanations based on user priorities.
+- Add user accounts and saved comparisons.
+- Add shareable comparison links and persistent quote history.
+- Extend AI assistant workflows for onboarding, follow-up questions, and offer explanations.
+- Add observability for provider latency, availability, and response shape changes.
+- Introduce a production-ready purchase handoff or checkout flow.
+
+---
+
+## Documentation
+
+- `docs/mvp-roadmap.md` - product and architecture roadmap notes.
+- `docs/ui-concepts.md` - UI direction and product experience notes.
+- `docs/third-car-mapping-audit.md` - mapping audit and provider evidence for car third-party insurance.
+
+---
+
+## License
+
+No license file is currently included in this repository. Add one before publishing or distributing the project publicly.

@@ -17,3 +17,9 @@ backend/logs/
 *.cmd
 
 .omo
+
+.agents/
+
+backe
+
+backend/src/logs/
