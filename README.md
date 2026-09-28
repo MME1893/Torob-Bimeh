@@ -12,20 +12,6 @@ Torob Bimeh is a modern fintech product experience for comparing insurance offer
 
 ---
 
-## Preview
-
-> Screenshots and demo media can be added here as the product UI stabilizes.
-
-| Insurance Intake | Search Results |
-| --- | --- |
-| `docs/screenshots/insurance-form.png` | `docs/screenshots/search-results.png` |
-
-| Comparison Modal | AI Assistant |
-| --- | --- |
-| `docs/screenshots/comparison-modal.png` | `docs/screenshots/ai-assistant.png` |
-
----
-
 ## Product Overview
 
 Traditional insurance purchasing forces users to compare offers manually across separate provider websites. Each provider has different form fields, identifiers, response shapes, pricing units, discounts, and payment options.
