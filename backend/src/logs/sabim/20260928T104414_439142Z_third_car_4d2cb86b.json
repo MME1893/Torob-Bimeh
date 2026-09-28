@@ -1,0 +1,29 @@
+{
+  "result": "ok",
+  "data": [
+    {
+      "company_id": "2",
+      "desc": "0",
+      "price": 74626574,
+      "numberOfDays": 365,
+      "pricefine": 30998499.999999996,
+      "tip": " ",
+      "priceEndExtraFinancial": 5037256.25,
+      "priceForcedThird": 30998500,
+      "pricePassenger": 3990000,
+      "discExtraFinancial": 0,
+      "request_description": "بیمه نامه در رشته بیمه شخص  ثالث برای اتوموبیل سواری پژو پارس با سال ساخت شمسی  و سال ساخت میلادی  تاریخ شروع بیمه نامه سال قبل 2022-09-28و تاریخ پایان بیمه نامه سال قبل  2023-09-26 و شرکت قبلی بیمه آرمانو  عدم خسارت ثالث صفر درصدو  عدم خسارت رانندهصفر درصد تعداد خسارت جانی فاقد خسارت جانی تعداد خسارت جانی فاقد خسارت مالی تعداد خسارت جانی فاقد خسارت حوادث راننده مورد استفاده شخصی و پوشش انتخابی 70 میلیون تومان ",
+      "company_name": "بیمه ایران",
+      "company_levelof_prosperity": "4",
+      "company_num_branchesdamages": "4",
+      "company_customer_satisfaction": "5",
+      "company_timeanswer_complaints": "6",
+      "company_description": "fdsf",
+      "company_logo_url": "https://api.sabim.com/filefolder/sitecontent/c2.png",
+      "fieldcompany_desc": "",
+      "fieldcompany_link": "//",
+      "jsonpricing_id": 1246946
+    }
+  ],
+  "desc": "قیمت بیمه ثالث با موفقیت ارسال شدINSERT INTO jsonpricing_tb( jsonpricing_text, jsonpricing_date,\tjsonpricing_fieldinsurance) VALUES\r\n                                      ( '{\"company_id\":\"12\",\"desc\":\"0\",\"price\":0,\"numberOfDays\":365,\"pricefine\":30998499.999999996,\"tip\":\" \",\"priceEndExtraFinancial\":5037256.25,\"priceForcedThird\":30998500,\"pricePassenger\":3990000,\"discExtraFinancial\":0,\"request_description\":\"بیمه نامه در رشته بیمه شخص  ثالث برای اتوموبیل سواری پژو پارس با سال ساخت شمسی  و سال ساخت میلادی  تاریخ شروع بیمه نامه سال قبل 2022-09-28و تاریخ پایان بیمه نامه سال قبل  2023-09-26 و شرکت قبلی بیمه آرمانو  عدم خسارت ثالث صفر درصدو  عدم خسارت رانندهصفر درصد تعداد خسارت جانی فاقد خسارت جانی تعداد خسارت جانی فاقد خسارت مالی تعداد خسارت جانی فاقد خسارت حوادث راننده مورد استفاده شخصی و پوشش انتخابی 70 میلیون تومان \",\"company_name\":\"بیمه نوین\",\"company_levelof_prosperity\":\"7\",\"company_num_branchesdamages\":\"6\",\"company_customer_satisfaction\":\"6\",\"company_timeanswer_complaints\":\"7\",\"company_description\":\"8\",\"company_logo_url\":\"https:\\/\\/api.sabim.com\\/filefolder\\/sitecontent\\/c12.png\",\"fieldcompany_desc\":\"\",\"fieldcompany_link\":\"\"}'      ,   now()         , 'thirdpartyins') "
+}

@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { ComboBox } from "../../../components/common/ComboBox";
+import {
+  isValidPersianDate,
+  normalizePersianDate,
+  PersianDatePicker,
+} from "../../../components/forms/PersianDatePicker";
 import type { SearchResult } from "../../search/searchTypes";
 
 type PolicyStatus = "no_previous_policy" | "had_previous_policy" | "new_vehicle";
@@ -44,13 +49,8 @@ const faDigits = (value: string) =>
   value
     .replace(/[۰-۹]/g, (char) => String(char.charCodeAt(0) - 1776))
     .replace(/[٠-٩]/g, (char) => String(char.charCodeAt(0) - 1632));
-const dateText = (value: string) => faDigits(value).trim().replace(/-/g, "/");
-const validDate = (value: string) => {
-  const normalized = dateText(value);
-  if (!/^(13|14)\d\d\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/.test(normalized)) return false;
-  const [, month, day] = normalized.split("/").map(Number);
-  return day <= (month <= 6 ? 31 : 30);
-};
+const dateText = normalizePersianDate;
+const validDate = isValidPersianDate;
 const number = (value: number) => value.toLocaleString("fa-IR");
 
 export function ThirdMotorWizard({
@@ -260,16 +260,14 @@ export function ThirdMotorWizard({
     }
   }
 
-  const dateField = (label: string, value: string, setter: (value: string) => void) => (
+  const dateField = (label: string, name: string, value: string, setter: (value: string) => void) => (
     <label>
       {label}
-      <input
+      <PersianDatePicker
+        name={name}
         value={value}
-        onChange={(event) => setter(event.target.value)}
-        placeholder="۱۴۰۴/۰۱/۰۱"
-        inputMode="numeric"
-        dir="ltr"
-        aria-invalid={!!value && !validDate(value)}
+        onChange={setter}
+        error={Boolean(value && !validDate(value))}
       />
       {value && !validDate(value) && <small className="field-error">تاریخ را به‌شکل ۱۴۰۴/۰۱/۰۱ وارد کن.</small>}
     </label>
@@ -306,11 +304,11 @@ export function ThirdMotorWizard({
             <span className="avatar">۲</span><h2>سابقهٔ بیمه‌نامه و مالکیت</h2>
             <div className="answer">
               <label>وضعیت بیمه‌نامهٔ قبلی<select value={status} onChange={(event) => setStatus(event.target.value as PolicyStatus)}>{Object.entries(policyLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
-              {status === "new_vehicle" && <>{dateField("تاریخ ترخیص / اولین استفاده", release, setRelease)}{dateField("تاریخ پایان بیمه‌نامهٔ اولیه", newExpiry, setNewExpiry)}</>}
+              {status === "new_vehicle" && <>{dateField("تاریخ ترخیص / اولین استفاده", "first_use_date_jalali", release, setRelease)}{dateField("تاریخ پایان بیمه‌نامهٔ اولیه", "new_vehicle_expiry_jalali", newExpiry, setNewExpiry)}</>}
               {status === "had_previous_policy" && <>
                 <ComboBox label="شرکت بیمهٔ قبلی" choices={catalog?.insurers || []} value={insurer} onChange={setInsurer} />
-                {dateField("شروع بیمه‌نامهٔ قبلی", start, setStart)}
-                {dateField("پایان بیمه‌نامهٔ قبلی", expiry, setExpiry)}
+                {dateField("شروع بیمه‌نامهٔ قبلی", "previous_start_date_jalali", start, setStart)}
+                {dateField("پایان بیمه‌نامهٔ قبلی", "previous_expiry_date_jalali", expiry, setExpiry)}
                 {months(previousDuration, setPreviousDuration, "مدت بیمه‌نامهٔ قبلی")}
                 <label>وضعیت پلاک و انتقال تخفیف<select value={ownershipMode} onChange={(event) => setOwnershipMode(event.target.value as OwnershipMode)}>{Object.entries(ownershipLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
                 <label>مالکیت تخفیف<select value={policyOwner} onChange={(event) => setPolicyOwner(event.target.value as "current" | "transfer")}><option value="current">مالک فعلی</option><option value="transfer">انتقال تخفیف</option></select></label>
@@ -335,8 +333,8 @@ export function ThirdMotorWizard({
               <label>تعهد مالی<select value={coverage} onChange={(event) => setCoverage(Number(event.target.value))}>{catalog?.coverages_toman.map((item) => <option key={item} value={item}>{number(item)} تومان</option>)}</select></label>
               {status !== "had_previous_policy" && <>
                 <ComboBox label="شرکت بیمهٔ مبنا برای سابیم" choices={catalog?.insurers || []} value={baseCompany} onChange={setBaseCompany} />
-                {dateField("شروع بازهٔ مبنا", baseStart, setBaseStart)}
-                {dateField("پایان بازهٔ مبنا", baseExpiry, setBaseExpiry)}
+                {dateField("شروع بازهٔ مبنا", "sabim_start_date_jalali", baseStart, setBaseStart)}
+                {dateField("پایان بازهٔ مبنا", "sabim_expiry_date_jalali", baseExpiry, setBaseExpiry)}
               </>}
               <details className="optional-section full"><summary>گزینه‌های اختصاصی منابع</summary><div className="answer">
                 {status === "new_vehicle" && <><label className="check-field"><input type="checkbox" checked={zeroThirdDiscount} onChange={(event) => setZeroThirdDiscount(event.target.checked)} />تخفیف صفرکیلومتر ثالث سابیم</label><label className="check-field"><input type="checkbox" checked={zeroDriverDiscount} onChange={(event) => setZeroDriverDiscount(event.target.checked)} />تخفیف صفرکیلومتر رانندهٔ سابیم</label></>}

@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { ComboBox } from "../../../components/common/ComboBox";
+import {
+  isValidPersianDate,
+  normalizePersianDate,
+  PersianDatePicker,
+} from "../../../components/forms/PersianDatePicker";
 import type { SearchResult } from "../../search/searchTypes";
 
 type Provider = "azki" | "sabim" | "bimebazar" | "bimeh";
@@ -96,14 +101,8 @@ const faDigits = (value: string) =>
   value
     .replace(/[۰-۹]/g, (c) => String(c.charCodeAt(0) - 1776))
     .replace(/[٠-٩]/g, (c) => String(c.charCodeAt(0) - 1632));
-const dateText = (value: string) => faDigits(value).trim().replace(/-/g, "/");
-const validDate = (value: string) => {
-  const x = dateText(value);
-  if (!/^(13|14)\d\d\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/.test(x))
-    return false;
-  const [, m, d] = x.split("/").map(Number);
-  return d <= (m <= 6 ? 31 : 30);
-};
+const dateText = normalizePersianDate;
+const validDate = isValidPersianDate;
 const number = (value: number) => value.toLocaleString("fa-IR");
 const yearLabel = (value: number) => String(value);
 const unique = <T extends { key: string }>(items: T[]) => [
@@ -457,18 +456,17 @@ export function BodyCarWizard({
     allReady = previews.length === 4 && readyCount === 4;
   const dateField = (
     label: string,
+    name: string,
     value: string,
     setter: (value: string) => void,
   ) => (
     <label>
       {label}
-      <input
+      <PersianDatePicker
+        name={name}
         value={value}
-        onChange={(event) => setter(event.target.value)}
-        placeholder="۱۴۰۵/۰۷/۰۱"
-        inputMode="numeric"
-        dir="ltr"
-        aria-invalid={!!value && !validDate(value)}
+        onChange={setter}
+        error={Boolean(value && !validDate(value))}
       />
       {value && !validDate(value) && (
         <small className="field-error">
@@ -616,7 +614,7 @@ export function BodyCarWizard({
                   <option value="new">صفرکیلومتر</option>
                 </select>
               </label>
-              {zero && dateField("تاریخ ترخیص", clearance, setClearance)}
+              {zero && dateField("تاریخ ترخیص", "clearance_date_jalali", clearance, setClearance)}
               <details className="provider-mapping optional-section full">
                 <summary>
                   <span>
@@ -726,7 +724,7 @@ export function BodyCarWizard({
                     value={previousInsurer}
                     onChange={setPreviousInsurer}
                   />
-                  {dateField("تاریخ انقضای بیمه بدنهٔ قبلی", expiry, setExpiry)}
+                  {dateField("تاریخ انقضای بیمه بدنهٔ قبلی", "previous_expiry_date_jalali", expiry, setExpiry)}
                   <label>
                     سال‌های بدون خسارت
                     <select

@@ -23,6 +23,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { SearchResult } from "../../search/searchTypes";
+import {
+  isValidPersianDate,
+  normalizePersianDate,
+  normalizePersianDigits,
+  PersianDatePicker,
+} from "../../../components/forms/PersianDatePicker";
 import stepOneIllustration from "../../../assets/insurance/bimeh_shakhs_1.png";
 import stepTwoIllustration from "../../../assets/insurance/bimeh_shakhs_2.png";
 import stepThreeIllustration from "../../../assets/insurance/bimeh_shakhs_3.png";
@@ -90,18 +96,9 @@ const illustrations: Record<Step, string> = {
   4: stepFourIllustration,
 };
 
-const toEnglishDigits = (value: string) =>
-  value
-    .replace(/[۰-۹]/g, (character) => String(character.charCodeAt(0) - 1776))
-    .replace(/[٠-٩]/g, (character) => String(character.charCodeAt(0) - 1632));
-const dateText = (value: string) => toEnglishDigits(value).trim().replace(/-/g, "/");
-const isValidDate = (value: string) => {
-  const normalized = dateText(value);
-  if (!/^(13|14)\d\d\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/.test(normalized))
-    return false;
-  const [, month, day] = normalized.split("/").map(Number);
-  return day <= (month <= 6 ? 31 : 30);
-};
+const dateText = normalizePersianDate;
+const isValidDate = isValidPersianDate;
+const toEnglishDigits = normalizePersianDigits;
 const formatNumber = (value: number) => value.toLocaleString("fa-IR");
 const yearLabel = (value: number) => String(value);
 const unique = <T extends { key: string }>(items: T[]) =>
@@ -350,22 +347,23 @@ function SelectField({
 
 function DateField({
   label,
+  name,
   value,
   onChange,
 }: {
   label: string;
+  name: string;
   value: string;
   onChange: (value: string) => void;
 }) {
+  const hasError = Boolean(value && !isValidDate(value));
   return (
-    <IconInput label={label} icon="calendar" className={value && !isValidDate(value) ? "is-invalid" : ""}>
-      <input
+    <IconInput label={label} icon="calendar" className={hasError ? "is-invalid" : ""}>
+      <PersianDatePicker
+        name={name}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder="۱۴۰۴/۰۱/۰۱"
-        inputMode="numeric"
-        dir="ltr"
-        aria-invalid={Boolean(value && !isValidDate(value))}
+        onChange={onChange}
+        error={hasError}
       />
     </IconInput>
   );
@@ -743,8 +741,8 @@ export function ThirdPartyInsuranceFlow({
                   </SelectField>
                   {status === "new_vehicle" && (
                     <>
-                      <DateField label="تاریخ ترخیص / اولین استفاده" value={release} onChange={setRelease} />
-                      <DateField label="تاریخ پایان بیمه‌نامه اولیه" value={newExpiry} onChange={setNewExpiry} />
+                      <DateField name="first_use_date_jalali" label="تاریخ ترخیص / اولین استفاده" value={release} onChange={setRelease} />
+                      <DateField name="new_vehicle_expiry_jalali" label="تاریخ پایان بیمه‌نامه اولیه" value={newExpiry} onChange={setNewExpiry} />
                     </>
                   )}
                   {status === "had_previous_policy" && (
@@ -753,8 +751,8 @@ export function ThirdPartyInsuranceFlow({
                         <option value="">انتخاب کنید...</option>
                         {catalog?.insurers.map((item) => <option value={item.key} key={item.key}>{item.label}</option>)}
                       </SelectField>
-                      <DateField label="شروع بیمه‌نامه قبلی" value={start} onChange={setStart} />
-                      <DateField label="پایان بیمه‌نامه قبلی" value={expiry} onChange={setExpiry} />
+                      <DateField name="previous_start_date_jalali" label="شروع بیمه‌نامه قبلی" value={start} onChange={setStart} />
+                      <DateField name="previous_expiry_date_jalali" label="پایان بیمه‌نامه قبلی" value={expiry} onChange={setExpiry} />
                       <SelectField label="مدت بیمه‌نامه قبلی" icon="calendar" value={previousDuration} onChange={(value) => setPreviousDuration(Number(value))}>
                         {catalog?.durations.map((item) => <option value={item} key={item}>{formatNumber(item)} ماه</option>)}
                       </SelectField>
@@ -821,8 +819,8 @@ export function ThirdPartyInsuranceFlow({
                         <option value="">انتخاب کن...</option>
                         {catalog?.insurers.map((item) => <option value={item.key} key={item.key}>{item.label}</option>)}
                       </SelectField>
-                      <DateField label="شروع بازه ثبت‌شده" value={baseStart} onChange={setBaseStart} />
-                      <DateField label="پایان بازه ثبت‌شده" value={baseExpiry} onChange={setBaseExpiry} />
+                      <DateField name="sabim_start_date_jalali" label="شروع بازه ثبت‌شده" value={baseStart} onChange={setBaseStart} />
+                      <DateField name="sabim_expiry_date_jalali" label="پایان بازه ثبت‌شده" value={baseExpiry} onChange={setBaseExpiry} />
                     </>
                   )}
                   {status === "had_previous_policy" && (
